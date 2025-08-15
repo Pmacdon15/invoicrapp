@@ -58,6 +58,12 @@ export default {
 				'invoice-green-light': 'hsl(var(--invoice-green-light))',
 				'invoice-purple': 'hsl(var(--invoice-purple))',
 				'invoice-purple-light': 'hsl(var(--invoice-purple-light))',
+				'invoice-orange': 'hsl(var(--invoice-orange))',
+				'invoice-orange-light': 'hsl(var(--invoice-orange-light))',
+				'invoice-teal': 'hsl(var(--invoice-teal))',
+				'invoice-teal-light': 'hsl(var(--invoice-teal-light))',
+				'invoice-rose': 'hsl(var(--invoice-rose))',
+				'invoice-rose-light': 'hsl(var(--invoice-rose-light))',
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',

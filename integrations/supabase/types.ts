@@ -41,6 +41,93 @@ export type Database = {
         }
         Relationships: []
       }
+      user_settings: {
+        Row: {
+          id: string
+          user_id: string
+          company_name: string | null
+          company_email: string | null
+          company_phone: string | null
+          company_address: string | null
+          company_website: string | null
+          company_logo: string | null
+          default_theme: string | null
+          default_currency: string | null
+          default_tax_rate: number | null
+          default_payment_terms: string | null
+          default_notes: string | null
+          email_notifications: boolean | null
+          payment_reminders: boolean | null
+          invoice_updates: boolean | null
+          marketing_emails: boolean | null
+          date_format: string | null
+          number_format: string | null
+          timezone: string | null
+          language: string | null
+          invoice_prefix: string | null
+          invoice_counter: number | null
+          invoice_number_format: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          company_name?: string | null
+          company_email?: string | null
+          company_phone?: string | null
+          company_address?: string | null
+          company_website?: string | null
+          company_logo?: string | null
+          default_theme?: string | null
+          default_currency?: string | null
+          default_tax_rate?: number | null
+          default_payment_terms?: string | null
+          default_notes?: string | null
+          email_notifications?: boolean | null
+          payment_reminders?: boolean | null
+          invoice_updates?: boolean | null
+          marketing_emails?: boolean | null
+          date_format?: string | null
+          number_format?: string | null
+          timezone?: string | null
+          language?: string | null
+          invoice_prefix?: string | null
+          invoice_counter?: number | null
+          invoice_number_format?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          company_name?: string | null
+          company_email?: string | null
+          company_phone?: string | null
+          company_address?: string | null
+          company_website?: string | null
+          company_logo?: string | null
+          default_theme?: string | null
+          default_currency?: string | null
+          default_tax_rate?: number | null
+          default_payment_terms?: string | null
+          default_notes?: string | null
+          email_notifications?: boolean | null
+          payment_reminders?: boolean | null
+          invoice_updates?: boolean | null
+          marketing_emails?: boolean | null
+          date_format?: string | null
+          number_format?: string | null
+          timezone?: string | null
+          language?: string | null
+          invoice_prefix?: string | null
+          invoice_counter?: number | null
+          invoice_number_format?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
