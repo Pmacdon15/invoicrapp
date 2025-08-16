@@ -167,7 +167,7 @@ export const DashboardHeader = ({
                 variant="ghost"
                 className="relative h-10 w-10 rounded-full hover:bg-accent/10 transition-colors"
               >
-                <Avatar className="h-10 w-10 ring-2 ring-border">
+                <Avatar className="h-10 w-10">
                   <AvatarImage src="/avatars/01.png" alt="User" />
                   <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
                     {getUserInitials(
