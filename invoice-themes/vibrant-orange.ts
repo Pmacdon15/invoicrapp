@@ -6,7 +6,7 @@ export const vibrantOrangeTheme: InvoiceTheme = {
   color: "orange",
   description: "Energetic and warm with orange accents",
   version: "1.0.0",
-  author: "Invoice Wiz Craft",
+  author: "Invoicr",
   preview: {
     primary: "#f97316",
     secondary: "#fed7aa",

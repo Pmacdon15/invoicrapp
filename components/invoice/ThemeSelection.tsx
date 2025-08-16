@@ -65,16 +65,16 @@ export const ThemeSelection = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <div className="text-center">
-        <div className="flex items-center justify-center gap-2 mb-2">
+        <div className="flex items-center justify-center gap-2 lg:mb-2">
           <Palette className="w-6 h-6 text-primary" />
-          <h2 className="text-2xl font-bold">Choose Your Invoice Theme</h2>
+          <h2 className="text-lg md:text-xl lg:text-2xl font-bold">Choose Your Invoice Theme</h2>
         </div>
         {/* <p className="text-muted-foreground">Select a professional design for your invoices</p> */}
       </div>
 
-      <Card className="grid md:grid-cols-4 gap-6 h-[55vh] overflow-y-auto p-6 bg-muted/90 rounded-lg">
+      <Card className="grid md:grid-cols-4 gap-6 max-h-[50vh] overflow-y-auto p-6 bg-muted/90 rounded-lg">
         {availableThemes.map((theme) => (
           <Card
             key={theme.id}

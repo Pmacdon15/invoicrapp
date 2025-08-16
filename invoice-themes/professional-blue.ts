@@ -6,7 +6,7 @@ export const professionalBlueTheme: InvoiceTheme = {
   color: "blue",
   description: "Clean and modern with blue accents",
   version: "1.0.0",
-  author: "Invoice Wiz Craft",
+  author: "Invoicr",
   preview: {
     primary: "#3b82f6",
     secondary: "#dbeafe",

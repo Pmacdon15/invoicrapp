@@ -88,11 +88,11 @@ export const ClientInformation = ({
   };
 
   return (
-    <div className="space-y-6 h-full">
+    <div className="space-y-4 md:space-y-6 h-full">
       <div className="text-center">
         <div className="flex items-center justify-center gap-2">
           <User className="w-6 h-6 text-primary" />
-          <h2 className="text-2xl font-bold">Client Information</h2>
+          <h2 className="text-lg md:text-xl lg:text-2xl font-bold">Client Information</h2>
         </div>
       </div>
 
@@ -118,7 +118,7 @@ export const ClientInformation = ({
         </Button>
       </div>
 
-      <Card className="p-6 bg-muted/90 h-[45vh] overflow-y-auto">
+      <Card className="p-6 bg-muted/90 max-h-[40vh] overflow-y-auto">
         {/* Existing Client Selection */}
         {!isNewClient &&
           (loading ? (

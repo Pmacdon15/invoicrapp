@@ -6,7 +6,7 @@ export const elegantGreenTheme: InvoiceTheme = {
   color: "green",
   description: "Sophisticated with green highlights",
   version: "1.0.0",
-  author: "Invoice Wiz Craft",
+  author: "Invoicr",
   preview: {
     primary: "#10b981",
     secondary: "#d1fae5",

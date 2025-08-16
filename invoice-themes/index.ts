@@ -29,7 +29,7 @@ export const themeMetadata = {
     id: 'professional-blue',
     name: 'Professional Blue',
     description: 'Clean and modern with blue accents',
-    author: 'Invoice Wiz Craft',
+    author: 'Invoicr',
     version: '1.0.0',
     preview: {
       primary: '#3b82f6',
@@ -41,7 +41,7 @@ export const themeMetadata = {
     id: 'elegant-green',
     name: 'Elegant Green',
     description: 'Sophisticated with green highlights',
-    author: 'Invoice Wiz Craft',
+    author: 'Invoicr',
     version: '1.0.0',
     preview: {
       primary: '#10b981',
@@ -53,7 +53,7 @@ export const themeMetadata = {
     id: 'creative-purple',
     name: 'Creative Purple',
     description: 'Bold and creative with purple theme',
-    author: 'Invoice Wiz Craft',
+    author: 'Invoicr',
     version: '1.0.0',
     preview: {
       primary: '#8b5cf6',
@@ -65,7 +65,7 @@ export const themeMetadata = {
     id: 'vibrant-orange',
     name: 'Vibrant Orange',
     description: 'Energetic and warm with orange accents',
-    author: 'Invoice Wiz Craft',
+    author: 'Invoicr',
     version: '1.0.0',
     preview: {
       primary: '#f97316',
@@ -77,7 +77,7 @@ export const themeMetadata = {
     id: 'modern-teal',
     name: 'Modern Teal',
     description: 'Fresh and modern with teal highlights',
-    author: 'Invoice Wiz Craft',
+    author: 'Invoicr',
     version: '1.0.0',
     preview: {
       primary: '#14b8a6',
@@ -89,7 +89,7 @@ export const themeMetadata = {
     id: 'elegant-rose',
     name: 'Elegant Rose',
     description: 'Sophisticated with rose pink accents',
-    author: 'Invoice Wiz Craft',
+    author: 'Invoicr',
     version: '1.0.0',
     preview: {
       primary: '#f43f5e',

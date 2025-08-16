@@ -4,12 +4,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Download, Printer, Send, Eye, Maximize2 } from "lucide-react";
+import { Download, Printer, Send, Eye, Maximize2, X } from "lucide-react";
 import {
   formatCurrency,
   formatDate,
@@ -245,11 +246,11 @@ export const InvoicePreview = ({
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                min-height: 100vh;
+                min-height: 100dvh;
               }
               .print-image {
                 max-width: 100%;
-                max-height: 100vh;
+                max-height: 100dvh;
                 width: auto;
                 height: auto;
                 object-fit: contain;
@@ -310,18 +311,22 @@ export const InvoicePreview = ({
   const FullInvoiceContent = () => (
     <Card
       ref={pdfRef}
-      className="p-8 shadow-lg bg-white"
-      style={{ width: "210mm", minHeight: "297mm", aspectRatio: "210/297" }}
+      className="p-4 sm:p-6 lg:p-8 shadow-lg bg-white w-full max-w-4xl mx-auto"
+      style={{ 
+        minHeight: "297mm", 
+        aspectRatio: "210/297",
+        maxWidth: "210mm"
+      }}
     >
       {/* Header */}
       <div
-        className={`invoice-header-${invoiceData.theme.id} -m-8 px-8 py-6 mb-6`}
+        className={`invoice-header-${invoiceData.theme.id} -m-4 sm:-m-6 lg:-m-8 px-4 sm:px-6 lg:px-8 py-4 sm:py-5 lg:py-6 mb-4 sm:mb-5 lg:mb-6`}
       >
-        <div className="flex justify-between items-start">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
           {/* User/Company Information */}
-          <div className="text-left text-white/90">
+          <div className="text-left text-white/90 flex-1">
             <div className="space-y-1">
-              <p className="font-bold text-2xl">
+              <p className="font-bold text-lg sm:text-xl lg:text-2xl">
                 {userSettings?.company_name || "Your Company Name"}
               </p>
               {userSettings?.company_email && (
@@ -342,20 +347,20 @@ export const InvoicePreview = ({
           </div>
 
           {/* Logo & Invoice Number */}
-          <div className="text-right text-white/90">
-            <div className="space-y-4 flex flex-col items-end">
+          <div className="text-right text-white/90 flex-shrink-0">
+            <div className="space-y-2 sm:space-y-4 flex flex-col items-end">
               {userSettings?.company_logo && (
                 <div className="flex-shrink-0">
                   <img
                     src={userSettings.company_logo}
                     alt="Company Logo"
-                    className="w-16 h-16 object-contain"
+                    className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 object-contain"
                   />
                 </div>
               )}
               <div className="text-right">
-                <p className="text-sm text-white/70">Invoice Number</p>
-                <p className="font-mono font-semibold text-lg">
+                <p className="text-xs sm:text-sm text-white/70">Invoice Number</p>
+                <p className="font-mono font-semibold text-base sm:text-lg">
                   {invoiceData.invoiceNumber}
                 </p>
               </div>
@@ -365,13 +370,13 @@ export const InvoicePreview = ({
       </div>
 
       {/* Invoice Details */}
-      <div className="grid md:grid-cols-2 gap-8 mb-8">
+      <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-4 sm:mb-6 lg:mb-8">
         <div>
           <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-3">
             Bill To
           </h3>
           <div className="space-y-1">
-            <p className="font-semibold text-lg">{invoiceData.client.name}</p>
+            <p className="font-semibold text-base sm:text-lg">{invoiceData.client.name}</p>
             {invoiceData.client.email && (
               <p className="text-muted-foreground">
                 {invoiceData.client.email}
@@ -413,19 +418,19 @@ export const InvoicePreview = ({
       {/* Items Table */}
       <div className="">
         <div className="overflow-x-auto rounded-sm border">
-          <table className="w-full">
+          <table className="w-full min-w-[500px]">
             <thead>
               <tr className={`invoice-table-${invoiceData.theme.id}`}>
-                <th className="text-left p-3 font-semibold text-white">
+                <th className="text-left p-2 sm:p-3 font-semibold text-white text-sm sm:text-base">
                   Description
                 </th>
-                <th className="text-center p-3 font-semibold w-20 text-white">
+                <th className="text-center p-2 sm:p-3 font-semibold w-16 sm:w-20 text-white text-sm sm:text-base">
                   Qty
                 </th>
-                <th className="text-right p-3 font-semibold w-24 text-white">
+                <th className="text-right p-2 sm:p-3 font-semibold w-20 sm:w-24 text-white text-sm sm:text-base">
                   Price
                 </th>
-                <th className="text-right p-3 font-semibold w-24 text-white">
+                <th className="text-right p-2 sm:p-3 font-semibold w-20 sm:w-24 text-white text-sm sm:text-base">
                   Total
                 </th>
               </tr>
@@ -438,15 +443,15 @@ export const InvoicePreview = ({
                     index % 2 === 0 ? "bg-muted/60" : ""
                   }`}
                 >
-                  <td className="px-3 py-2.5 border-b">
-                    <p className="whitespace-pre-line">{item.description}</p>
+                  <td className="px-2 sm:px-3 py-2 sm:py-2.5 border-b">
+                    <p className="whitespace-pre-line text-sm sm:text-base">{item.description}</p>
                   </td>
-                  <td className="px-3 py-2.5 border-b text-center">
+                  <td className="px-2 sm:px-3 py-2 sm:py-2.5 border-b text-center text-sm sm:text-base">
                     {userSettings
                       ? formatNumber(item.quantity, userSettings.number_format)
                       : item.quantity}
                   </td>
-                  <td className="px-3 py-2.5 border-b text-right">
+                  <td className="px-2 sm:px-3 py-2 sm:py-2.5 border-b text-right text-sm sm:text-base">
                     {userSettings
                       ? formatCurrency(
                           item.price,
@@ -454,7 +459,7 @@ export const InvoicePreview = ({
                         )
                       : `$${item.price.toFixed(2)}`}
                   </td>
-                  <td className="px-3 py-2.5 border-b text-right font-semibold">
+                  <td className="px-2 sm:px-3 py-2 sm:py-2.5 border-b text-right font-semibold text-sm sm:text-base">
                     {userSettings
                       ? formatCurrency(
                           item.quantity * item.price,
@@ -470,9 +475,9 @@ export const InvoicePreview = ({
       </div>
 
       {/* Custom Fields and Totals */}
-      <div className="flex justify-between mt-8">
+      <div className="flex flex-col lg:flex-row justify-between gap-4 lg:gap-8 mt-4 sm:mt-6 lg:mt-8">
         {/* Custom Fields - Left Side */}
-        <div className="w-64 space-y-3">
+        <div className="w-full lg:w-64 space-y-3">
           {invoiceData.customFields &&
             invoiceData.customFields.length > 0 &&
             userSettings?.custom_fields && (
@@ -507,7 +512,7 @@ export const InvoicePreview = ({
         </div>
 
         {/* Totals - Right Side */}
-        <div className="w-64 space-y-3">
+        <div className="w-full lg:w-64 space-y-2 sm:space-y-3">
           <div className="flex justify-between items-center">
             <span className="text-muted-foreground">Subtotal:</span>
             <span className="font-semibold">
@@ -562,24 +567,24 @@ export const InvoicePreview = ({
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <div className="flex items-center justify-center gap-2 mb-2">
-        <Eye className="w-6 h-6 text-primary" />
-        <h2 className="text-2xl font-bold">Invoice Preview</h2>
+        <Eye className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+        <h2 className="text-lg sm:text-xl lg:text-2xl font-bold">
+          Invoice Preview
+        </h2>
       </div>
       {/* A4 Paper Preview */}
-      <div className="flex justify-center bg-gray-100 rounded-lg h-[45vh] w-60 mx-auto relative overflow-hidden">
+      <div className="flex justify-center bg-gray-100 rounded-lg max-h-[40vh] w-full max-w-48 md:max-w-60 mx-auto relative overflow-hidden aspect-[3/4]">
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 overflow-hidden">
           <div
-            className="bg-white shadow-2xl border border-gray-200"
+            className="bg-white shadow-2xl border border-gray-200 scale-[0.18] sm:scale-[0.22] md:scale-[0.23]"
             style={{
               width: "210mm",
-              // minHeight: "297mm",
               aspectRatio: "210/297",
               boxShadow:
                 "0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.05)",
               borderRadius: "2px",
-              transform: "scale(0.26)",
             }}
           >
             <div className="p-8">
@@ -861,59 +866,57 @@ export const InvoicePreview = ({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-2 justify-center mt-2">
+      <div className="flex flex-col sm:flex-row flex-wrap gap-2 justify-center mt-4">
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <div className="flex flex-col items-center gap-2 z-[1]">
-              <Button className="flex items-center gap-2 z-[1]">
-                <Maximize2 className="w-4 h-4" />
-                View Full Size
-              </Button>
-              <p className="text-xs text-muted-foreground">
-                View Full size to print or download
-              </p>
-            </div>
+            <Button
+              variant="outline"
+              className="flex items-center gap-2 w-full sm:w-auto justify-center"
+              onClick={() => setIsDialogOpen(true)}
+              size="sm"
+            >
+              <Maximize2 className="w-4 h-4" />
+              Full Preview
+            </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto z-[100]">
+          <DialogContent className="max-w-[95vw] sm:max-w-4xl lg:max-w-5xl max-h-[90dvh] overflow-y-auto z-[100] px-2 py-6 sm:p-6">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Eye className="w-5 h-5" />
+              <DialogTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
                 Full Invoice Preview
               </DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
+            <div className="space-y-2 sm:space-y-4">
               {/* Action Buttons in Dialog */}
-              <div className="flex justify-center gap-2 flex-wrap">
+              <div className="flex justify-center gap-2 flex-wrap w-1/4 md:w-full">
                 <Button
                   variant="outline"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 w-full sm:w-auto justify-center"
+                  size="sm"
                   onClick={PrintInvoice}
                   disabled={isSaving}
                 >
                   <Printer className="w-4 h-4" />
-                  {isSaving
-                    ? hasBeenSaved
-                      ? "Printing..."
-                      : "Saving..."
-                    : "Print"}
+                  Print
+                  {isSaving && (hasBeenSaved ? " (Printing...)" : " (Saving...)")}
                 </Button>
                 <Button
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 w-full sm:w-auto justify-center"
                   onClick={DownloadInvoice}
                   disabled={isSaving}
+                  size="sm"
                 >
                   <Download className="w-4 h-4" />
-                  {isSaving
-                    ? hasBeenSaved
-                      ? "Downloading..."
-                      : "Saving..."
-                    : "Download PDF"}
+                  Download PDF
+                  {isSaving && (hasBeenSaved ? " (Downloading...)" : " (Saving...)")}
                 </Button>
               </div>
 
               {/* Full Invoice Content */}
-              <div className="flex justify-center">
-                <FullInvoiceContent />
+              <div className="flex justify-center overflow-x-auto">
+                <div className="min-w-fit">
+                  <FullInvoiceContent />
+                </div>
               </div>
             </div>
           </DialogContent>

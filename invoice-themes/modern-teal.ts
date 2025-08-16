@@ -6,7 +6,7 @@ export const modernTealTheme: InvoiceTheme = {
   color: "teal",
   description: "Fresh and modern with teal highlights",
   version: "1.0.0",
-  author: "Invoice Wiz Craft",
+  author: "Invoicr",
   preview: {
     primary: "#14b8a6",
     secondary: "#ccfbf1",

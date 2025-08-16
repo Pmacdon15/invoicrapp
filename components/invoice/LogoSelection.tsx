@@ -72,7 +72,7 @@ export const LogoSelection = ({ logo, onLogoChange }: LogoSelectionProps) => {
                 Loading your logo history...
               </div>
             ) : usedLogos.length > 0 ? (
-              <div className="grid grid-cols-5 gap-4 h-[40vh] overflow-y-auto p-2">
+              <div className="grid grid-cols-5 gap-4 max-h-[35vh] overflow-y-auto p-2">
                 {usedLogos.map((usedLogo, index) => (
                   <Card
                     key={`used-${index}`}

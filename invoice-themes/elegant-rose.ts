@@ -6,7 +6,7 @@ export const elegantRoseTheme: InvoiceTheme = {
   color: "rose",
   description: "Sophisticated with rose pink accents",
   version: "1.0.0",
-  author: "Invoice Wiz Craft",
+  author: "Invoicr",
   preview: {
     primary: "#f43f5e",
     secondary: "#ffe4e6",

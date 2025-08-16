@@ -100,7 +100,7 @@ export const Analytics = () => {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
             Analytics Dashboard
           </h1>
         </div>
@@ -152,20 +152,21 @@ export const Analytics = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
             Analytics Dashboard
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-sm sm:text-base text-gray-600 mt-1">
             Track your invoice performance and business insights
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button
             variant={selectedPeriod === "30days" ? "default" : "outline"}
             size="sm"
             onClick={() => setSelectedPeriod("30days")}
+            className="text-xs sm:text-sm"
           >
             30 Days
           </Button>
@@ -173,6 +174,7 @@ export const Analytics = () => {
             variant={selectedPeriod === "6months" ? "default" : "outline"}
             size="sm"
             onClick={() => setSelectedPeriod("6months")}
+            className="text-xs sm:text-sm"
           >
             6 Months
           </Button>
@@ -180,6 +182,7 @@ export const Analytics = () => {
             variant={selectedPeriod === "1year" ? "default" : "outline"}
             size="sm"
             onClick={() => setSelectedPeriod("1year")}
+            className="text-xs sm:text-sm"
           >
             1 Year
           </Button>
@@ -187,74 +190,74 @@ export const Analytics = () => {
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-purple-600">
+                <p className="text-xs sm:text-sm font-medium text-purple-600">
                   Total Revenue
                 </p>
-                <p className="text-2xl font-bold text-purple-900">
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-900">
                   {formatCurrency(analytics.totalRevenue)}
                 </p>
               </div>
-              <DollarSign className="w-8 h-8 text-purple-600" />
+              <DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-purple-600" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-blue-600">
+                <p className="text-xs sm:text-sm font-medium text-blue-600">
                   Total Invoices
                 </p>
-                <p className="text-2xl font-bold text-blue-900">
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-900">
                   {analytics.totalInvoices}
                 </p>
               </div>
-              <FileText className="w-8 h-8 text-blue-600" />
+              <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-green-600">
+                <p className="text-xs sm:text-sm font-medium text-green-600">
                   Collection Rate
                 </p>
-                <p className="text-2xl font-bold text-green-900">
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-green-900">
                   {collectionRate.toFixed(1)}%
                 </p>
               </div>
-              <TrendingUp className="w-8 h-8 text-green-600" />
+              <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-orange-600">
+                <p className="text-xs sm:text-sm font-medium text-orange-600">
                   Avg Invoice Value
                 </p>
-                <p className="text-2xl font-bold text-orange-900">
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-orange-900">
                   {formatCurrency(analytics.averageInvoiceValue)}
                 </p>
               </div>
-              <BarChart3 className="w-8 h-8 text-orange-600" />
+              <BarChart3 className="w-6 h-6 sm:w-8 sm:h-8 text-orange-600" />
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Charts and Detailed Analytics */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Invoice Status Breakdown */}
         <Card>
           <CardHeader>
@@ -326,7 +329,7 @@ export const Analytics = () => {
       </div>
 
       {/* Top Clients and Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Top Clients */}
         <Card>
           <CardHeader>
@@ -384,7 +387,7 @@ export const Analytics = () => {
           <CardContent>
             <div className="space-y-3">
               {analytics.recentActivity.length > 0 ? (
-                analytics.recentActivity.map((activity, index) => (
+                analytics.recentActivity.slice(0, 5).map((activity, index) => (
                   <div
                     key={index}
                     className="flex items-center justify-between p-3 border-l-4 border-purple-200 bg-purple-50 rounded-r-lg"
@@ -414,34 +417,34 @@ export const Analytics = () => {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
         <Card className="bg-gradient-to-br from-green-50 to-emerald-100 border-green-200">
-          <CardContent className="p-6 text-center">
-            <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-green-900">
+          <CardContent className="p-4 sm:p-6 text-center">
+            <CheckCircle className="w-8 h-8 sm:w-12 sm:h-12 text-green-600 mx-auto mb-2" />
+            <p className="text-lg sm:text-xl lg:text-2xl font-bold text-green-900">
               {analytics.paidInvoices}
             </p>
-            <p className="text-sm text-green-600">Paid Invoices</p>
+            <p className="text-xs sm:text-sm text-green-600">Paid Invoices</p>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-yellow-50 to-amber-100 border-yellow-200">
-          <CardContent className="p-6 text-center">
-            <Clock className="w-12 h-12 text-yellow-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-yellow-900">
+          <CardContent className="p-4 sm:p-6 text-center">
+            <Clock className="w-8 h-8 sm:w-12 sm:h-12 text-yellow-600 mx-auto mb-2" />
+            <p className="text-lg sm:text-xl lg:text-2xl font-bold text-yellow-900">
               {analytics.pendingInvoices}
             </p>
-            <p className="text-sm text-yellow-600">Pending Invoices</p>
+            <p className="text-xs sm:text-sm text-yellow-600">Pending Invoices</p>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-red-50 to-rose-100 border-red-200">
-          <CardContent className="p-6 text-center">
-            <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-red-900">
+          <CardContent className="p-4 sm:p-6 text-center">
+            <AlertCircle className="w-8 h-8 sm:w-12 sm:h-12 text-red-600 mx-auto mb-2" />
+            <p className="text-lg sm:text-xl lg:text-2xl font-bold text-red-900">
               {analytics.overdueInvoices}
             </p>
-            <p className="text-sm text-red-600">Overdue Invoices</p>
+            <p className="text-xs sm:text-sm text-red-600">Overdue Invoices</p>
           </CardContent>
         </Card>
       </div>

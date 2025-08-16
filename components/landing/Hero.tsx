@@ -18,7 +18,7 @@ const Hero = ({ companyLogos = [] }: HeroProps) => {
   const router = useRouter()
 
   return (
-    <section className="py-24 px-6 bg-gradient-to-br from-background via-primary/5 to-accent/10">
+    <section className="py-12 sm:py-16 md:py-24 px-4 sm:px-6 bg-gradient-to-br from-background via-primary/5 to-accent/10">
       <div className="container mx-auto text-center max-w-5xl">
         <div className="">
           <span className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 text-primary text-sm font-medium mb-8 border border-primary/20">
@@ -26,11 +26,11 @@ const Hero = ({ companyLogos = [] }: HeroProps) => {
             Trusted by 50,000+ professionals worldwide
           </span>
         </div>
-        <h1 className="text-6xl md:text-7xl font-bold text-foreground mb-8 leading-tight">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 sm:mb-8 leading-tight">
           Transform Your
           <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent block">Invoicing Workflow</span>
         </h1>
-        <p className="text-xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">
+        <p className="text-lg sm:text-xl text-muted-foreground mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed px-4">
           Streamline your tasks and boost productivity with our all-in-one solution. Create professional invoices in
           minutes, collaborate with your team, and get paid faster than ever.
         </p>
@@ -49,7 +49,7 @@ const Hero = ({ companyLogos = [] }: HeroProps) => {
         {companyLogos.length > 0 && (
           <div className="border-t border-border pt-12">
             <p className="text-sm text-muted-foreground mb-8">Trusted by leading companies</p>
-            <div className="flex justify-center items-center space-x-12 opacity-60">
+            <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-8 md:gap-12 opacity-60">
               {companyLogos.map((company, index) => (
                 <img
                   key={index}

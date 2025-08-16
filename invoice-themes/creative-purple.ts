@@ -6,7 +6,7 @@ export const creativePurpleTheme: InvoiceTheme = {
   color: "purple",
   description: "Bold and creative with purple theme",
   version: "1.0.0",
-  author: "Invoice Wiz Craft",
+  author: "Invoicr",
   preview: {
     primary: "#8b5cf6",
     secondary: "#ede9fe",

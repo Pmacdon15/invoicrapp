@@ -1,4 +1,6 @@
-# Welcome to your Lovable project
+# Invoicr - Professional Invoice Generation
+
+A modern, professional invoice generation SaaS application built with React, Next.js, and Supabase.
 
 ## Project info
 

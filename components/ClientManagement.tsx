@@ -279,7 +279,7 @@ export const ClientManagement = ({
       color: themeMetadata?.id.split('-')[1] || 'blue',
       description: themeMetadata?.description || 'Professional theme',
       version: themeMetadata?.version || '1.0.0',
-      author: themeMetadata?.author || 'Invoice Wiz Craft',
+      author: themeMetadata?.author || 'Invoicr',
       preview: themeMetadata?.preview || {
         primary: '#3b82f6',
         secondary: '#dbeafe',
@@ -337,7 +337,7 @@ export const ClientManagement = ({
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Client Management</h2>
+          <h2 className="text-lg md:text-2xl font-bold">Client Management</h2>
         </div>
         <div className="grid gap-4">
           {[1, 2, 3].map((i) => (
@@ -357,10 +357,10 @@ export const ClientManagement = ({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900">
             {showSelectMode ? "Select Client" : "Client Management"}
           </h2>
-          <p className="text-gray-600 mt-1">
+          <p className="text-sm md:text-base text-gray-600 mt-1">
             {showSelectMode ? "Choose a client for your invoice" : "Manage your client database"}
           </p>
         </div>
@@ -447,7 +447,7 @@ export const ClientManagement = ({
               </div>
             </div>
             
-            <DialogFooter>
+            <DialogFooter className="gap-2">
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                 Cancel
               </Button>

@@ -17,6 +17,7 @@ export const Dashboard = () => {
   const [editingInvoice, setEditingInvoice] = useState<SavedInvoice | null>(
     null
   );
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleEditInvoice = (invoice: SavedInvoice) => {
     setEditingInvoice(invoice);
@@ -72,14 +73,26 @@ export const Dashboard = () => {
   return (
     <div className="h-screen bg-gray-50 flex flex-col">
       {/* Header */}
-      <DashboardHeader onNewInvoice={handleNewInvoice} onTabChange={setActiveTab}/>
+      <DashboardHeader 
+        onNewInvoice={handleNewInvoice} 
+        onTabChange={setActiveTab}
+        onMenuToggle={() => setIsSidebarOpen(!isSidebarOpen)}
+      />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex h-[90vh]">
+      <div className="flex-1 flex h-[90vh] lg:min-h-0">
         {/* Sidebar */}
-        <DashboardSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        <DashboardSidebar 
+          activeTab={activeTab} 
+          onTabChange={(tab) => {
+            setActiveTab(tab);
+            setIsSidebarOpen(false); // Close sidebar on mobile after selection
+          }}
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+        />
         {/* Content */}
-        <main className="flex-1 p-4 overflow-y-auto bg-primary/5">
+        <main className="flex-1 p-4 pb-safe lg:pb-4 overflow-y-auto bg-primary/5 lg:ml-0">
           <div className="max-w-7xl mx-auto">{renderContent()}</div>
         </main>
       </div>

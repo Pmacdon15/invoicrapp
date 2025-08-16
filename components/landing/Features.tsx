@@ -36,17 +36,17 @@ const Features = ({ features }: FeaturesProps) => {
   const featuresData = features || defaultFeatures
 
   return (
-    <section className="py-24 px-6">
+    <section className="py-12 sm:py-16 md:py-24 px-4 sm:px-6">
       <div className="container mx-auto max-w-6xl">
         <div className="text-center mb-20">
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">Everything You Need to Scale</h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-6">Everything You Need to Scale</h2>
+          <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto px-4">
             Powerful features designed to streamline your workflow and help you focus on what matters most - growing
             your business.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {featuresData.map((feature, index) => (
             <Card
               key={index}

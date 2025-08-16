@@ -64,7 +64,7 @@ export const HelpSupport = () => {
     {
       id: "2",
       question: "Can I customize my invoice themes?",
-      answer: "Yes! Invoice Wiz Craft offers 6 professional themes (Professional Blue, Elegant Green, Creative Purple, Vibrant Orange, Modern Teal, and Elegant Rose). You can set a default theme in Settings > Invoice Defaults.",
+      answer: "Yes! Invoicr offers 6 professional themes (Professional Blue, Elegant Green, Creative Purple, Vibrant Orange, Modern Teal, and Elegant Rose). You can set a default theme in Settings > Invoice Defaults.",
       category: "invoices",
     },
     {
@@ -151,15 +151,15 @@ export const HelpSupport = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Help & Support</h1>
-          <p className="text-muted-foreground">
-            Get help with Invoice Wiz Craft and find answers to common questions
+          <h1 className="text-lg md:text-3xl font-bold text-foreground">Help & Support</h1>
+          <p className="text-xs md:text-base text-muted-foreground">
+            Get help with Invoicr and find answers to common questions
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="gap-1">
             <Clock className="h-3 w-3" />
-            24/7 Support
+            <span className="text-xs md:text-base">24/7 Support</span>
           </Badge>
         </div>
       </div>
@@ -182,7 +182,7 @@ export const HelpSupport = () => {
             <CardHeader>
               <CardTitle>Frequently Asked Questions</CardTitle>
               <CardDescription>
-                Find quick answers to common questions about Invoice Wiz Craft
+                Find quick answers to common questions about Invoicr
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -319,7 +319,7 @@ export const HelpSupport = () => {
                     </div>
                     <div>
                       <p className="font-medium">Email Support</p>
-                      <p className="text-sm text-muted-foreground">support@invoicewizcraft.com</p>
+                      <p className="text-sm text-muted-foreground">support@invoicr.com</p>
                     </div>
                   </div>
 

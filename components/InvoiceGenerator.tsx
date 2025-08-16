@@ -184,9 +184,10 @@ export const InvoiceGenerator = ({
             currency: "USD",
             paymentTerms: "Net 30",
             notes: editingInvoice.notes || undefined,
-            taxRate: editingInvoice.tax_amount && editingInvoice.subtotal > 0 
-              ? (editingInvoice.tax_amount / editingInvoice.subtotal) * 100 
-              : 0,
+            taxRate:
+              editingInvoice.tax_amount && editingInvoice.subtotal > 0
+                ? (editingInvoice.tax_amount / editingInvoice.subtotal) * 100
+                : 0,
             customFields: editingInvoice.custom_fields || [],
           });
           setCurrentStep(5); // Go to preview step when editing
@@ -225,11 +226,13 @@ export const InvoiceGenerator = ({
         return invoiceData.items?.length > 0;
       case 4:
         // Check if all required custom fields are filled
-        const requiredFields = customFields.filter(field => field.required);
+        const requiredFields = customFields.filter((field) => field.required);
         const customFieldValues = invoiceData.customFields || [];
-        return requiredFields.every(field => {
-          const fieldValue = customFieldValues.find(cfv => cfv.fieldId === field.id);
-          return fieldValue && fieldValue.value.trim() !== '';
+        return requiredFields.every((field) => {
+          const fieldValue = customFieldValues.find(
+            (cfv) => cfv.fieldId === field.id
+          );
+          return fieldValue && fieldValue.value.trim() !== "";
         });
       default:
         return true;
@@ -324,13 +327,15 @@ export const InvoiceGenerator = ({
           <CustomFields
             customFields={customFields}
             customFieldValues={invoiceData.customFields || []}
-            onCustomFieldValuesChange={(values) => updateInvoiceData("customFields", values)}
+            onCustomFieldValuesChange={(values) =>
+              updateInvoiceData("customFields", values)
+            }
           />
         );
       case 5:
         return (
-          <InvoicePreview 
-            invoiceData={invoiceData} 
+          <InvoicePreview
+            invoiceData={invoiceData}
             isSaved={isSaved}
             onSaveStateChange={setIsSaved}
             onInvoiceSaved={onInvoiceSaved}
@@ -355,18 +360,55 @@ export const InvoiceGenerator = ({
   return (
     <div className="h-full">
       <div className="max-w-7xl mx-auto">
-        <div className="flex gap-8">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
           {/* Left Sidebar - Vertical Steps Progress */}
-          <div className="w-80 flex-shrink-0">
-            <Card className="p-6 bg-gradient-to-b from-card to-muted/20 sticky top-0 shadow-lg h-[95%] border-primary/30">
-              <div className="flex items-center gap-3 mb-6">
+          <div className="w-full lg:w-80 lg:flex-shrink-0">
+            <Card className="p-4 px-1 lg:p-6 bg-gradient-to-b from-card to-muted/20 lg:sticky lg:top-0 shadow-lg lg:h-[95%] border-primary/30">
+              {/* <div className="flex items-center gap-3 mb-6">
                 <FileText className="w-6 h-6 text-primary" />
                 <h2 className="text-xl font-bold text-foreground">
                   Invoice Generator
                 </h2>
+              </div> */}
+
+              {/* Mobile: Horizontal Steps */}
+              <div className="lg:hidden">
+                <div className="flex justify-between items-center">
+                  {steps.map((step, index) => (
+                    <div
+                      key={step.id}
+                      className="flex items-center flex-1 h-20 relative"
+                    >
+                      <div className="flex flex-col items-center flex-1 h-20">
+                        <div
+                          className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 ${
+                            currentStep >= step.id
+                              ? "bg-primary text-primary-foreground shadow-lg"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {step.id}
+                        </div>
+                        <p
+                          className={`text-xs mt-1 text-center ${
+                            currentStep >= step.id
+                              ? "text-foreground"
+                              : "text-muted-foreground"
+                          }`}
+                        >
+                          {step.title}
+                        </p>
+                      </div>
+                      {index < steps.length - 1 && (
+                        <div className="absolute top-4 -right-1 w-3 h-0.5 bg-border z-10" />
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              <div className="space-y-14">
+              {/* Desktop: Vertical Steps */}
+              <div className="hidden lg:block space-y-16">
                 {steps.map((step, index) => (
                   <div key={step.id} className="relative">
                     <div className="flex items-start gap-4">
@@ -397,7 +439,7 @@ export const InvoiceGenerator = ({
 
                     {/* Vertical connector line */}
                     {index < steps.length - 1 && (
-                      <div className="absolute left-5 top-[48px] w-0.5 h-12 bg-border" />
+                      <div className="absolute left-5 top-[48px] w-0.5 h-14 bg-border" />
                     )}
                   </div>
                 ))}
@@ -416,20 +458,22 @@ export const InvoiceGenerator = ({
           {/* Right Content Area */}
           <div className="flex-1 flex flex-col">
             {/* Step Content */}
-            <Card className="p-8 shadow-lg flex-1 min-h-[75vh] border-primary/30">
+            <Card className="p-4 sm:p-6 lg:p-8 shadow-lg flex-1 min-h-[60vh] lg:min-h-[75vh] border-primary/30">
               {renderStepContent()}
             </Card>
 
             {/* Navigation */}
-            <div className="flex justify-between mt-6 h-[10vh] z-[2]">
+            <div className="flex justify-between mt-4 lg:mt-6 pb-safe lg:pb-0 z-[2]">
               <Button
                 variant="outline"
                 onClick={prevStep}
                 disabled={currentStep === 1}
                 className="flex items-center gap-2"
+                size="sm"
               >
                 <ArrowLeft className="w-4 h-4" />
-                Previous
+                <span className="hidden sm:inline">Previous</span>
+                <span className="sm:hidden">Prev</span>
               </Button>
 
               {currentStep < steps.length ? (
@@ -437,8 +481,14 @@ export const InvoiceGenerator = ({
                   onClick={nextStep}
                   disabled={!invoiceData || (invoiceData && !canProceed())}
                   className="flex items-center gap-2"
+                  size="sm"
                 >
-                  {currentStep === 2 && isNewClient ? "Save Client & Next" : "Next"}
+                  <span className="hidden sm:inline">
+                    {currentStep === 2 && isNewClient
+                      ? "Save Client & Next"
+                      : "Next"}
+                  </span>
+                  <span className="sm:hidden">Next</span>
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               ) : (
@@ -446,6 +496,7 @@ export const InvoiceGenerator = ({
                   onClick={handleSaveInvoice}
                   disabled={isSaving || isSaved}
                   className="flex items-center gap-2"
+                  size="sm"
                 >
                   {isSaving ? (
                     <>
@@ -460,7 +511,8 @@ export const InvoiceGenerator = ({
                   ) : (
                     <>
                       <Save className="w-4 h-4" />
-                      Save Invoice
+                      <span className="hidden sm:inline">Save Invoice</span>
+                      <span className="sm:hidden">Save</span>
                     </>
                   )}
                 </Button>

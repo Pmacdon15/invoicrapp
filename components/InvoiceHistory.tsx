@@ -152,7 +152,7 @@ export const InvoiceHistory = ({ onEditInvoice, onViewInvoice }: InvoiceHistoryP
       color: themeMetadata?.id.split('-')[1] || 'blue',
       description: themeMetadata?.description || 'Professional theme',
       version: themeMetadata?.version || '1.0.0',
-      author: themeMetadata?.author || 'Invoice Wiz Craft',
+      author: themeMetadata?.author || 'Invoicr',
       preview: themeMetadata?.preview || {
         primary: '#3b82f6',
         secondary: '#dbeafe',
@@ -231,7 +231,7 @@ export const InvoiceHistory = ({ onEditInvoice, onViewInvoice }: InvoiceHistoryP
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Invoice History</h2>
@@ -258,11 +258,11 @@ export const InvoiceHistory = ({ onEditInvoice, onViewInvoice }: InvoiceHistoryP
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-4 w-full">
           {invoices.map((invoice) => (
             <Card 
               key={invoice.id} 
-              className="hover:shadow-md transition-shadow cursor-pointer"
+              className="hover:shadow-md transition-shadow cursor-pointer w-full overflow-hidden"
               onClick={() => handlePreviewInvoice(invoice)}
             >
               <CardContent className="p-6">
@@ -313,7 +313,7 @@ export const InvoiceHistory = ({ onEditInvoice, onViewInvoice }: InvoiceHistoryP
                       className="flex items-center gap-1"
                     >
                       <Eye className="w-4 h-4" />
-                      View
+                      <span className="hidden sm:inline">View</span>
                     </Button>
                     
                     <DropdownMenu>

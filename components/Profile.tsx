@@ -319,33 +319,35 @@ export const Profile = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
-          <User className="w-8 h-8 text-white" />
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 mb-6 sm:mb-8">
+        <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
+          <User className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
         </div>
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Profile Settings</h1>
-          <p className="text-muted-foreground">
+        <div className="text-center sm:text-left">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">Profile Settings</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Manage your account information and preferences
           </p>
         </div>
       </div>
 
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="general" className="flex items-center gap-2">
-            <User className="w-4 h-4" />
-            General
-          </TabsTrigger>
-          <TabsTrigger value="security" className="flex items-center gap-2">
-            <Shield className="w-4 h-4" />
-            Security
-          </TabsTrigger>
-          <TabsTrigger value="notifications" className="flex items-center gap-2">
-            <Bell className="w-4 h-4" />
-            Notifications
-          </TabsTrigger>
-        </TabsList>
+        <div className="w-full overflow-x-auto">
+          <TabsList className="flex w-max min-w-full justify-between sm:grid sm:grid-cols-3 gap-1 p-1">
+            <TabsTrigger value="general" className="flex-shrink-0 px-3 py-2 text-xs sm:text-sm font-medium">
+              <User className="w-4 h-4 mr-1" />
+              General
+            </TabsTrigger>
+            <TabsTrigger value="security" className="flex-shrink-0 px-3 py-2 text-xs sm:text-sm font-medium">
+              <Shield className="w-4 h-4 mr-1" />
+              Security
+            </TabsTrigger>
+            <TabsTrigger value="notifications" className="flex-shrink-0 px-3 py-2 text-xs sm:text-sm font-medium">
+              <Bell className="w-4 h-4 mr-1" />
+              Notifications
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* General Tab */}
         <TabsContent value="general" className="space-y-6">
@@ -360,7 +362,7 @@ export const Profile = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address</Label>
                   <Input
@@ -401,7 +403,7 @@ export const Profile = () => {
 
 
               <div className="flex justify-end">
-                <Button onClick={handleProfileSave} disabled={saving}>
+                <Button onClick={handleProfileSave} disabled={saving} className="w-full sm:w-auto">
                   {saving ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -554,7 +556,7 @@ export const Profile = () => {
               </div>
 
               <div className="flex justify-end">
-                <Button onClick={handlePasswordChange} disabled={saving}>
+                <Button onClick={handlePasswordChange} disabled={saving} className="w-full sm:w-auto">
                   {saving ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -609,7 +611,7 @@ export const Profile = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-between p-4 border border-destructive/20 rounded-lg">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 border border-destructive/20 rounded-lg">
                 <div>
                   <h4 className="font-medium">Delete Account</h4>
                   <p className="text-sm text-muted-foreground">
@@ -618,7 +620,7 @@ export const Profile = () => {
                 </div>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="destructive" size="sm">
+                    <Button variant="destructive" size="sm" className="w-full sm:w-auto">
                       <Trash2 className="w-4 h-4 mr-2" />
                       Delete Account
                     </Button>
@@ -696,7 +698,7 @@ export const Profile = () => {
               </div>
 
               <div className="flex justify-end">
-                <Button onClick={handleNotificationSave} disabled={saving}>
+                <Button onClick={handleNotificationSave} disabled={saving} className="w-full sm:w-auto">
                   {saving ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>

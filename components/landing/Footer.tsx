@@ -13,7 +13,7 @@ const Footer = () => {
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <FileText className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold text-foreground">InvoiceGen</span>
+              <span className="text-xl font-bold text-foreground">Invoicr</span>
             </div>
             <p className="text-muted-foreground">Professional invoicing made simple for modern businesses.</p>
           </div>
@@ -95,7 +95,7 @@ const Footer = () => {
         </div>
         <div className="border-t border-border pt-8 text-center">
           <p className="text-muted-foreground">
-            © 2024 InvoiceGen. All rights reserved. Built with ❤️ for professionals worldwide.
+            © 2024 Invoicr. All rights reserved. Built with ❤️ for professionals worldwide.
           </p>
         </div>
       </div>

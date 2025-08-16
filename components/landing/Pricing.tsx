@@ -61,16 +61,16 @@ const Pricing = ({ pricingPlans }: PricingProps) => {
   const plansData = pricingPlans || defaultPricingPlans
 
   return (
-    <section className="py-24 px-6 bg-gradient-to-br from-secondary/30 via-primary/5 to-accent/5">
+    <section className="py-12 sm:py-16 md:py-24 px-4 sm:px-6 bg-gradient-to-br from-secondary/30 via-primary/5 to-accent/5">
       <div className="container mx-auto max-w-6xl">
         <div className="text-center mb-20">
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-6">
             Choose the Plan That Fits Your Needs
           </h2>
-          <p className="text-xl text-muted-foreground">Scale as you grow with flexible pricing options</p>
+          <p className="text-lg sm:text-xl text-muted-foreground px-4">Scale as you grow with flexible pricing options</p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {plansData.map((plan, index) => (
             <Card
               key={index}

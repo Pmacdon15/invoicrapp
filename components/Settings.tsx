@@ -226,14 +226,14 @@ export const Settings = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">Settings</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Manage your account and invoice preferences
           </p>
         </div>
-        <Button onClick={handleSave} disabled={saving} className="gap-2">
+        <Button onClick={handleSave} disabled={saving} className="gap-2 w-full sm:w-auto">
           {saving ? (
             <RefreshCw className="h-4 w-4 animate-spin" />
           ) : (
@@ -244,32 +244,34 @@ export const Settings = () => {
       </div>
 
       <Tabs defaultValue="company" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="company" className="gap-2">
-            <Building2 className="h-4 w-4" />
-            Company
-          </TabsTrigger>
-          <TabsTrigger value="invoices" className="gap-2">
-            <CreditCard className="h-4 w-4" />
-            Invoices
-          </TabsTrigger>
-          <TabsTrigger value="notifications" className="gap-2">
-            <Bell className="h-4 w-4" />
-            Notifications
-          </TabsTrigger>
-          <TabsTrigger value="preferences" className="gap-2">
-            <Globe className="h-4 w-4" />
-            Preferences
-          </TabsTrigger>
-          <TabsTrigger value="numbering" className="gap-2">
-            <Hash className="h-4 w-4" />
-            Numbering
-          </TabsTrigger>
-          <TabsTrigger value="custom-fields" className="gap-2">
-            <Plus className="h-4 w-4" />
-            Custom Fields
-          </TabsTrigger>
-        </TabsList>
+        <div className="w-full overflow-x-auto">
+          <TabsList className="flex w-max min-w-full justify-start sm:grid sm:grid-cols-3 lg:grid-cols-6 gap-1 p-1">
+            <TabsTrigger value="company" className="flex-shrink-0 px-3 py-2 text-xs font-medium">
+              <Building2 className="h-4 w-4 mr-1" />
+              Company
+            </TabsTrigger>
+            <TabsTrigger value="invoices" className="flex-shrink-0 px-3 py-2 text-xs font-medium">
+              <CreditCard className="h-4 w-4 mr-1" />
+              Invoices
+            </TabsTrigger>
+            <TabsTrigger value="notifications" className="flex-shrink-0 px-3 py-2 text-xs font-medium">
+              <Bell className="h-4 w-4 mr-1" />
+              Notifications
+            </TabsTrigger>
+            <TabsTrigger value="preferences" className="flex-shrink-0 px-3 py-2 text-xs font-medium">
+              <Globe className="h-4 w-4 mr-1" />
+              Preferences
+            </TabsTrigger>
+            <TabsTrigger value="numbering" className="flex-shrink-0 px-3 py-2 text-xs font-medium">
+              <Hash className="h-4 w-4 mr-1" />
+              Numbering
+            </TabsTrigger>
+            <TabsTrigger value="custom-fields" className="flex-shrink-0 px-3 py-2 text-xs font-medium">
+              <Plus className="h-4 w-4 mr-1" />
+              Custom Fields
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* Company Information */}
         <TabsContent value="company" className="space-y-6">
@@ -281,7 +283,7 @@ export const Settings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Company Logo</Label>
                   <div className="flex items-center gap-4">

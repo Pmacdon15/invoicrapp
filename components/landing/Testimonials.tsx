@@ -22,7 +22,7 @@ const Testimonials = ({ testimonials }: TestimonialsProps) => {
       name: "Sarah Johnson",
       role: "Freelance Designer",
       content:
-        "InvoiceGen transformed my workflow completely. I've saved 10+ hours per week and my clients love the professional look.",
+        "Invoicr transformed my workflow completely. I've saved 10+ hours per week and my clients love the professional look.",
       rating: 5,
       avatar: "/professional-woman-diverse.png",
     },

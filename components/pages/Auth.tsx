@@ -159,7 +159,7 @@ const Auth = () => {
             <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
               <FileText className="h-6 w-6 text-primary-foreground" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground">InvoiceGen</h1>
+            <h1 className="text-3xl font-bold text-foreground">Invoicr</h1>
           </div>
           <p className="text-muted-foreground">Create your account or sign in to continue</p>
         </div>
