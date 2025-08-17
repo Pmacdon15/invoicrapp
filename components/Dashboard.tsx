@@ -10,14 +10,39 @@ import { HelpSupport } from "./HelpSupport";
 import { Profile } from "./Profile";
 import { DashboardHeader } from "./DashboardHeader";
 import { DashboardSidebar } from "./DashboardSidebar";
+import { useAuth } from "@/contexts/AuthContext";
 import type { SavedInvoice } from "@/lib/invoice-service";
 
 export const Dashboard = () => {
+  const { user, loading } = useAuth();
   const [activeTab, setActiveTab] = useState("history");
   const [editingInvoice, setEditingInvoice] = useState<SavedInvoice | null>(
     null
   );
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // This should be handled by middleware, but adding as backup
+  if (!user) {
+    return (
+      <div className="h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Please sign in to access the dashboard.</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleEditInvoice = (invoice: SavedInvoice) => {
     setEditingInvoice(invoice);

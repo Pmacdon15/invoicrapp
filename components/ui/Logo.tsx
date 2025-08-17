@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-
+import { useRouter } from 'next/navigation';
 
 interface LogoProps {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -31,8 +31,9 @@ export function Logo({
   showText = true, 
   textClassName 
 }: LogoProps) {
+  const router = useRouter();
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn("flex items-center gap-2 cursor-pointer", className)} onClick={() => router.push("/")}>
       <img 
         src="/invoicr-logo.png" 
         alt="Invoicr Logo" 

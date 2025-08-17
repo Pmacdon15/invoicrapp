@@ -2,8 +2,9 @@
 
 import React from "react"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Award } from "lucide-react"
+import { ArrowRight, Award, LayoutDashboard } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/AuthContext"
 
 interface CompanyLogo {
   name: string
@@ -16,6 +17,7 @@ interface HeroProps {
 
 const Hero = ({ companyLogos = [] }: HeroProps) => {
   const router = useRouter()
+    const { user } = useAuth()
 
   return (
     <section className="py-12 sm:py-16 md:py-24 px-4 sm:px-6 bg-gradient-to-br from-background via-primary/5 to-accent/10">
@@ -35,6 +37,17 @@ const Hero = ({ companyLogos = [] }: HeroProps) => {
           minutes, collaborate with your team, and get paid faster than ever.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+          {user ? (
+            <Button 
+              size="lg" 
+              className="group text-lg px-8 py-4 h-auto bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-lg hover:shadow-xl transition-all" 
+              onClick={() => router.push("/dashboard")}
+            >
+              <LayoutDashboard className="w-5 h-5" />
+              Go to Dashboard
+              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          ) : (
           <Button 
             size="lg" 
             className="group text-lg px-8 py-4 h-auto bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-lg hover:shadow-xl transition-all" 
@@ -43,6 +56,7 @@ const Hero = ({ companyLogos = [] }: HeroProps) => {
             Get Started for Free
             <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
           </Button>
+          )}
         </div>
 
         {/* Company Logos */}

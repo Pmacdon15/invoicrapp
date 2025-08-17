@@ -1,5 +1,4 @@
 "use client";
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,9 +23,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Logo } from "@/components/ui/Logo";
-import { supabase } from "@/integrations/supabase/client";
-import { showSuccess, showError } from "@/hooks/use-toast";
-import type { User as SupabaseUser } from "@supabase/supabase-js";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface DashboardHeaderProps {
   onNewInvoice: () => void;
@@ -39,46 +36,11 @@ export const DashboardHeader = ({
   onTabChange,
   onMenuToggle,
 }: DashboardHeaderProps) => {
-  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const { user, signOut } = useAuth();
   const router = useRouter();
-  // Using enhanced toast helpers
-
-  useEffect(() => {
-    // Get current user session
-    const getCurrentUser = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
-    };
-
-    getCurrentUser();
-
-    // Listen for auth state changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   const handleSignOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        showError("Error signing out", error.message);
-      } else {
-        showSuccess(
-          "Signed out successfully",
-          "You have been signed out of your account."
-        );
-        router.push("/");
-      }
-    } catch (error) {
-      showError("An error occurred", "Please try again later.");
-    }
+    await signOut();
   };
 
   const getUserInitials = (text?: string) => {

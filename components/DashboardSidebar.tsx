@@ -36,7 +36,7 @@ export const DashboardSidebar = ({
 }: DashboardSidebarProps) => {
   const mainItems: SidebarItem[] = [
     {
-      id: "history",
+      id: "invoices",
       label: "Invoices",
       icon: <FileText className="w-5 h-5" />,
     },
