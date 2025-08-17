@@ -39,19 +39,41 @@ const Header = () => {
   }
 
   return (
-    <header className="bg-background/95 backdrop-blur-sm border-b border-border sticky top-0 z-50">
+    <header className="bg-background/80 backdrop-blur-lg border-b border-border sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4 sm:px-6 py-4">
         <div className="flex justify-between items-center">
           <Logo size="lg" className="text-xl sm:text-2xl" />
           
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-6">
+            {/* Navigation Links */}
+            <nav className="hidden lg:flex items-center space-x-8">
+              <button 
+                className="text-muted-foreground hover:text-primary font-medium transition-colors"
+                onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                Features
+              </button>
+              <button 
+                className="text-muted-foreground hover:text-primary font-medium transition-colors"
+                onClick={() => document.querySelector('[data-section="pricing"]')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                Pricing
+              </button>
+              <button className="text-muted-foreground hover:text-primary font-medium transition-colors">
+                Templates
+              </button>
+              <button className="text-muted-foreground hover:text-primary font-medium transition-colors">
+                Help
+              </button>
+            </nav>
+
             {user ? (
               <>
                 {/* Dashboard Button */}
                 <Button 
                   variant="outline" 
-                  className="font-medium" 
+                  className="font-medium border-primary/30 text-primary hover:bg-primary/5 hover:border-primary/50 transition-all" 
                   onClick={() => router.push("/dashboard")}
                 >
                   <LayoutDashboard className="w-4 h-4 mr-2" />
@@ -63,11 +85,11 @@ const Header = () => {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
-                      className="relative h-10 w-10 rounded-full hover:bg-accent/10 transition-colors"
+                      className="relative h-10 w-10 rounded-full hover:bg-primary/5 transition-colors"
                     >
                       <Avatar className="h-10 w-10">
                         <AvatarImage src="/avatars/01.png" alt="User" />
-                        <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+                        <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-primary-foreground font-semibold">
                           {getUserInitials(
                             user?.user_metadata?.full_name || user?.email
                           )}
@@ -109,11 +131,18 @@ const Header = () => {
               </>
             ) : (
               <>
-                <Button variant="ghost" className="font-medium" onClick={() => router.push("/auth")}>
+                <Button 
+                  variant="ghost" 
+                  className="font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all" 
+                  onClick={() => router.push("/auth")}
+                >
                   Sign In
                 </Button>
-                <Button className="font-medium" onClick={() => router.push("/auth")}>
-                  Get Started for Free
+                <Button 
+                  className="font-semibold bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" 
+                  onClick={() => router.push("/auth")}
+                >
+                  🚀 Get Started Free
                 </Button>
               </>
             )}
@@ -130,14 +159,42 @@ const Header = () => {
           </Button>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Enhanced Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 space-y-3">
+          <div className="md:hidden mt-6 pb-6 space-y-4 border-t border-border pt-6">
+            {/* Mobile Navigation Links */}
+            <div className="space-y-3 mb-6">
+              <button 
+                className="w-full text-left px-4 py-2 text-muted-foreground hover:text-primary font-medium transition-colors rounded-lg hover:bg-primary/5"
+                onClick={() => {
+                  document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })
+                  setIsMobileMenuOpen(false)
+                }}
+              >
+                Features
+              </button>
+              <button 
+                className="w-full text-left px-4 py-2 text-muted-foreground hover:text-primary font-medium transition-colors rounded-lg hover:bg-primary/5"
+                onClick={() => {
+                  document.querySelector('[data-section="pricing"]')?.scrollIntoView({ behavior: 'smooth' })
+                  setIsMobileMenuOpen(false)
+                }}
+              >
+                Pricing
+              </button>
+              <button className="w-full text-left px-4 py-2 text-muted-foreground hover:text-primary font-medium transition-colors rounded-lg hover:bg-primary/5">
+                Templates
+              </button>
+              <button className="w-full text-left px-4 py-2 text-muted-foreground hover:text-primary font-medium transition-colors rounded-lg hover:bg-primary/5">
+                Help
+              </button>
+            </div>
+
             {user ? (
               <>
                 <Button 
-                  variant="ghost" 
-                  className="w-full justify-start font-medium" 
+                  variant="outline" 
+                  className="w-full justify-start font-medium border-primary/30 text-primary hover:bg-primary/5" 
                   onClick={() => {
                     router.push("/dashboard")
                     setIsMobileMenuOpen(false)
@@ -148,7 +205,7 @@ const Header = () => {
                 </Button>
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start font-medium text-destructive hover:text-destructive" 
+                  className="w-full justify-start font-medium text-destructive hover:text-destructive hover:bg-red-50" 
                   onClick={() => {
                     handleSignOut()
                     setIsMobileMenuOpen(false)
@@ -162,7 +219,7 @@ const Header = () => {
               <>
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start font-medium" 
+                  className="w-full justify-start font-medium text-muted-foreground hover:text-primary hover:bg-primary/5" 
                   onClick={() => {
                     router.push("/auth")
                     setIsMobileMenuOpen(false)
@@ -171,13 +228,13 @@ const Header = () => {
                   Sign In
                 </Button>
                 <Button 
-                  className="w-full font-medium" 
+                  className="w-full font-semibold bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-lg" 
                   onClick={() => {
                     router.push("/auth")
                     setIsMobileMenuOpen(false)
                   }}
                 >
-                  Get Started for Free
+                  🚀 Get Started Free
                 </Button>
               </>
             )}
