@@ -92,8 +92,8 @@ export const Dashboard = () => {
           onClose={() => setIsSidebarOpen(false)}
         />
         {/* Content */}
-        <main className="flex-1 p-4 pb-safe lg:pb-4 overflow-y-auto bg-primary/5 lg:ml-0">
-          <div className="max-w-7xl mx-auto">{renderContent()}</div>
+        <main className="flex-1 p-4 pb-safe lg:pb-4 overflow-y-auto bg-primary/5 lg:ml-0 h-full">
+          <div className="max-w-7xl xl:max-w-full xl:px-4 mx-auto h-full">{renderContent()}</div>
         </main>
       </div>
     </div>

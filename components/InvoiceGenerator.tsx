@@ -359,11 +359,11 @@ export const InvoiceGenerator = ({
 
   return (
     <div className="h-full">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
+      <div className="mx-auto h-full">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8 h-full">
           {/* Left Sidebar - Vertical Steps Progress */}
-          <div className="w-full lg:w-80 lg:flex-shrink-0">
-            <Card className="p-4 px-1 lg:p-6 bg-gradient-to-b from-card to-muted/20 lg:sticky lg:top-0 shadow-lg lg:h-[95%] border-primary/30">
+          <div className="w-full lg:w-80 lg:flex-shrink-0 lg:h-full">
+            <Card className="pt-4 pb-1 px-1 lg:p-6 bg-gradient-to-b from-card to-muted/20 lg:sticky lg:top-0 shadow-lg lg:h-full border-primary/30">
               {/* <div className="flex items-center gap-3 mb-6">
                 <FileText className="w-6 h-6 text-primary" />
                 <h2 className="text-xl font-bold text-foreground">
@@ -456,9 +456,9 @@ export const InvoiceGenerator = ({
           </div>
 
           {/* Right Content Area */}
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col lg:h-full overflow-y-auto">
             {/* Step Content */}
-            <Card className="p-4 sm:p-6 lg:p-8 shadow-lg flex-1 min-h-[60vh] lg:min-h-[75vh] border-primary/30">
+            <Card className="p-4 sm:p-6 lg:p-8 shadow-lg flex-1 h-[80%] lg:h-[90%] border-primary/30">
               {renderStepContent()}
             </Card>
 

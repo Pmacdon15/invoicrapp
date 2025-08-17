@@ -127,17 +127,17 @@ export function CustomFields({
   };
 
   return (
-    <Card>
+    <Card className="bg-muted/70 h-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Plus className="h-5 w-5" />
           Custom Fields
         </CardTitle>
         <CardDescription>
-          Add additional information to your invoice
+          You can add additioanl information from the settings.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 h-[65%] lg:h-[75%] overflow-y-auto">
         {/* Existing fields */}
         {allFields.map((field) => (
           <div key={field.id} className="space-y-2">

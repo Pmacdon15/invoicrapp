@@ -65,7 +65,7 @@ export const ThemeSelection = ({
   };
 
   return (
-    <div className="space-y-4 md:space-y-6">
+    <div className="space-y-4 md:space-y-6 h-full overflow-y-auto">
       <div className="text-center">
         <div className="flex items-center justify-center gap-2 lg:mb-2">
           <Palette className="w-6 h-6 text-primary" />
@@ -74,7 +74,7 @@ export const ThemeSelection = ({
         {/* <p className="text-muted-foreground">Select a professional design for your invoices</p> */}
       </div>
 
-      <Card className="grid md:grid-cols-4 gap-6 max-h-[50vh] overflow-y-auto p-6 bg-muted/90 rounded-lg">
+      <Card className="grid md:grid-cols-4 gap-6 overflow-y-auto p-6 bg-muted/90 rounded-lg h-full/2">
         {availableThemes.map((theme) => (
           <Card
             key={theme.id}

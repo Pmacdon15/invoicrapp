@@ -67,7 +67,7 @@ export const InvoiceItems = ({
   };
 
   return (
-    <div className="space-y-4 md:space-y-6">
+    <div className="space-y-2 md:space-y-6 h-full">
       <div className="text-center">
         <div className="flex items-center justify-center gap-2 md:mb-2">
           <Package className="w-6 h-6 text-primary" />
@@ -150,8 +150,8 @@ export const InvoiceItems = ({
 
         {/* Mobile Layout */}
         <div className="md:hidden space-y-1 flex flex-col">
-          <div className="">
-            <Label htmlFor="description">Description:</Label>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="description">Desc:</Label>
             <Input
               id="description"
               placeholder="Describe the product or service"
@@ -159,7 +159,7 @@ export const InvoiceItems = ({
               onChange={(e) =>
                 setNewItem({ ...newItem, description: e.target.value })
               }
-              className="mt-1"
+              className="mt-1 text-sm h-8"
             />
           </div>
           <div className="flex items-center justify-between gap-2">
@@ -176,7 +176,7 @@ export const InvoiceItems = ({
                     quantity: parseInt(e.target.value) || 1,
                   })
                 }
-                className="mt-1 w-16"
+                className="mt-1 text-sm w-16 h-7"
               />
             </div>
 
@@ -194,14 +194,14 @@ export const InvoiceItems = ({
                     price: parseFloat(e.target.value) || 0,
                   })
                 }
-                className="mt-1 w-16"
+                className="mt-1 text-sm w-16 h-7"
               />
             </div>
 
-            <div className="flex items-end flex-1">
+            <div className="flex items-end flex-1 h-7">
               <Button
                 onClick={addItem}
-                className="w-full"
+                className="w-full h-7"
                 disabled={
                   !newItem.description.trim() || items.length >= MAX_ITEMS
                 }
@@ -215,8 +215,8 @@ export const InvoiceItems = ({
 
       {/* Items List */}
       {items.length > 0 && (
-        <Card className="p-4 max-h-[40vh] overflow-y-auto flex flex-col bg-muted/90">
-          <h3 className="font-semibold mb-4">
+        <Card className="p-4 h-[65%] overflow-y-auto flex flex-col bg-muted/90">
+          <h3 className="font-semibold text-sm lg:text-base mb-1 lg:mb-4">
             Invoice Items ({items.length}/{MAX_ITEMS})
           </h3>
 
@@ -342,7 +342,7 @@ export const InvoiceItems = ({
           </div> */}
 
           {/* Totals */}
-          <div className="mt-3 pt-3 border-t">
+          <div className=" mt-1 lg:mt-3 pt-1 lg:pt-3 border-t">
             {/* Desktop Totals Layout */}
             <div className="hidden md:flex justify-end">
               <div className="w-56 space-y-2">
@@ -393,8 +393,8 @@ export const InvoiceItems = ({
             </div>
 
             {/* Mobile Totals Layout */}
-            <div className="md:hidden space-y-3">
-              <div className="flex items-center justify-between">
+            <div className="md:hidden space-y-1">
+              <div className="flex items-center justify-between pl-2">
                 <Label htmlFor="taxRate-mobile" className="text-sm font-medium">
                   Tax Rate (%):
                 </Label>
@@ -408,13 +408,13 @@ export const InvoiceItems = ({
                   onChange={(e) =>
                     onTaxRateUpdate?.(parseFloat(e.target.value) || 0)
                   }
-                  className="w-20 h-8 text-sm"
+                  className="w-20 h-6 text-sm"
                   placeholder="0"
                 />
               </div>
 
-              <div className="space-y-2 bg-background rounded-md p-3 border">
-                <div className="flex justify-between items-center text-sm">
+              <div className="space-y-2 bg-background rounded-md p-2 border">
+                <div className="flex justify-between items-center text-xs">
                   <span className="text-muted-foreground">Subtotal:</span>
                   <span className="font-semibold">
                     ${calculateSubtotal().toFixed(2)}
@@ -430,7 +430,7 @@ export const InvoiceItems = ({
                     </span>
                   </div>
                 )}
-                <div className="flex justify-between items-center text-base font-bold border-t pt-2">
+                <div className="flex justify-between items-center text-base font-bold border-t pt-1">
                   <span className="flex items-center gap-2">
                     <Calculator className="w-4 h-4" />
                     Total:

@@ -317,7 +317,7 @@ export const Profile = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 h-full mb-2 ">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 mb-6 sm:mb-8">
         <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
@@ -331,7 +331,7 @@ export const Profile = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="general" className="space-y-6">
+      <Tabs defaultValue="general" className="space-y-6 mb-2">
         <div className="w-full overflow-x-auto">
           <TabsList className="flex w-max min-w-full justify-between sm:grid sm:grid-cols-3 gap-1 p-1">
             <TabsTrigger value="general" className="flex-shrink-0 px-3 py-2 text-xs sm:text-sm font-medium">

@@ -582,7 +582,7 @@ export const InvoicePreview = ({
         </h2>
       </div>
       {/* A4 Paper Preview */}
-      <div className="flex justify-center bg-gray-100 rounded-lg max-h-[40vh] w-full max-w-48 md:max-w-60 mx-auto relative overflow-hidden aspect-[3/4]">
+      <div className="flex justify-center bg-gray-100 rounded-lg h-[80%] w-full max-w-48 md:max-w-60 mx-auto relative overflow-hidden aspect-[3/4]">
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 overflow-hidden">
           <div
             className="bg-white shadow-2xl border border-gray-200 scale-[0.18] sm:scale-[0.22] md:scale-[0.23]"
