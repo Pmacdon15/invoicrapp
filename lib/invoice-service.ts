@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { InvoiceData, InvoiceItem, CustomFieldValue } from '@/types/invoice';
+import { SubscriptionService } from './subscription-service';
 
 // Define the database row type for invoices
 type InvoiceRow = {
@@ -102,13 +103,19 @@ export const convertInvoiceDataToSaveFormat = (invoiceData: InvoiceData): Create
   };
 };
 
-// Save a new invoice
-export const saveInvoice = async (invoiceData: CreateInvoiceData): Promise<SavedInvoice | null> => {
+// Save a new invoice with usage tracking
+export const saveInvoice = async (invoiceData: CreateInvoiceData): Promise<{ success: boolean; invoice?: SavedInvoice; error?: string }> => {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
-      throw new Error('User not authenticated');
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    // Increment usage before creating invoice
+    const usageIncremented = await SubscriptionService.incrementInvoiceUsage(user.id);
+    if (!usageIncremented) {
+      return { success: false, error: 'Failed to update usage tracking.' };
     }
 
     const { data, error } = await (supabase as any)
@@ -122,13 +129,13 @@ export const saveInvoice = async (invoiceData: CreateInvoiceData): Promise<Saved
 
     if (error) {
       console.error('Error saving invoice:', error);
-      return null;
+      return { success: false, error: 'Failed to save invoice to database.' };
     }
 
-    return data as SavedInvoice;
+    return { success: true, invoice: data as SavedInvoice };
   } catch (error) {
     console.error('Error saving invoice:', error);
-    return null;
+    return { success: false, error: 'An unexpected error occurred.' };
   }
 };
 

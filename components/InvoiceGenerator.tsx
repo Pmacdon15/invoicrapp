@@ -8,6 +8,7 @@ import {
   FileText,
   Save,
   CheckCircle,
+  Lock,
 } from "lucide-react";
 import { ThemeSelection } from "./invoice/ThemeSelection";
 import { ClientInformation } from "./invoice/ClientInformation";
@@ -22,6 +23,8 @@ import {
 } from "@/lib/invoice-service";
 import { SettingsService } from "@/lib/settings-service";
 import { showSuccess, showError } from "@/hooks/use-toast";
+import { BlockingUpgradeDialog } from "@/components/ui/BlockingUpgradeDialog";
+import { useUsage } from "@/contexts/UsageContext";
 import { getThemeById } from "@/lib/invoice-themes";
 import { getEditingLogo } from "@/lib/logo-utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -58,7 +61,16 @@ export const InvoiceGenerator = ({
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [isNewClient, setIsNewClient] = useState(false);
-  // Using enhanced toast helpers
+  const [showBlockingDialog, setShowBlockingDialog] = useState(false);
+  const { usage, refreshUsage } = useUsage();
+  const isLimitReached = usage ? usage.current >= usage.limit : false;
+
+  useEffect(() => {
+    // if user reached the limit show the dialog
+    if (isLimitReached) {
+      setShowBlockingDialog(true);
+    }
+  }, [isLimitReached]);
 
   // Initialize default invoice data with user settings
   useEffect(() => {
@@ -245,9 +257,9 @@ export const InvoiceGenerator = ({
     setIsSaving(true);
     try {
       const invoiceToSave = convertInvoiceDataToSaveFormat(invoiceData);
-      const savedInvoice = await saveInvoice(invoiceToSave);
+      const result = await saveInvoice(invoiceToSave);
 
-      if (savedInvoice) {
+      if (result.success && result.invoice) {
         // Increment invoice counter in user settings after successful save
         const {
           data: { user },
@@ -271,14 +283,16 @@ export const InvoiceGenerator = ({
           `Invoice ${invoiceData.invoiceNumber} has been saved to your history.`
         );
 
-        // Don't reset the saved state - keep it saved
-
         // Call the callback if provided
         onInvoiceSaved?.();
+        
+        // Refresh usage data after successful save
+        await refreshUsage();
       } else {
         showError(
           "Error Saving Invoice",
-          "There was an error saving your invoice. Please try again."
+          result.error ||
+            "There was an error saving your invoice. Please try again."
         );
       }
     } catch (error) {
@@ -364,9 +378,13 @@ export const InvoiceGenerator = ({
   }
 
   return (
-    <div className="h-full">
+    <div className="h-full relative">
       <div className="mx-auto h-full">
-        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8 h-full">
+        <div
+          className={`flex flex-col lg:flex-row gap-4 lg:gap-8 h-full ${
+            isLimitReached ? "blur-sm pointer-events-none" : ""
+          }`}
+        >
           {/* Left Sidebar - Vertical Steps Progress */}
           <div className="w-full lg:w-80 lg:flex-shrink-0 lg:h-full">
             <Card className="pt-4 pb-1 px-1 lg:p-6 bg-gradient-to-b from-card to-muted/20 lg:sticky lg:top-0 shadow-lg lg:h-full border-primary/30">
@@ -470,63 +488,111 @@ export const InvoiceGenerator = ({
 
             {/* Navigation */}
             <div className="flex justify-between mt-4 lg:mt-6 pb-safe lg:pb-0 z-[2]">
-              <Button
-                variant="outline"
-                onClick={prevStep}
-                disabled={currentStep === 1}
-                className="flex items-center gap-2"
-                size="sm"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span className="hidden sm:inline">Previous</span>
-                <span className="sm:hidden">Prev</span>
-              </Button>
+              <>
+                {!isLimitReached && (
+                  <>
+                    <Button
+                      variant="outline"
+                      onClick={prevStep}
+                      disabled={currentStep === 1}
+                      className="flex items-center gap-2"
+                      size="sm"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      <span className="hidden sm:inline">Previous</span>
+                      <span className="sm:hidden">Prev</span>
+                    </Button>
 
-              {currentStep < steps.length ? (
-                <Button
-                  onClick={nextStep}
-                  disabled={!invoiceData || (invoiceData && !canProceed())}
-                  className="flex items-center gap-2"
-                  size="sm"
-                >
-                  <span className="hidden sm:inline">
-                    {currentStep === 2 && isNewClient
-                      ? "Save Client & Next"
-                      : "Next"}
-                  </span>
-                  <span className="sm:hidden">Next</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleSaveInvoice}
-                  disabled={isSaving || isSaved}
-                  className="flex items-center gap-2"
-                  size="sm"
-                >
-                  {isSaving ? (
-                    <>
-                      <div className="w-4 h-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                      Saving...
-                    </>
-                  ) : isSaved ? (
-                    <>
-                      <CheckCircle className="w-4 h-4" />
-                      Saved!
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4" />
-                      <span className="hidden sm:inline">Save Invoice</span>
-                      <span className="sm:hidden">Save</span>
-                    </>
-                  )}
-                </Button>
-              )}
+                    {currentStep < steps.length ? (
+                      <Button
+                        onClick={nextStep}
+                        disabled={
+                          !invoiceData || (invoiceData && !canProceed())
+                        }
+                        className="flex items-center gap-2"
+                        size="sm"
+                      >
+                        <span className="hidden sm:inline">
+                          {currentStep === 2 && isNewClient
+                            ? "Save Client & Next"
+                            : "Next"}
+                        </span>
+                        <span className="sm:hidden">Next</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={handleSaveInvoice}
+                        disabled={isSaving || isSaved}
+                        className="flex items-center gap-2"
+                        size="sm"
+                      >
+                        {isSaving ? (
+                          <>
+                            <div className="w-4 h-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                            Saving...
+                          </>
+                        ) : isSaved ? (
+                          <>
+                            <CheckCircle className="w-4 h-4" />
+                            Saved!
+                          </>
+                        ) : (
+                          <>
+                            <Save className="w-4 h-4" />
+                            <span className="hidden sm:inline">
+                              Save Invoice
+                            </span>
+                            <span className="sm:hidden">Save</span>
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </>
+                )}
+              </>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Lock Overlay when limit reached */}
+      {isLimitReached && (
+        <div className="absolute inset-0 flex items-center justify-center z-10 bg-background/80 backdrop-blur-sm">
+          <div className="text-center p-8 bg-card rounded-lg shadow-lg border border-primary/20 max-w-md mx-4">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+              <Lock className="w-8 h-8 text-primary" />
+            </div>
+            <h3 className="text-xl font-semibold text-foreground mb-2">
+              Invoice Limit Reached
+            </h3>
+            <p className="text-muted-foreground mb-4">
+              You've used {usage?.current || 0}/{usage?.limit || 0} invoices
+              this month. Upgrade to Pro to continue creating invoices.
+            </p>
+            <Button
+              onClick={() => setShowBlockingDialog(true)}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            >
+              <Lock className="w-4 h-4 mr-2" />
+              Upgrade to Pro
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Blocking Upgrade Dialog */}
+      <BlockingUpgradeDialog
+        isOpen={showBlockingDialog}
+        onUpgrade={() => {
+          // TODO: Implement actual upgrade flow
+          console.log("Upgrade to Pro clicked from blocking dialog");
+          setShowBlockingDialog(false);
+        }}
+        currentUsage={usage?.current || 0}
+        onClose={() => setShowBlockingDialog(false)}
+        limit={usage?.limit || 0}
+      />
     </div>
   );
 };

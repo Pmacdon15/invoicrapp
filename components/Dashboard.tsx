@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { InvoiceGenerator } from "./InvoiceGenerator";
 import { InvoiceHistory } from "./InvoiceHistory";
@@ -20,7 +20,6 @@ export const Dashboard = () => {
     null
   );
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   // Show loading state while checking authentication
   if (loading) {
     return (
@@ -61,16 +60,18 @@ export const Dashboard = () => {
     setActiveTab("create");
   };
 
+  const handleInvoiceSaved = () => {
+    setEditingInvoice(null);
+    setActiveTab("history");
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case "create":
         return (
           <InvoiceGenerator
             editingInvoice={editingInvoice}
-            onInvoiceSaved={() => {
-              setEditingInvoice(null);
-              setActiveTab("history");
-            }}
+            onInvoiceSaved={handleInvoiceSaved}
           />
         );
       case "history":

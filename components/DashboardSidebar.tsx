@@ -2,6 +2,7 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/ui/Logo";
+import { useUsage } from "@/contexts/UsageContext";
 import {
   FileText,
   Users,
@@ -34,6 +35,7 @@ export const DashboardSidebar = ({
   isOpen = true,
   onClose,
 }: DashboardSidebarProps) => {
+  const { usage } = useUsage();
   const mainItems: SidebarItem[] = [
     {
       id: "invoices",
@@ -145,21 +147,23 @@ export const DashboardSidebar = ({
           </div>
         </nav>
 
-        {/* Bottom Section */}
-        <div className="p-4 border-t border-border">
-          <div className="bg-gradient-to-r from-primary to-accent rounded-lg p-4 text-white">
-            <h3 className="font-semibold text-sm mb-1">Upgrade to Pro</h3>
-            <p className="text-xs text-primary-foreground/80 mb-3">
-              Unlock advanced features and unlimited invoices
-            </p>
-            <Button
-              size="sm"
-              className="w-full bg-white text-primary hover:bg-muted"
-            >
-              Upgrade Now
-            </Button>
+        {/* Bottom Section - Only show upgrade prompt for free plan users */}
+        {usage?.planType === 'free' && (
+          <div className="p-4 border-t border-border">
+            <div className="bg-gradient-to-r from-primary to-accent rounded-lg p-4 text-white">
+              <h3 className="font-semibold text-sm mb-1">Upgrade to Pro</h3>
+              <p className="text-xs text-primary-foreground/80 mb-3">
+                Unlock advanced features and unlimited invoices
+              </p>
+              <Button
+                size="sm"
+                className="w-full bg-white text-primary hover:bg-muted"
+              >
+                Upgrade Now
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
       </aside>
     </>
   );

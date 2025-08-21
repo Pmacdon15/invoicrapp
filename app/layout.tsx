@@ -4,6 +4,8 @@ import './globals.css'
 import { Toaster } from "@/components/ui/toaster"
 import { Toaster as Sonner } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import { AuthProvider } from "@/contexts/AuthContext";
+import { UsageProvider } from "@/contexts/UsageContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Providers } from './providers'
 import { Analytics } from "@vercel/analytics/next"
@@ -24,12 +26,14 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} antialiased`}>
         <Providers>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <Analytics />
-            {children}
-          </TooltipProvider>
+          <AuthProvider>
+            <UsageProvider>
+              <Toaster />
+              <Sonner />
+              <Analytics />
+              {children}
+            </UsageProvider>
+          </AuthProvider>
         </Providers>
       </body>
     </html>
