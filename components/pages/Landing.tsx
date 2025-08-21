@@ -23,8 +23,8 @@ const Landing = () => {
       <Hero companyLogos={companyLogos} />
       <Features />
       <Pricing />
-      <Testimonials />
-      <FinalCTA />
+      {/* <Testimonials /> */}
+      {/* <FinalCTA /> */}
       <Footer />
     </div>
   )

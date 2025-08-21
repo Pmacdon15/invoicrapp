@@ -47,36 +47,56 @@ const Testimonials = ({ testimonials }: TestimonialsProps) => {
   const testimonialsData = testimonials || defaultTestimonials
 
   return (
-    <section className="py-24 px-6">
-      <div className="container mx-auto max-w-6xl">
-        <div className="text-center mb-20">
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">Loved by Professionals Worldwide</h2>
-          <p className="text-xl text-muted-foreground">See what our customers have to say about their experience</p>
+    <section data-section="testimonials" className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 bg-gradient-to-br from-white via-emerald-50/50 to-teal-50 relative overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute top-10 right-10 w-24 h-24 bg-gradient-to-br from-teal-200/30 to-emerald-200/30 rounded-full blur-2xl"></div>
+      <div className="absolute bottom-10 left-10 w-32 h-32 bg-gradient-to-br from-emerald-200/30 to-teal-200/30 rounded-full blur-2xl"></div>
+      
+      <div className="container mx-auto max-w-6xl relative z-10">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center px-4 py-2 rounded-full bg-emerald-100 text-emerald-700 text-sm font-semibold mb-4">
+            ⭐ Customer Stories
+          </div>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            What Our Users 
+            <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent block">Are Saying</span>
+          </h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Join thousands of professionals who have transformed their invoicing process with Invoicr.
+          </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
           {testimonialsData.map((testimonial, index) => (
             <Card 
               key={index} 
-              className="p-8 bg-card border-border hover:shadow-lg hover:shadow-primary/10 hover:border-primary/20 transition-all duration-300"
+              className="group p-8 bg-white border-0 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 relative overflow-hidden"
             >
-              <div className="flex mb-6">
-                {[...Array(testimonial.rating)].map((_, i) => (
-                  <Star key={i} className="h-5 w-5 text-accent fill-current" />
-                ))}
-              </div>
-              <p className="text-foreground mb-6 italic leading-relaxed">"{testimonial.content}"</p>
-              <div className="flex items-center">
-                <img
-                  src={testimonial.avatar || "/placeholder.svg"}
-                  alt={testimonial.name}
-                  className="w-12 h-12 rounded-full mr-4"
-                />
-                <div>
-                  <p className="font-bold text-foreground">{testimonial.name}</p>
-                  <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+              {/* Background gradient on hover */}
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-teal-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              
+              <div className="relative z-10">
+                <div className="flex mb-6">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 text-emerald-400 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-6 italic leading-relaxed group-hover:text-gray-800 transition-colors">"{testimonial.content}"</p>
+                <div className="flex items-center">
+                  {/* <img
+                    src={testimonial.avatar || "/placeholder.svg"}
+                    alt={testimonial.name}
+                    className="w-12 h-12 rounded-full mr-4"
+                  /> */}
+                  <div>
+                    <p className="font-bold text-gray-900 group-hover:text-emerald-700 transition-colors">{testimonial.name}</p>
+                    <p className="text-sm text-gray-500">{testimonial.role}</p>
+                  </div>
                 </div>
               </div>
+              
+              {/* Subtle border animation */}
+              <div className="absolute inset-0 rounded-lg border-2 border-transparent group-hover:border-emerald-200 transition-colors duration-300"></div>
             </Card>
           ))}
         </div>

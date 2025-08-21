@@ -60,12 +60,12 @@ const Header = () => {
               >
                 Pricing
               </button>
-              <button className="text-muted-foreground hover:text-primary font-medium transition-colors">
+              {/* <button className="text-muted-foreground hover:text-primary font-medium transition-colors">
                 Templates
               </button>
               <button className="text-muted-foreground hover:text-primary font-medium transition-colors">
                 Help
-              </button>
+              </button> */}
             </nav>
 
             {user ? (
@@ -88,7 +88,7 @@ const Header = () => {
                       className="relative h-10 w-10 rounded-full hover:bg-primary/5 transition-colors"
                     >
                       <Avatar className="h-10 w-10">
-                        <AvatarImage src="/avatars/01.png" alt="User" />
+                        <AvatarImage src="/" alt="User" />
                         <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-primary-foreground font-semibold">
                           {getUserInitials(
                             user?.user_metadata?.full_name || user?.email
@@ -133,7 +133,7 @@ const Header = () => {
               <>
                 <Button 
                   variant="ghost" 
-                  className="font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all" 
+                  className="font-medium text-primary border border-primary hover:text-primary hover:bg-primary/5 transition-all" 
                   onClick={() => router.push("/auth")}
                 >
                   Sign In
