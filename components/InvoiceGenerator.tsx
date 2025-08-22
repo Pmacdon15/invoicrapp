@@ -434,7 +434,7 @@ export const InvoiceGenerator = ({
 
   const handleGoToSettings = () => {
     setShowSettingsDialog(false);
-    router.push("/dashboard?tab=settings");
+    router.push("/dashboard/settings");
   };
 
   const handleContinueWithoutSettings = async () => {
