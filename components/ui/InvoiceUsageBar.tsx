@@ -45,14 +45,14 @@ export const InvoiceUsageBar: React.FC<InvoiceUsageBarProps> = ({
   };
 
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
+    <div className={`flex flex-col-reverse md:flex-row items-center gap-3 ${className}`}>
       <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
         <Zap className="w-3 h-3 mr-1" />
         Free Plan
       </Badge>
       
       <div className="flex items-center gap-2 min-w-0 flex-1">
-        <div className="flex-1 min-w-[200px]">
+        <div className="flex-1 min-w-[150px] lg:min-w-[200px]">
           <Progress 
             value={percentage} 
             className="h-2"
@@ -63,11 +63,11 @@ export const InvoiceUsageBar: React.FC<InvoiceUsageBarProps> = ({
           />
         </div>
         
-        <div className="flex items-center gap-1 text-sm whitespace-nowrap">
+        <div className="flex items-center gap-1 text-xs md:text-sm whitespace-nowrap">
           <span className={getTextColor()}>
             {current}/{limit}
           </span>
-          <span className="text-muted-foreground">
+          <span className=" text-muted-foreground">
             invoices
           </span>
         </div>

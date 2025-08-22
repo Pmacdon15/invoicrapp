@@ -14,6 +14,7 @@ import {
   Plus,
   X,
 } from "lucide-react";
+import { InvoiceUsageBar } from "./ui/InvoiceUsageBar";
 
 interface SidebarItem {
   id: string;
@@ -124,6 +125,15 @@ export const DashboardSidebar = ({
 
         {/* Main Navigation */}
         <nav className="px-4 py-6 space-y-2 flex-1">
+
+          <div className="md:hidden mb-6">
+            <InvoiceUsageBar
+              current={usage?.current || 0}
+              limit={usage?.limit || 0}
+              planType={usage?.planType || 'free'}
+            />
+          </div>
+
           <div className="mb-6">
             <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
               Main

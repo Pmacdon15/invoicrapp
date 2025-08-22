@@ -65,7 +65,7 @@ export const ThemeSelection = ({
   };
 
   return (
-    <div className="space-y-4 md:space-y-6 h-full overflow-y-auto">
+    <div className="space-y-4 md:space-y-6 h-full">
       <div className="text-center">
         <div className="flex items-center justify-center gap-2 lg:mb-2">
           <Palette className="w-6 h-6 text-primary" />
@@ -74,7 +74,7 @@ export const ThemeSelection = ({
         {/* <p className="text-muted-foreground">Select a professional design for your invoices</p> */}
       </div>
 
-      <Card className="grid md:grid-cols-4 gap-6 overflow-y-auto p-6 bg-muted/90 rounded-lg h-full/2">
+      <Card className="grid md:grid-cols-4 gap-6 overflow-y-auto p-6 bg-muted/90 rounded-lg h-[90%]">
         {availableThemes.map((theme) => (
           <Card
             key={theme.id}
@@ -91,7 +91,7 @@ export const ThemeSelection = ({
               </div>
             )}
 
-            <div className="space-y-2">
+            <div className="md:space-y-2">
               {/* Theme Info */}
               <div className="text-center">
                 <h3
@@ -104,7 +104,7 @@ export const ThemeSelection = ({
                 {/* <p className="text-xs text-muted-foreground">v{theme.version} by {theme.author}</p> */}
               </div>
               {/* Mini Invoice Preview */}
-              <div className="h-44 w-32 bg-white rounded-lg shadow-sm border p-2 mx-auto relative">
+              <div className="h-40 md:h-44 w-32 bg-white rounded-lg shadow-sm border p-2 mx-auto relative scale-[0.9] md:scale-100">
                 {/* Invoice Header */}
                 <div
                   className="flex justify-between items-start pb-2 border-b p-2 rounded-t-lg -m-2 mb-3"

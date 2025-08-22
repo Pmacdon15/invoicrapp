@@ -47,14 +47,14 @@ export default function DashboardLayout({
   const activeTab = getActiveTab()
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col">
+    <div className="h-[100dvh] bg-gray-50 flex flex-col">
       <DashboardHeader 
         onNewInvoice={() => router.push('/dashboard/create')} 
         onTabChange={(tab) => router.push(`/dashboard/${tab}`)}
         onMenuToggle={() => setIsSidebarOpen(!isSidebarOpen)}
       />
       
-      <div className="flex-1 flex h-[90vh] lg:min-h-0">
+      <div className="flex-1 flex h-[90dvh] lg:min-h-0">
         <DashboardSidebar 
           activeTab={activeTab} 
           onTabChange={(tab) => router.push(`/dashboard/${tab}`)}

@@ -9,6 +9,7 @@ import {
   Save,
   CheckCircle,
   Lock,
+  LogOut,
 } from "lucide-react";
 import { ThemeSelection } from "./invoice/ThemeSelection";
 import { ClientInformation } from "./invoice/ClientInformation";
@@ -21,7 +22,7 @@ import {
   convertInvoiceDataToSaveFormat,
   type SavedInvoice,
 } from "@/lib/invoice-service";
-import { SettingsService } from "@/lib/settings-service";
+import { saveClient, CreateClientData } from "@/lib/client-service";
 import { showSuccess, showError } from "@/hooks/use-toast";
 import { BlockingUpgradeDialog } from "@/components/ui/BlockingUpgradeDialog";
 import { useUsage } from "@/contexts/UsageContext";
@@ -29,6 +30,7 @@ import { getThemeById } from "@/lib/invoice-themes";
 import { getEditingLogo } from "@/lib/logo-utils";
 import { supabase } from "@/integrations/supabase/client";
 import { calculateDueDate } from "@/lib/format-utils";
+import { checkUserSettingsConfigured, type SettingsValidationResult } from "@/lib/settings-validation";
 import type {
   InvoiceTheme,
   ClientInfo,
@@ -37,6 +39,9 @@ import type {
   CustomFieldValue,
 } from "@/types/invoice";
 import type { CustomField } from "@/types/settings";
+import { useRouter } from "next/navigation";
+import { SettingsService } from "@/lib/settings-service";
+import { SettingsRequiredDialog } from "@/components/ui/SettingsRequiredDialog";
 
 const steps = [
   { id: 1, title: "Choose Theme", description: "Select your invoice design" },
@@ -62,8 +67,11 @@ export const InvoiceGenerator = ({
   const [isSaved, setIsSaved] = useState(false);
   const [isNewClient, setIsNewClient] = useState(false);
   const [showBlockingDialog, setShowBlockingDialog] = useState(false);
+  const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+  const [settingsValidation, setSettingsValidation] = useState<SettingsValidationResult | null>(null);
   const { usage, refreshUsage } = useUsage();
   const isLimitReached = usage ? usage.current >= usage.limit : false;
+  const router = useRouter();
 
   useEffect(() => {
     // if user reached the limit show the dialog
@@ -72,14 +80,33 @@ export const InvoiceGenerator = ({
     }
   }, [isLimitReached]);
 
+
   // Initialize default invoice data with user settings
   useEffect(() => {
     const initializeInvoiceData = async () => {
       try {
+        console.log('Starting invoice initialization...');
         // Get current user
         const {
           data: { user },
         } = await supabase.auth.getUser();
+        console.log('User:', user?.id);
+
+        // Check user settings first (only for new invoices, not when editing)
+        if (user && !editingInvoice) {
+          console.log('Checking user settings for user:', user.id);
+          const validation = await checkUserSettingsConfigured(user.id);
+          console.log('Settings validation result:', validation);
+          setSettingsValidation(validation);
+          
+          // Show settings dialog if critical fields are missing
+          if (!validation.isValid) {
+            console.log('Settings invalid, showing dialog');
+            setShowSettingsDialog(true);
+          }
+        }
+
+        console.log('Proceeding with invoice initialization...');
 
         let defaultTheme = await getDefaultTheme();
         let invoiceNumber = `INV-${Date.now()}`;
@@ -216,7 +243,34 @@ export const InvoiceGenerator = ({
     setInvoiceData((prev) => (prev ? { ...prev, [field]: value } : null));
   };
 
-  const nextStep = () => {
+  const nextStep = async () => {
+    // If on step 2 (client info) and it's a new client, save the client first
+    if (currentStep === 2 && isNewClient && invoiceData?.client) {
+      const clientData: CreateClientData = {
+        name: invoiceData.client.name.trim(),
+        address: invoiceData.client.address.trim(),
+        email: invoiceData.client.email?.trim() || undefined,
+        phone: invoiceData.client.phone?.trim() || undefined,
+        tax_number: invoiceData.client.tax_number?.trim() || undefined,
+        website: invoiceData.client.website?.trim() || undefined,
+      };
+
+      const savedClient = await saveClient(clientData);
+      
+      if (savedClient) {
+        showSuccess(
+          "Client Saved!",
+          `${savedClient.name} has been saved to your client list.`
+        );
+      } else {
+        showError(
+          "Save Failed",
+          "There was an error saving the client. Please try again."
+        );
+        return; // Don't proceed to next step if save failed
+      }
+    }
+
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
     }
@@ -285,9 +339,10 @@ export const InvoiceGenerator = ({
 
         // Call the callback if provided
         onInvoiceSaved?.();
-        
+
         // Refresh usage data after successful save
         await refreshUsage();
+        router.push(`/dashboard/invoices`);
       } else {
         showError(
           "Error Saving Invoice",
@@ -377,6 +432,88 @@ export const InvoiceGenerator = ({
     );
   }
 
+  const handleGoToSettings = () => {
+    setShowSettingsDialog(false);
+    router.push("/dashboard?tab=settings");
+  };
+
+  const handleContinueWithoutSettings = async () => {
+    setShowSettingsDialog(false);
+    
+    // Initialize invoice data even without complete settings
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      let defaultTheme = await getDefaultTheme();
+      let invoiceNumber = `INV-${Date.now()}`;
+      let defaultNotes = "";
+
+      if (user) {
+        const userSettings = await SettingsService.getSettingsWithDefaults(user.id);
+        setCustomFields(userSettings.custom_fields || []);
+
+        if (userSettings.default_theme) {
+          const userTheme = await getThemeById(userSettings.default_theme);
+          if (userTheme) {
+            defaultTheme = userTheme;
+          }
+        }
+
+        if (
+          userSettings.invoice_prefix &&
+          userSettings.invoice_counter &&
+          userSettings.invoice_number_format
+        ) {
+          invoiceNumber = userSettings.invoice_number_format
+            .replace("{prefix}", userSettings.invoice_prefix)
+            .replace(
+              "{number}",
+              userSettings.invoice_counter.toString().padStart(4, "0")
+            );
+        }
+
+        defaultNotes = userSettings.default_notes || "";
+      }
+
+      const defaultData: InvoiceData = {
+        theme: defaultTheme,
+        client: { name: "", address: "", email: "", phone: "" },
+        items: [{ id: "1", description: "", quantity: 1, price: 0 }],
+        invoiceNumber,
+        date: new Date().toISOString().split("T")[0],
+        dueDate: calculateDueDate(
+          new Date().toISOString().split("T")[0],
+          user
+            ? (await SettingsService.getSettingsWithDefaults(user.id))
+                .default_payment_terms
+            : "Net 30"
+        ),
+        notes: defaultNotes,
+        currency: user
+          ? (await SettingsService.getSettingsWithDefaults(user.id))
+              .default_currency
+          : "USD",
+        paymentTerms: user
+          ? (await SettingsService.getSettingsWithDefaults(user.id))
+              .default_payment_terms
+          : "Net 30",
+        taxRate: user
+          ? (await SettingsService.getSettingsWithDefaults(user.id))
+              .default_tax_rate
+          : 0,
+        customFields: [],
+        dynamicFields: [],
+      };
+
+      setInvoiceData(defaultData);
+    } catch (error) {
+      console.error("Error initializing invoice data:", error);
+      showError("Failed to initialize invoice data");
+    }
+  };
+
   return (
     <div className="h-full relative">
       <div className="mx-auto h-full">
@@ -387,7 +524,7 @@ export const InvoiceGenerator = ({
         >
           {/* Left Sidebar - Vertical Steps Progress */}
           <div className="w-full lg:w-80 lg:flex-shrink-0 lg:h-full">
-            <Card className="pt-4 pb-1 px-1 lg:p-6 bg-gradient-to-b from-card to-muted/20 lg:sticky lg:top-0 shadow-lg lg:h-full border-primary/30">
+            <Card className="pt-4 pb-1 px-1 lg:p-6 bg-gradient-to-b from-card to-muted/20 lg:sticky lg:top-0 shadow-lg lg:h-full border-primary/30 lg:flex lg:flex-col lg:justify-center">
               {/* <div className="flex items-center gap-3 mb-6">
                 <FileText className="w-6 h-6 text-primary" />
                 <h2 className="text-xl font-bold text-foreground">
@@ -482,7 +619,7 @@ export const InvoiceGenerator = ({
           {/* Right Content Area */}
           <div className="flex-1 flex flex-col lg:h-full overflow-y-auto">
             {/* Step Content */}
-            <Card className="p-4 sm:p-6 lg:p-8 shadow-lg flex-1 h-[80%] lg:h-[90%] border-primary/30">
+            <Card className="p-4 sm:p-6 lg:p-8 shadow-lg flex-1 h-[85%] lg:h-[90%] border-primary/30">
               {renderStepContent()}
             </Card>
 
@@ -503,51 +640,64 @@ export const InvoiceGenerator = ({
                       <span className="sm:hidden">Prev</span>
                     </Button>
 
-                    {currentStep < steps.length ? (
-                      <Button
-                        onClick={nextStep}
-                        disabled={
-                          !invoiceData || (invoiceData && !canProceed())
-                        }
-                        className="flex items-center gap-2"
-                        size="sm"
-                      >
-                        <span className="hidden sm:inline">
-                          {currentStep === 2 && isNewClient
-                            ? "Save Client & Next"
-                            : "Next"}
-                        </span>
-                        <span className="sm:hidden">Next</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </Button>
-                    ) : (
-                      <Button
-                        onClick={handleSaveInvoice}
-                        disabled={isSaving || isSaved}
-                        className="flex items-center gap-2"
-                        size="sm"
-                      >
-                        {isSaving ? (
-                          <>
-                            <div className="w-4 h-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                            Saving...
-                          </>
-                        ) : isSaved ? (
-                          <>
-                            <CheckCircle className="w-4 h-4" />
-                            Saved!
-                          </>
-                        ) : (
-                          <>
-                            <Save className="w-4 h-4" />
-                            <span className="hidden sm:inline">
-                              Save Invoice
-                            </span>
-                            <span className="sm:hidden">Save</span>
-                          </>
-                        )}
-                      </Button>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {isSaved && (
+                        <Button
+                          variant="outline"
+                          onClick={() => router.push("/dashboard/invoices")}
+                          className="flex items-center gap-2"
+                          size="sm"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          Exit
+                        </Button>
+                      )}
+                      {currentStep < steps.length ? (
+                        <Button
+                          onClick={nextStep}
+                          disabled={
+                            !invoiceData || (invoiceData && !canProceed())
+                          }
+                          className="flex items-center gap-2"
+                          size="sm"
+                        >
+                          <span className="hidden sm:inline">
+                            {currentStep === 2 && isNewClient
+                              ? "Save Client & Next"
+                              : "Next"}
+                          </span>
+                          <span className="sm:hidden">Next</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={handleSaveInvoice}
+                          disabled={isSaving || isSaved}
+                          className="flex items-center gap-2"
+                          size="sm"
+                        >
+                          {isSaving ? (
+                            <>
+                              <div className="w-4 h-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                              Saving...
+                            </>
+                          ) : isSaved ? (
+                            <>
+                              <CheckCircle className="w-4 h-4" />
+                              Saved!
+                            </>
+                          ) : (
+                            <>
+                              <Save className="w-4 h-4" />
+                              <span className="hidden sm:inline">
+                                Save Invoice
+                              </span>
+                              <span className="sm:hidden">Save</span>
+                            </>
+                          )}
+                        </Button>
+                      )}
+                    </div>
                   </>
                 )}
               </>
@@ -592,6 +742,15 @@ export const InvoiceGenerator = ({
         currentUsage={usage?.current || 0}
         onClose={() => setShowBlockingDialog(false)}
         limit={usage?.limit || 0}
+      />
+
+      {/* Settings Dialog */}
+      <SettingsRequiredDialog
+        open={showSettingsDialog && settingsValidation !== null}
+        onOpenChange={setShowSettingsDialog}
+        validationResult={settingsValidation || { isValid: true, missingFields: [], criticalMissing: [] }}
+        onGoToSettings={handleGoToSettings}
+        onContinueAnyway={settingsValidation && settingsValidation.criticalMissing.length === 0 ? handleContinueWithoutSettings : undefined}
       />
     </div>
   );

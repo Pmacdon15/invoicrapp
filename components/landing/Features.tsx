@@ -3,6 +3,7 @@
 import React from "react"
 import { Card } from "@/components/ui/card"
 import { FileText, Users, TrendingUp, Zap, Shield, Clock, Palette, Globe, BarChart3, CheckCircle, Plus, Edit3, Eye } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 interface AppFeature {
   id: string
@@ -17,6 +18,7 @@ interface FeaturesProps {
 }
 
 const Features = ({ features }: FeaturesProps) => {
+  const router = useRouter()
   const defaultFeatures: AppFeature[] = [
     {
       id: "invoice-generation",
@@ -359,7 +361,7 @@ const Features = ({ features }: FeaturesProps) => {
                 </p>
                 
                 <div className="flex items-center space-x-4 pt-4">
-                  <button className="flex items-center space-x-2 bg-emerald-500 text-white px-6 py-3 rounded-lg hover:bg-emerald-600 transition-colors">
+                  <button onClick={() => router.push("/auth")} className="flex items-center space-x-2 bg-emerald-500 text-white px-6 py-3 rounded-lg hover:bg-emerald-600 transition-colors">
                     <Eye className="w-4 h-4" />
                     <span>Try Feature</span>
                   </button>

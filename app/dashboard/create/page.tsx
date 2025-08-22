@@ -50,7 +50,7 @@ export default function CreateInvoicePage() {
   return (
     <InvoiceGenerator
       editingInvoice={editingInvoice}
-      onInvoiceSaved={() => router.push('/dashboard/invoices')}
+      onInvoiceSaved={() => null}
     />
   )
 }

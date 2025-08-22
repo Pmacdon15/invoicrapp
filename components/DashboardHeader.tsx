@@ -41,7 +41,7 @@ export const DashboardHeader = ({
   onTabChange,
   onMenuToggle,
 }: DashboardHeaderProps) => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, loading } = useAuth();
   const { usage, isLoading } = useUsage();
   const router = useRouter();
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
@@ -95,7 +95,7 @@ export const DashboardHeader = ({
         <div className="flex items-center space-x-2 sm:space-x-3">
           {/* Usage Bar - Show to the left of New Invoice button */}
           {usage && !isLoading && (
-            <div className="hidden sm:block">
+            <div className="hidden md:block">
               <InvoiceUsageBar
                 current={usage.current}
                 limit={usage.limit === Infinity ? 999 : usage.limit}
@@ -112,8 +112,8 @@ export const DashboardHeader = ({
             className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg transition-all duration-200 flex items-center gap-1 sm:gap-2"
           >
             <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">New Invoice</span>
-            <span className="sm:hidden">New</span>
+            <span className="hidden lg:inline">New Invoice</span>
+            <span className="lg:hidden">New</span>
           </Button>
 
           {/* Upgrade to Pro Button - Hidden on mobile, only show for free users */}

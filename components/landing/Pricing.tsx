@@ -4,6 +4,7 @@ import React from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CheckCircle, Star, Crown, Zap } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 interface PricingPlan {
   name: string
@@ -19,6 +20,7 @@ interface PricingProps {
 }
 
 const Pricing = ({ pricingPlans }: PricingProps) => {
+  const router = useRouter();
   const defaultPricingPlans = [
     {
       name: "Free",
@@ -144,6 +146,7 @@ const Pricing = ({ pricingPlans }: PricingProps) => {
 
                 {/* CTA Button */}
                 <button 
+                onClick={() => router.push("/auth")}
                   className={`w-full py-4 px-6 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 ${
                     plan.popular
                       ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg hover:shadow-xl"

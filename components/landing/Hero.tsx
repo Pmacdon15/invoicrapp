@@ -15,6 +15,7 @@ import {
   Palette,
   User,
   Receipt,
+  Loader2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
@@ -31,7 +32,7 @@ interface HeroProps {
 
 const Hero = ({ companyLogos = [] }: HeroProps) => {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [currentStep, setCurrentStep] = useState("theme");
   const [passedSteps, setPassedSteps] = useState(["theme"]);
 
@@ -96,7 +97,11 @@ const Hero = ({ companyLogos = [] }: HeroProps) => {
 
             {/* CTA buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mb-12 items-center justify-center lg:justify-start">
-              {user ? (
+              {loading ? (
+                <div className="flex items-center justify-center space-x-2 w-40">
+                  <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                </div>
+              ) : user ? (
                 <Button
                   size="lg"
                   className="group text-lg px-8 py-4 h-auto bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-xl hover:shadow-emerald-500/25 transition-all duration-300 transform hover:scale-105 border-0 font-semibold"
