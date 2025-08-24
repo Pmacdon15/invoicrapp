@@ -333,10 +333,10 @@ const Hero = ({ companyLogos = [] }: HeroProps) => {
 
                   {/* Right Side - Paper-sized Invoice */}
                   <div
-                    className={`relative w-36 h-52 bg-white border border-gray-300 rounded shadow-sm p-1.5 space-y-4 flex-shrink-0 ${
+                    className={`relative w-36 h-52 bg-white border rounded shadow-sm p-1.5 space-y-4 flex-shrink-0 ${
                       currentStep === "preview"
                         ? "border border-emerald-500"
-                        : ""
+                        : "border-gray-300"
                     }`}
                   >
                     {/* Header */}
@@ -366,10 +366,10 @@ const Hero = ({ companyLogos = [] }: HeroProps) => {
 
                     {/* Items table */}
                     <div
-                      className={`border border-gray-200 rounded p-1 space-y-2 ${
+                      className={`border rounded p-1 space-y-2 ${
                         currentStep === "items"
                           ? "border border-emerald-500"
-                          : ""
+                          : "border-gray-200"
                       }`}
                     >
                       <div className="flex justify-between">

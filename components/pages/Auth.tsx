@@ -71,6 +71,7 @@ const Auth = () => {
           "Success!",
           "Please check your email to confirm your account."
         );
+        router.push("/dashboard");
       }
     } catch (error) {
       showError(
