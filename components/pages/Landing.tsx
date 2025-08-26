@@ -1,13 +1,14 @@
-'use client'
+"use client";
 
-import React from "react"
-import Header from "@/components/landing/Header"
-import Hero from "@/components/landing/Hero"
-import Features from "@/components/landing/Features"
-import Pricing from "@/components/landing/Pricing"
-import Testimonials from "@/components/landing/Testimonials"
-import FinalCTA from "@/components/landing/FinalCTA"
-import Footer from "@/components/landing/Footer"
+import React from "react";
+import Header from "@/components/landing/Header";
+import Hero from "@/components/landing/Hero";
+import Features from "@/components/landing/Features";
+import Pricing from "@/components/landing/Pricing";
+import Testimonials from "@/components/landing/Testimonials";
+import FinalCTA from "@/components/landing/FinalCTA";
+import Footer from "@/components/landing/Footer";
+import StructuredData from "@/components/StructuredData";
 
 const Landing = () => {
   const companyLogos = [
@@ -15,19 +16,22 @@ const Landing = () => {
     { name: "DesignStudio", logo: "/design-agency-logo.png" },
     { name: "StartupInc", logo: "/startup-logo.png" },
     { name: "ConsultingPro", logo: "/consulting-firm-logo.png" },
-  ]
+  ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <Hero companyLogos={companyLogos} />
-      <Features />
-      <Pricing />
-      {/* <Testimonials /> */}
-      {/* <FinalCTA /> */}
-      <Footer />
-    </div>
-  )
+    <>
+      <StructuredData />
+      <div className="min-h-screen bg-background">
+        <Header />
+        <Hero companyLogos={companyLogos} />
+        <Features />
+        <Pricing />
+        {/* <Testimonials /> */}
+        {/* <FinalCTA /> */}
+        <Footer />
+      </div>
+    </>
+  );
 };
 
 export default Landing;

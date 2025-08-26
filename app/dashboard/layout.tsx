@@ -1,26 +1,37 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
-import { useAuth } from '@/contexts/AuthContext'
-import { DashboardHeader } from '@/components/DashboardHeader'
-import { DashboardSidebar } from '@/components/DashboardSidebar'
+import type { Metadata } from "next";
+import { useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { DashboardHeader } from "@/components/DashboardHeader";
+import { DashboardSidebar } from "@/components/DashboardSidebar";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+  description:
+    "Manage your invoices, clients, and business analytics with Invoicr dashboard.",
+  robots: {
+    index: false, // Don't index dashboard pages
+    follow: false,
+  },
+};
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  const { user, loading } = useAuth()
-  const router = useRouter()
-  const pathname = usePathname()
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
-      router.replace('/auth')
+      router.replace("/auth");
     }
-  }, [user, loading, router])
+  }, [user, loading, router]);
 
   if (loading) {
     return (
@@ -30,38 +41,39 @@ export default function DashboardLayout({
           <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (!user) {
-    return null
+    return null;
   }
 
   // Extract the active tab from pathname
   const getActiveTab = () => {
-    if (pathname === '/dashboard' || pathname === '/dashboard/') return 'invoices'
-    const segments = pathname.split('/')
-    return segments[2] || 'invoices' // /dashboard/[tab]
-  }
+    if (pathname === "/dashboard" || pathname === "/dashboard/")
+      return "invoices";
+    const segments = pathname.split("/");
+    return segments[2] || "invoices"; // /dashboard/[tab]
+  };
 
-  const activeTab = getActiveTab()
+  const activeTab = getActiveTab();
 
   return (
     <div className="h-[100dvh] bg-gray-50 flex flex-col">
-      <DashboardHeader 
-        onNewInvoice={() => router.push('/dashboard/create')} 
+      <DashboardHeader
+        onNewInvoice={() => router.push("/dashboard/create")}
         onTabChange={(tab) => router.push(`/dashboard/${tab}`)}
         onMenuToggle={() => setIsSidebarOpen(!isSidebarOpen)}
       />
-      
+
       <div className="flex-1 flex h-[90dvh] lg:min-h-0">
-        <DashboardSidebar 
-          activeTab={activeTab} 
+        <DashboardSidebar
+          activeTab={activeTab}
           onTabChange={(tab) => router.push(`/dashboard/${tab}`)}
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
         />
-        
+
         <main className="flex-1 p-4 pb-safe lg:pb-4 overflow-y-auto bg-primary/5 lg:ml-0 h-full">
           <div className="max-w-7xl xl:max-w-full xl:px-4 mx-auto h-full">
             {children}
@@ -69,5 +81,5 @@ export default function DashboardLayout({
         </main>
       </div>
     </div>
-  )
+  );
 }

@@ -1,8 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['localhost'],
+    domains: ["localhost"],
+    formats: ["image/webp", "image/avif"],
   },
-}
+  compress: true,
+  poweredByHeader: false,
+  generateEtags: false,
+  experimental: {
+    optimizeCss: true,
+  },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
