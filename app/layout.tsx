@@ -37,14 +37,14 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://invoicrapp.com"),
+  metadataBase: new URL("https://www.invoicrapp.com"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://invoicrapp.com",
+    url: "https://www.invoicrapp.com",
     title: "Invoicr - Professional Invoice Generator | Create Invoices Fast",
     description:
       "Create professional invoices in minutes with Invoicr. Streamline your billing process with our intuitive invoice generator.",
