@@ -2,11 +2,27 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Eye, 
-  Edit, 
-  Trash2, 
-  Download, 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import {
+  Eye,
+  Edit,
+  Trash2,
+  Download,
   Calendar,
   User,
   DollarSign,
@@ -15,7 +31,11 @@ import {
   MoreVertical,
   Send,
   CircleCheck,
-  RefreshCcw
+  RefreshCcw,
+  ArrowUpDown,
+  Filter,
+  X,
+  Search,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -29,18 +49,23 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { 
-  getUserInvoices, 
-  deleteInvoice, 
+import {
+  getUserInvoices,
+  deleteInvoice,
   updateInvoiceStatus,
-  type SavedInvoice 
+  type SavedInvoice,
 } from "@/lib/invoice-service";
 import { showSuccess, showError } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { InvoicePreview } from "@/components/invoice/InvoicePreview";
 import { getThemeMetadataSync } from "@/lib/invoice-themes";
 import { getDisplayLogoUrl } from "@/lib/logo-utils";
-import type { InvoiceData, InvoiceItem, ClientInfo, InvoiceTheme } from "@/types/invoice";
+import type {
+  InvoiceData,
+  InvoiceItem,
+  ClientInfo,
+  InvoiceTheme,
+} from "@/types/invoice";
 
 interface InvoiceHistoryProps {
   onEditInvoice?: (invoice: SavedInvoice) => void;
@@ -49,26 +74,43 @@ interface InvoiceHistoryProps {
 
 const statusColors = {
   draft: "bg-gray-100 text-gray-800 border-gray-200",
-  sent: "bg-blue-100 text-blue-800 border-blue-200", 
+  sent: "bg-blue-100 text-blue-800 border-blue-200",
   paid: "bg-green-100 text-green-800 border-green-200",
   overdue: "bg-red-100 text-red-800 border-red-200",
-  cancelled: "bg-orange-100 text-orange-800 border-orange-200"
+  cancelled: "bg-orange-100 text-orange-800 border-orange-200",
 };
 
 const statusLabels = {
   draft: "Draft",
-  sent: "Sent", 
+  sent: "Sent",
   paid: "Paid",
   overdue: "Overdue",
-  cancelled: "Cancelled"
+  cancelled: "Cancelled",
 };
 
-export const InvoiceHistory = ({ onEditInvoice, onViewInvoice }: InvoiceHistoryProps) => {
+export const InvoiceHistory = ({
+  onEditInvoice,
+  onViewInvoice,
+}: InvoiceHistoryProps) => {
   const [invoices, setInvoices] = useState<SavedInvoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [previewInvoice, setPreviewInvoice] = useState<SavedInvoice | null>(null);
+  const [previewInvoice, setPreviewInvoice] = useState<SavedInvoice | null>(
+    null
+  );
   const [showPreviewDialog, setShowPreviewDialog] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState<
+    | "invoice_number"
+    | "client_name"
+    | "invoice_date"
+    | "total_amount"
+    | "status"
+  >("invoice_date");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [filterBy, setFilterBy] = useState<
+    "all" | "draft" | "sent" | "paid" | "overdue" | "cancelled"
+  >("all");
   // Using enhanced toast helpers
 
   const loadInvoices = async () => {
@@ -77,7 +119,7 @@ export const InvoiceHistory = ({ onEditInvoice, onViewInvoice }: InvoiceHistoryP
       const userInvoices = await getUserInvoices();
       setInvoices(userInvoices);
     } catch (error) {
-      console.error('Error loading invoices:', error);
+      console.error("Error loading invoices:", error);
       showError(
         "Error Loading Invoices",
         "Failed to load your invoice history. Please try again."
@@ -92,7 +134,7 @@ export const InvoiceHistory = ({ onEditInvoice, onViewInvoice }: InvoiceHistoryP
     try {
       const success = await deleteInvoice(id);
       if (success) {
-        setInvoices(prev => prev.filter(inv => inv.id !== id));
+        setInvoices((prev) => prev.filter((inv) => inv.id !== id));
         showSuccess(
           "Invoice Deleted",
           "Invoice has been successfully deleted."
@@ -104,7 +146,7 @@ export const InvoiceHistory = ({ onEditInvoice, onViewInvoice }: InvoiceHistoryP
         );
       }
     } catch (error) {
-      console.error('Error deleting invoice:', error);
+      console.error("Error deleting invoice:", error);
       showError(
         "Error Deleting Invoice",
         "Failed to delete the invoice. Please try again."
@@ -114,12 +156,15 @@ export const InvoiceHistory = ({ onEditInvoice, onViewInvoice }: InvoiceHistoryP
     }
   };
 
-  const handleStatusUpdate = async (id: string, newStatus: SavedInvoice['status']) => {
+  const handleStatusUpdate = async (
+    id: string,
+    newStatus: SavedInvoice["status"]
+  ) => {
     try {
       const success = await updateInvoiceStatus(id, newStatus);
       if (success) {
-        setInvoices(prev => 
-          prev.map(inv => 
+        setInvoices((prev) =>
+          prev.map((inv) =>
             inv.id === id ? { ...inv, status: newStatus } : inv
           )
         );
@@ -134,7 +179,7 @@ export const InvoiceHistory = ({ onEditInvoice, onViewInvoice }: InvoiceHistoryP
         );
       }
     } catch (error) {
-      console.error('Error updating status:', error);
+      console.error("Error updating status:", error);
       showError(
         "Error Updating Status",
         "Failed to update invoice status. Please try again."
@@ -145,47 +190,51 @@ export const InvoiceHistory = ({ onEditInvoice, onViewInvoice }: InvoiceHistoryP
   // Convert SavedInvoice to InvoiceData format for preview
   const convertToInvoiceData = (savedInvoice: SavedInvoice): InvoiceData => {
     const themeMetadata = getThemeMetadataSync(savedInvoice.theme_id);
-    
+
     // Create a complete theme object for preview purposes
     const previewTheme = {
       id: savedInvoice.theme_id,
       name: savedInvoice.theme_name,
-      color: themeMetadata?.id.split('-')[1] || 'blue',
-      description: themeMetadata?.description || 'Professional theme',
-      version: themeMetadata?.version || '1.0.0',
-      author: themeMetadata?.author || 'Invoicr',
+      color: themeMetadata?.id.split("-")[1] || "blue",
+      description: themeMetadata?.description || "Professional theme",
+      version: themeMetadata?.version || "1.0.0",
+      author: themeMetadata?.author || "Invoicr",
       preview: themeMetadata?.preview || {
-        primary: '#3b82f6',
-        secondary: '#dbeafe',
-        accent: '#1e40af'
+        primary: "#3b82f6",
+        secondary: "#dbeafe",
+        accent: "#1e40af",
       },
       styles: {
-        primary: `text-invoice-${themeMetadata?.id.split('-')[1] || 'blue'}`,
-        primaryLight: `bg-invoice-${themeMetadata?.id.split('-')[1] || 'blue'}-light`,
-        text: `text-invoice-${themeMetadata?.id.split('-')[1] || 'blue'}`,
-        background: `bg-invoice-${themeMetadata?.id.split('-')[1] || 'blue'}-light`,
-        border: `border-invoice-${themeMetadata?.id.split('-')[1] || 'blue'}`
+        primary: `text-invoice-${themeMetadata?.id.split("-")[1] || "blue"}`,
+        primaryLight: `bg-invoice-${
+          themeMetadata?.id.split("-")[1] || "blue"
+        }-light`,
+        text: `text-invoice-${themeMetadata?.id.split("-")[1] || "blue"}`,
+        background: `bg-invoice-${
+          themeMetadata?.id.split("-")[1] || "blue"
+        }-light`,
+        border: `border-invoice-${themeMetadata?.id.split("-")[1] || "blue"}`,
       },
       layout: {
-        headerStyle: 'classic',
-        footerStyle: 'minimal',
-        spacing: 'comfortable',
+        headerStyle: "classic",
+        footerStyle: "minimal",
+        spacing: "comfortable",
         typography: {
-          headerFont: 'font-semibold',
-          bodyFont: 'font-normal',
-          accentFont: 'font-medium'
-        }
+          headerFont: "font-semibold",
+          bodyFont: "font-normal",
+          accentFont: "font-medium",
+        },
       },
-      customCSS: ''
+      customCSS: "",
     };
-    
+
     return {
       theme: previewTheme,
       client: {
         name: savedInvoice.client_name,
         address: savedInvoice.client_address,
         email: savedInvoice.client_email || undefined,
-        phone: savedInvoice.client_phone || undefined
+        phone: savedInvoice.client_phone || undefined,
       },
       items: savedInvoice.items,
       invoiceNumber: savedInvoice.invoice_number,
@@ -202,6 +251,54 @@ export const InvoiceHistory = ({ onEditInvoice, onViewInvoice }: InvoiceHistoryP
     setPreviewInvoice(invoice);
     setShowPreviewDialog(true);
   };
+
+  const handleSort = (column: typeof sortBy) => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(column);
+      setSortOrder("asc");
+    }
+  };
+
+  const filteredAndSortedInvoices = invoices
+    .filter((invoice) => {
+      if (filterBy !== "all" && invoice.status !== filterBy) return false;
+      if (searchTerm) {
+        const searchLower = searchTerm.toLowerCase();
+        return (
+          invoice.invoice_number.toLowerCase().includes(searchLower) ||
+          invoice.client_name.toLowerCase().includes(searchLower) ||
+          (invoice.notes && invoice.notes.toLowerCase().includes(searchLower))
+        );
+      }
+      return true;
+    })
+    .sort((a, b) => {
+      let comparison = 0;
+
+      switch (sortBy) {
+        case "invoice_number":
+          comparison = a.invoice_number.localeCompare(b.invoice_number);
+          break;
+        case "client_name":
+          comparison = a.client_name.localeCompare(b.client_name);
+          break;
+        case "invoice_date":
+          comparison =
+            new Date(a.invoice_date).getTime() -
+            new Date(b.invoice_date).getTime();
+          break;
+        case "total_amount":
+          comparison = a.total_amount - b.total_amount;
+          break;
+        case "status":
+          comparison = a.status.localeCompare(b.status);
+          break;
+      }
+
+      return sortOrder === "asc" ? comparison : -comparison;
+    });
 
   useEffect(() => {
     loadInvoices();
@@ -246,117 +343,249 @@ export const InvoiceHistory = ({ onEditInvoice, onViewInvoice }: InvoiceHistoryP
         </Button>
       </div>
 
-      {invoices.length === 0 ? (
-        <Card className="text-center py-12">
-          <CardContent>
-            <FileText className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              No Invoices Yet
-            </h3>
-            <p className="text-gray-600 mb-4">
-              Start creating invoices to see them appear in your history.
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-4 w-full">
-          {invoices.map((invoice) => (
-            <Card 
-              key={invoice.id} 
-              className="hover:shadow-md transition-shadow cursor-pointer w-full overflow-hidden"
-              onClick={() => handlePreviewInvoice(invoice)}
+      {/* Search and Filters */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Input
+            placeholder="Search invoices by number, client, or notes..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <div className="flex gap-2 items-center">
+          <Filter className="w-4 h-4 text-gray-500" />
+          <Select
+            value={filterBy}
+            onValueChange={(value: typeof filterBy) => setFilterBy(value)}
+          >
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Invoices</SelectItem>
+              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="sent">Sent</SelectItem>
+              <SelectItem value="paid">Paid</SelectItem>
+              <SelectItem value="overdue">Overdue</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
+            </SelectContent>
+          </Select>
+          {(filterBy !== "all" || searchTerm) && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setFilterBy("all");
+                setSearchTerm("");
+              }}
+              className="h-8 w-8 p-0"
             >
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {invoice.invoice_number}
-                      </h3>
-                      <Badge 
-                        variant="outline" 
-                        className={statusColors[invoice.status as keyof typeof statusColors]}
-                      >
-                        {statusLabels[invoice.status as keyof typeof statusLabels]}
-                      </Badge>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4" />
-                        <span>{invoice.client_name}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        <span>{format(new Date(invoice.invoice_date), 'MMM dd, yyyy')}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4" />
-                        <span className="font-semibold text-gray-900">
-                          ${invoice.total_amount.toFixed(2)}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div className="mt-3 text-xs text-gray-500">
-                      Created {format(new Date(invoice.created_at), 'MMM dd, yyyy • h:mm a')}
-                    </div>
-                  </div>
+              <X className="w-4 h-4" />
+            </Button>
+          )}
+        </div>
+      </div>
 
-                  <div className="flex items-center gap-2 ml-4">
-                    <Button
+      {/* Invoices Table */}
+      {filteredAndSortedInvoices.length === 0 ? (
+        <div className="text-center py-16">
+          <FileText className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            No Invoices Found
+          </h3>
+          <p className="text-gray-600 mb-4">
+            {searchTerm || filterBy !== "all"
+              ? "No invoices match your current filters."
+              : "Start creating invoices to see them appear in your history."}
+          </p>
+        </div>
+      ) : (
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-gray-50">
+                <TableHead className="w-8">{/* Status */}</TableHead>
+                <TableHead>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleSort("invoice_number")}
+                    className="h-auto p-0 font-semibold hover:bg-transparent hover:text-primary"
+                  >
+                    Invoice #
+                    <ArrowUpDown className="ml-1 h-4 w-4" />
+                  </Button>
+                </TableHead>
+                <TableHead>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleSort("client_name")}
+                    className="h-auto p-0 font-semibold hover:bg-transparent hover:text-primary"
+                  >
+                    Client
+                    <ArrowUpDown className="ml-1 h-4 w-4" />
+                  </Button>
+                </TableHead>
+                <TableHead>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleSort("invoice_date")}
+                    className="h-auto p-0 font-semibold hover:bg-transparent hover:text-primary"
+                  >
+                    Date
+                    <ArrowUpDown className="ml-1 h-4 w-4" />
+                  </Button>
+                </TableHead>
+                <TableHead>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleSort("total_amount")}
+                    className="h-auto p-0 font-semibold hover:bg-transparent hover:text-primary"
+                  >
+                    Amount
+                    <ArrowUpDown className="ml-1 h-4 w-4" />
+                  </Button>
+                </TableHead>
+                <TableHead>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleSort("status")}
+                    className="h-auto p-0 font-semibold hover:bg-transparent hover:text-primary"
+                  >
+                    Status
+                    <ArrowUpDown className="ml-1 h-4 w-4" />
+                  </Button>
+                </TableHead>
+                <TableHead className="w-20">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredAndSortedInvoices.map((invoice) => (
+                <TableRow
+                  key={invoice.id}
+                  className="cursor-pointer hover:bg-gray-50"
+                  onClick={() => handlePreviewInvoice(invoice)}
+                >
+                  <TableCell>
+                    <div
+                      className={`w-3 h-3 rounded-full ${
+                        invoice.status === "paid"
+                          ? "bg-green-500"
+                          : invoice.status === "sent"
+                          ? "bg-blue-500"
+                          : invoice.status === "overdue"
+                          ? "bg-red-500"
+                          : invoice.status === "cancelled"
+                          ? "bg-orange-500"
+                          : "bg-gray-500"
+                      }`}
+                    ></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-semibold text-gray-900">
+                      {invoice.invoice_number}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      Created{" "}
+                      {format(new Date(invoice.created_at), "MMM dd, yyyy")}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <User className="w-4 h-4 text-gray-400" />
+                      <span className="text-gray-900">
+                        {invoice.client_name}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-gray-400" />
+                      <span className="text-gray-900">
+                        {format(new Date(invoice.invoice_date), "MMM dd, yyyy")}
+                      </span>
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      Due: {format(new Date(invoice.due_date), "MMM dd, yyyy")}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="w-4 h-4 text-gray-400" />
+                      <span className="font-semibold text-gray-900">
+                        ${invoice.total_amount.toFixed(2)}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge
                       variant="outline"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handlePreviewInvoice(invoice);
-                      }}
-                      className="flex items-center gap-1"
+                      className={`${
+                        statusColors[
+                          invoice.status as keyof typeof statusColors
+                        ]
+                      }`}
                     >
-                      <Eye className="w-4 h-4" />
-                      <span className="hidden sm:inline">View</span>
-                    </Button>
-                    
+                      {
+                        statusLabels[
+                          invoice.status as keyof typeof statusLabels
+                        ]
+                      }
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="ghost"
                           size="sm"
                           onClick={(e) => e.stopPropagation()}
+                          className="h-8 w-8 p-0"
                         >
                           <MoreVertical className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onEditInvoice?.(invoice)}>
+                        <DropdownMenuItem
+                          onClick={() => handlePreviewInvoice(invoice)}
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          View
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => onEditInvoice?.(invoice)}
+                        >
                           <Edit className="w-4 h-4 mr-2" />
                           Edit
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleStatusUpdate(invoice.id, 'sent')}>
+                        <DropdownMenuItem
+                          onClick={() => handleStatusUpdate(invoice.id, "sent")}
+                        >
                           <Send className="w-4 h-4 mr-2" />
                           Mark as Sent
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleStatusUpdate(invoice.id, 'paid')}>
-                          <CircleCheck
-                            className="w-4 h-4 mr-2"
-                          />
+                        <DropdownMenuItem
+                          onClick={() => handleStatusUpdate(invoice.id, "paid")}
+                        >
+                          <CircleCheck className="w-4 h-4 mr-2" />
                           Mark as Paid
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => handleDeleteInvoice(invoice.id)}
                           className="text-red-600"
                           disabled={deletingId === invoice.id}
                         >
                           <Trash2 className="w-4 h-4 mr-2" />
-                          {deletingId === invoice.id ? 'Deleting...' : 'Delete'}
+                          {deletingId === invoice.id ? "Deleting..." : "Delete"}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       )}
 
@@ -369,10 +598,12 @@ export const InvoiceHistory = ({ onEditInvoice, onViewInvoice }: InvoiceHistoryP
               Invoice Preview - {previewInvoice?.invoice_number}
             </DialogTitle>
           </DialogHeader>
-          
+
           {previewInvoice && (
             <div className="mt-4">
-              <InvoicePreview invoiceData={convertToInvoiceData(previewInvoice)} />
+              <InvoicePreview
+                invoiceData={convertToInvoiceData(previewInvoice)}
+              />
             </div>
           )}
         </DialogContent>
