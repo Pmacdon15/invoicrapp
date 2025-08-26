@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Header from "@/components/landing/Header";
 import Hero from "@/components/landing/Hero";
 import Features from "@/components/landing/Features";
@@ -9,6 +9,7 @@ import Testimonials from "@/components/landing/Testimonials";
 import FinalCTA from "@/components/landing/FinalCTA";
 import Footer from "@/components/landing/Footer";
 import StructuredData from "@/components/StructuredData";
+import { trackReferrerData } from "@/lib/referrer-utils";
 
 const Landing = () => {
   const companyLogos = [
@@ -17,6 +18,11 @@ const Landing = () => {
     { name: "StartupInc", logo: "/startup-logo.png" },
     { name: "ConsultingPro", logo: "/consulting-firm-logo.png" },
   ];
+
+  // Track referrer data on component mount
+  useEffect(() => {
+    trackReferrerData();
+  }, []);
 
   return (
     <>
