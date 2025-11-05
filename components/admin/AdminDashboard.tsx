@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -49,9 +50,12 @@ export const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const { isAdmin, isSuperAdmin, loading: adminLoading } = useAdmin();
   const { toast } = useToast();
+  const router = useRouter();
 
   useEffect(() => {
     if (!adminLoading && !isAdmin) {
+      // User is not admin, stop loading
+      setLoading(false);
       toast({
         variant: "destructive",
         title: "Access Denied",
@@ -96,16 +100,25 @@ export const AdminDashboard = () => {
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Card className="p-8 max-w-md">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <Card className="p-8 max-w-md w-full shadow-lg">
           <div className="text-center">
-            <Shield className="w-12 h-12 text-red-500 mx-auto mb-4" />
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Shield className="w-8 h-8 text-red-600" />
+            </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
               Access Denied
             </h2>
-            <p className="text-gray-600">
-              You do not have permission to access the admin dashboard.
+            <p className="text-gray-600 mb-6">
+              You don't have permission to access the admin dashboard. Only
+              administrators can view this page.
             </p>
+            <Button
+              onClick={() => router.push("/dashboard")}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground w-full"
+            >
+              Go to Dashboard
+            </Button>
           </div>
         </Card>
       </div>
@@ -438,5 +451,3 @@ export const AdminDashboard = () => {
     </div>
   );
 };
-
-

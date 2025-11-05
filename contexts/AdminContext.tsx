@@ -48,10 +48,24 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
 
     try {
       setLoading(true);
-      const [adminStatus, superAdminStatus] = await Promise.all([
+
+      // Add timeout to admin service calls to prevent hanging
+      const adminPromise = Promise.race([
         adminService.isAdmin(),
-        adminService.isSuperAdmin(),
+        new Promise<boolean>((resolve) =>
+          setTimeout(() => resolve(false), 5000)
+        ),
       ]);
+
+      const superAdminPromise = Promise.race([
+        adminService.isSuperAdmin(),
+        new Promise<boolean>((resolve) =>
+          setTimeout(() => resolve(false), 5000)
+        ),
+      ]);
+
+      const adminStatus = await adminPromise;
+      const superAdminStatus = await superAdminPromise;
 
       setIsAdmin(adminStatus);
       setIsSuperAdmin(superAdminStatus);

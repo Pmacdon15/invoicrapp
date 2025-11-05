@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { AdminProvider } from "@/contexts/AdminContext";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 
@@ -48,27 +49,29 @@ export default function DashboardLayoutClient({
   const activeTab = getActiveTab();
 
   return (
-    <div className="h-[100dvh] bg-gray-50 flex flex-col">
-      <DashboardHeader
-        onNewInvoice={() => router.push("/dashboard/create")}
-        onTabChange={(tab) => router.push(`/dashboard/${tab}`)}
-        onMenuToggle={() => setIsSidebarOpen(!isSidebarOpen)}
-      />
-
-      <div className="flex-1 flex h-[90dvh] lg:min-h-0">
-        <DashboardSidebar
-          activeTab={activeTab}
+    <AdminProvider>
+      <div className="h-[100dvh] bg-gray-50 flex flex-col">
+        <DashboardHeader
+          onNewInvoice={() => router.push("/dashboard/create")}
           onTabChange={(tab) => router.push(`/dashboard/${tab}`)}
-          isOpen={isSidebarOpen}
-          onClose={() => setIsSidebarOpen(false)}
+          onMenuToggle={() => setIsSidebarOpen(!isSidebarOpen)}
         />
 
-        <main className="flex-1 p-4 pb-safe lg:pb-4 overflow-y-auto bg-primary/5 lg:ml-0 h-full">
-          <div className="max-w-7xl xl:max-w-full xl:px-4 mx-auto h-full">
-            {children}
-          </div>
-        </main>
+        <div className="flex-1 flex h-[90dvh] lg:min-h-0">
+          <DashboardSidebar
+            activeTab={activeTab}
+            onTabChange={(tab) => router.push(`/dashboard/${tab}`)}
+            isOpen={isSidebarOpen}
+            onClose={() => setIsSidebarOpen(false)}
+          />
+
+          <main className="flex-1 p-4 pb-safe lg:pb-4 overflow-y-auto bg-primary/5 lg:ml-0 h-full">
+            <div className="max-w-7xl xl:max-w-full xl:px-4 mx-auto h-full">
+              {children}
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </AdminProvider>
   );
 }

@@ -42,6 +42,18 @@ import {
   Type,
   Calendar,
   Minus,
+  Image,
+  Building,
+  Mail,
+  Phone,
+  ExternalLink,
+  MapPin,
+  FileText,
+  DollarSign,
+  Clock,
+  Palette,
+  Settings as SettingsIcon,
+  Zap,
 } from "lucide-react";
 import type { SettingsFormData, CustomField } from "@/types/settings";
 import {
@@ -91,8 +103,44 @@ export const Settings = () => {
     initializeSettings();
   }, [router]);
 
+  const validateRequiredFields = () => {
+    const requiredFields = {
+      company_name: settings.company_name?.trim(),
+      company_email: settings.company_email?.trim(),
+      company_address: settings.company_address?.trim(),
+    };
+
+    const missingFields = [];
+    if (!requiredFields.company_name) missingFields.push("Company Name");
+    if (!requiredFields.company_email) missingFields.push("Company Email");
+    if (!requiredFields.company_address) missingFields.push("Address");
+
+    // Validate email format if provided
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (
+      requiredFields.company_email &&
+      !emailRegex.test(requiredFields.company_email)
+    ) {
+      return { isValid: false, missingFields: ["Valid Company Email"] };
+    }
+
+    return { isValid: missingFields.length === 0, missingFields };
+  };
+
   const handleSave = async () => {
     if (!user) return;
+
+    // Validate required fields
+    const validation = validateRequiredFields();
+    if (!validation.isValid) {
+      showError(
+        "Required fields missing",
+        `Please fill in the following required fields: ${validation.missingFields.join(
+          ", "
+        )}`
+      );
+      return;
+    }
 
     setSaving(true);
     try {
@@ -120,35 +168,23 @@ export const Settings = () => {
 
     // Validate file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
-      showError(
-        "File too large",
-        "Please select an image smaller than 2MB."
-      );
+      showError("File too large", "Please select an image smaller than 2MB.");
       return;
     }
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      showError(
-        "Invalid file type",
-        "Please select an image file."
-      );
+      showError("Invalid file type", "Please select an image file.");
       return;
     }
 
     try {
       const base64 = await SettingsService.uploadCompanyLogo(user.id, file);
       setSettings((prev) => ({ ...prev, company_logo: base64 }));
-      showSuccess(
-        "Logo uploaded",
-        "Your company logo has been updated."
-      );
+      showSuccess("Logo uploaded", "Your company logo has been updated.");
     } catch (error) {
       console.error("Error uploading logo:", error);
-      showError(
-        "Upload failed",
-        "Failed to upload logo. Please try again."
-      );
+      showError("Upload failed", "Failed to upload logo. Please try again.");
     }
   };
 
@@ -158,16 +194,10 @@ export const Settings = () => {
     try {
       await SettingsService.resetInvoiceCounter(user.id, 1);
       setSettings((prev) => ({ ...prev, invoice_counter: 1 }));
-      showSuccess(
-        "Counter reset",
-        "Invoice counter has been reset to 1."
-      );
+      showSuccess("Counter reset", "Invoice counter has been reset to 1.");
     } catch (error) {
       console.error("Error resetting counter:", error);
-      showError(
-        "Reset failed",
-        "Failed to reset invoice counter."
-      );
+      showError("Reset failed", "Failed to reset invoice counter.");
     }
   };
 
@@ -186,7 +216,10 @@ export const Settings = () => {
     }));
   };
 
-  const updateCustomField = (fieldId: string, updates: Partial<CustomField>) => {
+  const updateCustomField = (
+    fieldId: string,
+    updates: Partial<CustomField>
+  ) => {
     setSettings((prev) => ({
       ...prev,
       custom_fields: (prev.custom_fields || []).map((field) =>
@@ -198,7 +231,9 @@ export const Settings = () => {
   const removeCustomField = (fieldId: string) => {
     setSettings((prev) => ({
       ...prev,
-      custom_fields: (prev.custom_fields || []).filter((field) => field.id !== fieldId),
+      custom_fields: (prev.custom_fields || []).filter(
+        (field) => field.id !== fieldId
+      ),
     }));
   };
 
@@ -228,12 +263,19 @@ export const Settings = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">Settings</h1>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground flex items-center gap-3">
+            <SettingsIcon className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8" />
+            Settings
+          </h1>
           <p className="text-sm sm:text-base text-muted-foreground">
             Manage your account and invoice preferences
           </p>
         </div>
-        <Button onClick={handleSave} disabled={saving} className="gap-2 w-full sm:w-auto">
+        <Button
+          onClick={handleSave}
+          disabled={saving}
+          className="gap-2 w-full sm:w-auto"
+        >
           {saving ? (
             <RefreshCw className="h-4 w-4 animate-spin" />
           ) : (
@@ -246,27 +288,45 @@ export const Settings = () => {
       <Tabs defaultValue="company" className="space-y-6">
         <div className="w-full overflow-x-auto">
           <TabsList className="flex w-max min-w-full justify-start sm:grid sm:grid-cols-3 lg:grid-cols-6 gap-1 p-1">
-            <TabsTrigger value="company" className="flex-shrink-0 px-3 py-2 text-xs font-medium">
+            <TabsTrigger
+              value="company"
+              className="flex-shrink-0 px-3 py-2 text-xs font-medium"
+            >
               <Building2 className="h-4 w-4 mr-1" />
               Company
             </TabsTrigger>
-            <TabsTrigger value="invoices" className="flex-shrink-0 px-3 py-2 text-xs font-medium">
+            <TabsTrigger
+              value="invoices"
+              className="flex-shrink-0 px-3 py-2 text-xs font-medium"
+            >
               <CreditCard className="h-4 w-4 mr-1" />
               Invoices
             </TabsTrigger>
-            <TabsTrigger value="notifications" className="flex-shrink-0 px-3 py-2 text-xs font-medium">
+            <TabsTrigger
+              value="notifications"
+              className="flex-shrink-0 px-3 py-2 text-xs font-medium"
+            >
               <Bell className="h-4 w-4 mr-1" />
               Notifications
             </TabsTrigger>
-            <TabsTrigger value="preferences" className="flex-shrink-0 px-3 py-2 text-xs font-medium">
+            <TabsTrigger
+              value="preferences"
+              className="flex-shrink-0 px-3 py-2 text-xs font-medium"
+            >
               <Globe className="h-4 w-4 mr-1" />
               Preferences
             </TabsTrigger>
-            <TabsTrigger value="numbering" className="flex-shrink-0 px-3 py-2 text-xs font-medium">
+            <TabsTrigger
+              value="numbering"
+              className="flex-shrink-0 px-3 py-2 text-xs font-medium"
+            >
               <Hash className="h-4 w-4 mr-1" />
               Numbering
             </TabsTrigger>
-            <TabsTrigger value="custom-fields" className="flex-shrink-0 px-3 py-2 text-xs font-medium">
+            <TabsTrigger
+              value="custom-fields"
+              className="flex-shrink-0 px-3 py-2 text-xs font-medium"
+            >
               <Plus className="h-4 w-4 mr-1" />
               Custom Fields
             </TabsTrigger>
@@ -277,15 +337,23 @@ export const Settings = () => {
         <TabsContent value="company" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Company Information</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Building2 className="h-5 w-5" />
+                Company Information
+              </CardTitle>
               <CardDescription>
-                Update your business details that will appear on invoices
+                Update your business details that will appear on invoices.
+                Fields marked with <span className="text-red-500">*</span> are
+                required.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Company Logo</Label>
+                  <Label className="flex items-center gap-2">
+                    <Image className="h-4 w-4" />
+                    Company Logo
+                  </Label>
                   <div className="flex items-center gap-4">
                     {settings.company_logo && (
                       <div className="w-16 h-16 border rounded-lg overflow-hidden bg-muted">
@@ -311,7 +379,13 @@ export const Settings = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="company_name">Company Name</Label>
+                  <Label
+                    htmlFor="company_name"
+                    className="flex items-center gap-2"
+                  >
+                    <Building className="h-4 w-4" />
+                    Company Name <span className="text-red-500">*</span>
+                  </Label>
                   <Input
                     id="company_name"
                     value={settings.company_name}
@@ -322,10 +396,22 @@ export const Settings = () => {
                       }))
                     }
                     placeholder="Your Company Name"
+                    className={
+                      !settings.company_name?.trim()
+                        ? "border-red-300 focus:border-red-500"
+                        : ""
+                    }
+                    required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="company_email">Company Email</Label>
+                  <Label
+                    htmlFor="company_email"
+                    className="flex items-center gap-2"
+                  >
+                    <Mail className="h-4 w-4" />
+                    Company Email <span className="text-red-500">*</span>
+                  </Label>
                   <Input
                     id="company_email"
                     type="email"
@@ -337,10 +423,22 @@ export const Settings = () => {
                       }))
                     }
                     placeholder="contact@company.com"
+                    className={
+                      !settings.company_email?.trim()
+                        ? "border-red-300 focus:border-red-500"
+                        : ""
+                    }
+                    required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="company_phone">Phone Number</Label>
+                  <Label
+                    htmlFor="company_phone"
+                    className="flex items-center gap-2"
+                  >
+                    <Phone className="h-4 w-4" />
+                    Phone Number
+                  </Label>
                   <Input
                     id="company_phone"
                     value={settings.company_phone}
@@ -354,7 +452,13 @@ export const Settings = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="company_website">Website</Label>
+                  <Label
+                    htmlFor="company_website"
+                    className="flex items-center gap-2"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    Website
+                  </Label>
                   <Input
                     id="company_website"
                     value={settings.company_website}
@@ -369,7 +473,13 @@ export const Settings = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="company_address">Address</Label>
+                  <Label
+                    htmlFor="company_address"
+                    className="flex items-center gap-2"
+                  >
+                    <MapPin className="h-4 w-4" />
+                    Address <span className="text-red-500">*</span>
+                  </Label>
                   <Textarea
                     id="company_address"
                     value={settings.company_address}
@@ -381,6 +491,12 @@ export const Settings = () => {
                     }
                     placeholder="123 Business St, City, State 12345"
                     rows={3}
+                    className={
+                      !settings.company_address?.trim()
+                        ? "border-red-300 focus:border-red-500"
+                        : ""
+                    }
+                    required
                   />
                 </div>
               </div>
@@ -392,7 +508,10 @@ export const Settings = () => {
         <TabsContent value="invoices" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Invoice Defaults</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="h-5 w-5" />
+                Invoice Defaults
+              </CardTitle>
               <CardDescription>
                 Set default values for new invoices
               </CardDescription>
@@ -400,7 +519,13 @@ export const Settings = () => {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="default_theme">Default Theme</Label>
+                  <Label
+                    htmlFor="default_theme"
+                    className="flex items-center gap-2"
+                  >
+                    <Palette className="h-4 w-4" />
+                    Default Theme
+                  </Label>
                   <Select
                     value={settings.default_theme}
                     onValueChange={(value) =>
@@ -420,7 +545,13 @@ export const Settings = () => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="default_currency">Default Currency</Label>
+                  <Label
+                    htmlFor="default_currency"
+                    className="flex items-center gap-2"
+                  >
+                    <DollarSign className="h-4 w-4" />
+                    Default Currency
+                  </Label>
                   <Select
                     value={settings.default_currency}
                     onValueChange={(value) =>
@@ -446,7 +577,13 @@ export const Settings = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="default_tax_rate">Default Tax Rate (%)</Label>
+                  <Label
+                    htmlFor="default_tax_rate"
+                    className="flex items-center gap-2"
+                  >
+                    <Zap className="h-4 w-4" />
+                    Default Tax Rate (%)
+                  </Label>
                   <Input
                     id="default_tax_rate"
                     type="number"
@@ -464,7 +601,11 @@ export const Settings = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="default_payment_terms">
+                  <Label
+                    htmlFor="default_payment_terms"
+                    className="flex items-center gap-2"
+                  >
+                    <Clock className="h-4 w-4" />
                     Default Payment Terms
                   </Label>
                   <Select
@@ -491,7 +632,13 @@ export const Settings = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="default_notes">Default Notes</Label>
+                <Label
+                  htmlFor="default_notes"
+                  className="flex items-center gap-2"
+                >
+                  <FileText className="h-4 w-4" />
+                  Default Notes
+                </Label>
                 <Textarea
                   id="default_notes"
                   value={settings.default_notes}
@@ -513,7 +660,10 @@ export const Settings = () => {
         <TabsContent value="notifications" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Notification Preferences</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Bell className="h-5 w-5" />
+                Notification Preferences
+              </CardTitle>
               <CardDescription>
                 Choose what notifications you'd like to receive
               </CardDescription>
@@ -521,7 +671,10 @@ export const Settings = () => {
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Email Notifications</Label>
+                  <Label className="flex items-center gap-2">
+                    <Mail className="h-4 w-4" />
+                    Email Notifications
+                  </Label>
                   <p className="text-sm text-muted-foreground">
                     Receive general email notifications
                   </p>
@@ -539,7 +692,10 @@ export const Settings = () => {
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Payment Reminders</Label>
+                  <Label className="flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    Payment Reminders
+                  </Label>
                   <p className="text-sm text-muted-foreground">
                     Get notified about overdue invoices
                   </p>
@@ -557,7 +713,10 @@ export const Settings = () => {
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Invoice Updates</Label>
+                  <Label className="flex items-center gap-2">
+                    <Bell className="h-4 w-4" />
+                    Invoice Updates
+                  </Label>
                   <p className="text-sm text-muted-foreground">
                     Notifications when invoices are viewed or paid
                   </p>
@@ -575,7 +734,10 @@ export const Settings = () => {
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Marketing Emails</Label>
+                  <Label className="flex items-center gap-2">
+                    <Mail className="h-4 w-4" />
+                    Marketing Emails
+                  </Label>
                   <p className="text-sm text-muted-foreground">
                     Receive updates about new features and tips
                   </p>
@@ -598,7 +760,10 @@ export const Settings = () => {
         <TabsContent value="preferences" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Display Preferences</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Globe className="h-5 w-5" />
+                Display Preferences
+              </CardTitle>
               <CardDescription>
                 Customize how information is displayed
               </CardDescription>
@@ -606,7 +771,13 @@ export const Settings = () => {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="date_format">Date Format</Label>
+                  <Label
+                    htmlFor="date_format"
+                    className="flex items-center gap-2"
+                  >
+                    <Calendar className="h-4 w-4" />
+                    Date Format
+                  </Label>
                   <Select
                     value={settings.date_format}
                     onValueChange={(value) =>
@@ -626,7 +797,10 @@ export const Settings = () => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="timezone">Timezone</Label>
+                  <Label htmlFor="timezone" className="flex items-center gap-2">
+                    <Globe className="h-4 w-4" />
+                    Timezone
+                  </Label>
                   <Select
                     value={settings.timezone}
                     onValueChange={(value) =>
@@ -649,7 +823,13 @@ export const Settings = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="number_format">Number Format</Label>
+                  <Label
+                    htmlFor="number_format"
+                    className="flex items-center gap-2"
+                  >
+                    <Hash className="h-4 w-4" />
+                    Number Format
+                  </Label>
                   <Select
                     value={settings.number_format}
                     onValueChange={(value) =>
@@ -667,7 +847,10 @@ export const Settings = () => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="language">Language</Label>
+                  <Label htmlFor="language" className="flex items-center gap-2">
+                    <Type className="h-4 w-4" />
+                    Language
+                  </Label>
                   <Select
                     value={settings.language}
                     onValueChange={(value) =>
@@ -694,7 +877,10 @@ export const Settings = () => {
         <TabsContent value="numbering" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Invoice Numbering</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Hash className="h-5 w-5" />
+                Invoice Numbering
+              </CardTitle>
               <CardDescription>
                 Configure how invoice numbers are generated
               </CardDescription>
@@ -702,7 +888,13 @@ export const Settings = () => {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="invoice_prefix">Invoice Prefix</Label>
+                  <Label
+                    htmlFor="invoice_prefix"
+                    className="flex items-center gap-2"
+                  >
+                    <Hash className="h-4 w-4" />
+                    Invoice Prefix
+                  </Label>
                   <Input
                     id="invoice_prefix"
                     value={settings.invoice_prefix}
@@ -716,7 +908,13 @@ export const Settings = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="invoice_counter">Next Invoice Number</Label>
+                  <Label
+                    htmlFor="invoice_counter"
+                    className="flex items-center gap-2"
+                  >
+                    <Hash className="h-4 w-4" />
+                    Next Invoice Number
+                  </Label>
                   <div className="flex gap-2">
                     <Input
                       id="invoice_counter"
@@ -742,7 +940,13 @@ export const Settings = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="invoice_number_format">Number Format</Label>
+                <Label
+                  htmlFor="invoice_number_format"
+                  className="flex items-center gap-2"
+                >
+                  <SettingsIcon className="h-4 w-4" />
+                  Number Format
+                </Label>
                 <Select
                   value={settings.invoice_number_format}
                   onValueChange={(value) =>
@@ -786,117 +990,150 @@ export const Settings = () => {
         <TabsContent value="custom-fields" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Custom Fields</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Plus className="h-5 w-5" />
+                Custom Fields
+              </CardTitle>
               <CardDescription>
-                Add custom fields to collect additional information on your invoices. These fields will appear on the left side of the totals section.
+                Add custom fields to collect additional information on your
+                invoices. These fields will appear on the left side of the
+                totals section.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {!settings.custom_fields || settings.custom_fields.length === 0 ? (
+              {!settings.custom_fields ||
+              settings.custom_fields.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   <Plus className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p className="text-sm">
-                    No custom fields configured. Add your first custom field to get started.
+                    No custom fields configured. Add your first custom field to
+                    get started.
                   </p>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {settings.custom_fields && settings.custom_fields.map((field, index) => (
-                    <Card key={field.id} className="p-4">
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            {getFieldIcon(field.type)}
-                            <span className="font-medium">Field {index + 1}</span>
-                            <Badge variant="outline" className="text-xs">
-                              {field.type}
-                            </Badge>
-                            {field.required && (
-                              <Badge variant="destructive" className="text-xs">
-                                Required
-                              </Badge>
-                            )}
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeCustomField(field.id)}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label>Field Label</Label>
-                            <Input
-                              value={field.label}
-                              onChange={(e) =>
-                                updateCustomField(field.id, { label: e.target.value })
-                              }
-                              placeholder="Enter field label"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Field Type</Label>
-                            <Select
-                              value={field.type}
-                              onValueChange={(value: "text" | "number" | "date") =>
-                                updateCustomField(field.id, { type: value })
-                              }
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="text">Text</SelectItem>
-                                <SelectItem value="number">Number</SelectItem>
-                                <SelectItem value="date">Date</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label>Default Value (Optional)</Label>
-                            <Input
-                              value={field.defaultValue}
-                              onChange={(e) =>
-                                updateCustomField(field.id, { defaultValue: e.target.value })
-                              }
-                              placeholder="Enter default value"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Required Field</Label>
-                            <div className="flex items-center space-x-2 pt-2">
-                              <Switch
-                                checked={field.required}
-                                onCheckedChange={(checked) =>
-                                  updateCustomField(field.id, { required: checked })
-                                }
-                              />
-                              <span className="text-sm text-muted-foreground">
-                                {field.required ? "Required" : "Optional"}
+                  {settings.custom_fields &&
+                    settings.custom_fields.map((field, index) => (
+                      <Card key={field.id} className="p-4">
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              {getFieldIcon(field.type)}
+                              <span className="font-medium">
+                                Field {index + 1}
                               </span>
+                              <Badge variant="outline" className="text-xs">
+                                {field.type}
+                              </Badge>
+                              {field.required && (
+                                <Badge
+                                  variant="destructive"
+                                  className="text-xs"
+                                >
+                                  Required
+                                </Badge>
+                              )}
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeCustomField(field.id)}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label className="flex items-center gap-2">
+                                <Type className="h-4 w-4" />
+                                Field Label
+                              </Label>
+                              <Input
+                                value={field.label}
+                                onChange={(e) =>
+                                  updateCustomField(field.id, {
+                                    label: e.target.value,
+                                  })
+                                }
+                                placeholder="Enter field label"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="flex items-center gap-2">
+                                <SettingsIcon className="h-4 w-4" />
+                                Field Type
+                              </Label>
+                              <Select
+                                value={field.type}
+                                onValueChange={(
+                                  value: "text" | "number" | "date"
+                                ) =>
+                                  updateCustomField(field.id, { type: value })
+                                }
+                              >
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="text">Text</SelectItem>
+                                  <SelectItem value="number">Number</SelectItem>
+                                  <SelectItem value="date">Date</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label className="flex items-center gap-2">
+                                <FileText className="h-4 w-4" />
+                                Default Value (Optional)
+                              </Label>
+                              <Input
+                                value={field.defaultValue}
+                                onChange={(e) =>
+                                  updateCustomField(field.id, {
+                                    defaultValue: e.target.value,
+                                  })
+                                }
+                                placeholder="Enter default value"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="flex items-center gap-2">
+                                <AlertTriangle className="h-4 w-4" />
+                                Required Field
+                              </Label>
+                              <div className="flex items-center space-x-2 pt-2">
+                                <Switch
+                                  checked={field.required}
+                                  onCheckedChange={(checked) =>
+                                    updateCustomField(field.id, {
+                                      required: checked,
+                                    })
+                                  }
+                                />
+                                <span className="text-sm text-muted-foreground">
+                                  {field.required ? "Required" : "Optional"}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </Card>
-                  ))}
+                      </Card>
+                    ))}
                 </div>
               )}
-              
+
               <div className="flex justify-center pt-4">
                 <Button onClick={addCustomField} className="gap-2">
                   <Plus className="h-4 w-4" />
                   Add Custom Field
                 </Button>
               </div>
-              
+
               {settings.custom_fields && settings.custom_fields.length > 0 && (
                 <div className="mt-6 p-4 bg-muted/50 rounded-lg">
                   <div className="flex items-start gap-2">
@@ -904,8 +1141,9 @@ export const Settings = () => {
                     <div className="text-sm text-muted-foreground">
                       <p className="font-medium mb-1">Custom Fields Preview:</p>
                       <p>
-                        These fields will appear on the left side of the totals section in your invoice preview. 
-                        Required fields must be filled before proceeding to the final step.
+                        These fields will appear on the left side of the totals
+                        section in your invoice preview. Required fields must be
+                        filled before proceeding to the final step.
                       </p>
                     </div>
                   </div>
