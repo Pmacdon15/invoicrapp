@@ -31,7 +31,7 @@ const Landing = () => {
         <Header />
         <Hero companyLogos={companyLogos} />
         <Features />
-        <Pricing />
+        {/* <Pricing /> */}
         {/* <Testimonials /> */}
         {/* <FinalCTA /> */}
         <Footer />
