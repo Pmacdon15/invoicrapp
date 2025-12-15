@@ -67,7 +67,7 @@ const Header = () => {
               >
                 Features
               </button>
-              <button
+              {/* <button
                 className="text-muted-foreground hover:text-primary font-medium transition-colors"
                 onClick={() =>
                   document
@@ -76,7 +76,7 @@ const Header = () => {
                 }
               >
                 Pricing
-              </button>
+              </button> */}
               {/* <button className="text-muted-foreground hover:text-primary font-medium transition-colors">
                 Templates
               </button>
