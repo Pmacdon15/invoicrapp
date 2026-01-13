@@ -27,10 +27,12 @@ const Landing = () => {
   return (
     <>
       <StructuredData />
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gradient-to-r from-emerald-900 via-green-800 to-teal-800">
         <Header />
         <Hero companyLogos={companyLogos} />
-        <Features />
+        <div className="bg-background">
+          <Features />
+        </div>
         {/* <Pricing /> */}
         {/* <Testimonials /> */}
         {/* <FinalCTA /> */}

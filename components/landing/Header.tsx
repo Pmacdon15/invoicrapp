@@ -48,17 +48,17 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-background/80 backdrop-blur-lg border-b border-border sticky top-0 z-50 shadow-sm">
-      <div className="container mx-auto px-4 sm:px-6 py-4">
+    <header className="bg-transparent sticky top-0 z-50 pt-5">
+      <div className="w-auto max-w-xs sm:max-w-lg md:max-w-2xl mx-auto bg-background backdrop-blur-lg border-b border-border shadow-2xl rounded-full px-4 sm:px-6 py-2 sm:py-4 relative">
         <div className="flex justify-between items-center">
-          <Logo size="lg" className="text-xl sm:text-2xl" />
+          <Logo size="md" className="text-lg sm:text-xl" />
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden sm:flex items-center space-x-3">
             {/* Navigation Links */}
-            <nav className="hidden lg:flex items-center space-x-8">
+            <nav className="hidden sm:flex items-center space-x-8">
               <button
-                className="text-muted-foreground hover:text-primary font-medium transition-colors"
+                className="text-muted-foreground hover:text-primary font-medium text-sm transition-colors"
                 onClick={() =>
                   document
                     .getElementById("features")
@@ -92,8 +92,8 @@ const Header = () => {
               <>
                 {/* Dashboard Button */}
                 <Button
-                  variant="outline"
-                  className="font-medium border-primary/30 text-primary transition-all"
+                  variant="ghost"
+                  className="font-medium text-primary transition-all text-sm"
                   onClick={() => router.push("/dashboard")}
                 >
                   <LayoutDashboard className="w-4 h-4 mr-2" />
@@ -153,16 +153,16 @@ const Header = () => {
               <>
                 <Button
                   variant="ghost"
-                  className="font-medium text-primary border border-primary hover:text-primary hover:bg-primary/5 transition-all"
+                  className="font-semibold text-sm text-primary hover:text-primary hover:bg-primary/5 transition-all"
                   onClick={() => router.push("/auth")}
                 >
                   Sign In
                 </Button>
                 <Button
-                  className="font-semibold bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  className="font-semibold !text-sm !px-3 !py-1 bg-gradient-to-r from-primary rounded-full to-accent hover:from-primary/90 hover:to-accent/90 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                   onClick={() => router.push("/auth")}
                 >
-                  🚀 Get Started Free
+                  Get Started
                 </Button>
               </>
             )}
@@ -172,7 +172,7 @@ const Header = () => {
           <Button
             variant="ghost"
             size="sm"
-            className="md:hidden"
+            className="sm:hidden"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? (
@@ -185,11 +185,11 @@ const Header = () => {
 
         {/* Enhanced Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden mt-6 pb-6 space-y-4 border-t border-border pt-6">
+          <div className="sm:hidden mt-6 pb-6 space-y-4 pt-6 absolute top-16 left-0 right-0 bg-background backdrop-blur-lg border-b border-border shadow-sm rounded-3xl px-4">
             {/* Mobile Navigation Links */}
-            <div className="space-y-3 mb-6">
+            <div className="space-y-4 mb-2">
               <button
-                className="w-full text-left px-4 py-2 text-muted-foreground hover:text-primary font-medium transition-colors rounded-lg hover:bg-primary/5"
+                className="w-full text-left text-muted-foreground hover:text-primary font-medium transition-colors rounded-lg hover:bg-primary/5"
                 onClick={() => {
                   document
                     .getElementById("features")
@@ -200,7 +200,7 @@ const Header = () => {
                 Features
               </button>
               <button
-                className="w-full text-left px-4 py-2 text-muted-foreground hover:text-primary font-medium transition-colors rounded-lg hover:bg-primary/5"
+                className="w-full text-left text-muted-foreground hover:text-primary font-medium transition-colors rounded-lg hover:bg-primary/5"
                 onClick={() => {
                   document
                     .querySelector('[data-section="pricing"]')
@@ -241,7 +241,7 @@ const Header = () => {
               <>
                 <Button
                   variant="outline"
-                  className="w-full font-medium border border-black/30"
+                  className="w-full font-medium border border-black/30 rounded-full"
                   onClick={() => {
                     router.push("/auth");
                     setIsMobileMenuOpen(false);
@@ -250,13 +250,13 @@ const Header = () => {
                   Sign In
                 </Button>
                 <Button
-                  className="w-full font-semibold bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-lg"
+                  className="w-full font-semibold bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-lg rounded-full"
                   onClick={() => {
                     router.push("/auth");
                     setIsMobileMenuOpen(false);
                   }}
                 >
-                  🚀 Get Started Free
+                  Get Started Free
                 </Button>
               </>
             )}
