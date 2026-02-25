@@ -1,15 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import {
   ArrowLeft,
-  ArrowRight,
-  FileText,
-  Save,
+  ArrowRight, Save,
   CheckCircle,
   Lock,
-  LogOut,
+  LogOut
 } from "lucide-react";
 import { ThemeSelection } from "./invoice/ThemeSelection";
 import { ClientInformation } from "./invoice/ClientInformation";
@@ -27,7 +24,6 @@ import { showSuccess, showError } from "@/hooks/use-toast";
 import { BlockingUpgradeDialog } from "@/components/ui/BlockingUpgradeDialog";
 import { useUsage } from "@/contexts/UsageContext";
 import { getThemeById } from "@/lib/invoice-themes";
-import { getEditingLogo } from "@/lib/logo-utils";
 import { supabase } from "@/integrations/supabase/client";
 import { calculateDueDate } from "@/lib/format-utils";
 import {
@@ -35,11 +31,7 @@ import {
   type SettingsValidationResult,
 } from "@/lib/settings-validation";
 import type {
-  InvoiceTheme,
-  ClientInfo,
-  InvoiceItem,
-  InvoiceData,
-  CustomFieldValue,
+  InvoiceData
 } from "@/types/invoice";
 import type { CustomField } from "@/types/settings";
 import { useRouter } from "next/navigation";
@@ -55,14 +47,16 @@ const steps = [
 ];
 
 interface InvoiceGeneratorProps {
-  editingInvoice?: SavedInvoice;
+  editingInvoicePromise?:  Promise<SavedInvoice>
   onInvoiceSaved?: () => void;
 }
 
 export const InvoiceGenerator = ({
-  editingInvoice,
+  editingInvoicePromise,
   onInvoiceSaved,
 }: InvoiceGeneratorProps) => {
+
+  const editingInvoice= use(editingInvoicePromise)
   const [currentStep, setCurrentStep] = useState(1);
   const [invoiceData, setInvoiceData] = useState<InvoiceData | null>(null);
   const [customFields, setCustomFields] = useState<CustomField[]>([]);

@@ -1,12 +1,19 @@
-'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { InvoiceGenerator } from '@/components/InvoiceGenerator'
 import { getInvoiceById } from '@/lib/invoice-service'
 import type { SavedInvoice } from '@/lib/invoice-service'
 
-export default function CreateInvoicePage() {
+export default function CreateInvoicePage(props:PageProps<"/dashboard/create">) {
+
+ const invoicePromise = props.searchParams.then(({ editId, viewId }) => {
+    // Use .flat() or simple check to ensure you get a string
+    const targetId = [editId, viewId].flat().filter(Boolean)[0];
+  
+    return getInvoiceById(targetId);
+  });
+
   const router = useRouter()
   const searchParams = useSearchParams()
   const [editingInvoice, setEditingInvoice] = useState<SavedInvoice | null>(null)
@@ -48,9 +55,11 @@ export default function CreateInvoicePage() {
   }
 
   return (
+    <Suspense>
     <InvoiceGenerator
-      editingInvoice={editingInvoice}
+      editingInvoicePromise={invoicePromise}
       onInvoiceSaved={() => null}
     />
+    </Suspense>
   )
 }
