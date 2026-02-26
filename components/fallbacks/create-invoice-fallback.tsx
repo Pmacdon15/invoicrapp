@@ -1,5 +1,5 @@
-import InvoiceGeneratorDesktopSteps from '../invoice/invoice-generator-desktop-steps'
-import InvoiceGeneratorMobileHorizontalSteps from '../invoice/invoice-generator-mobile-horizontal-steps'
+import InvoiceGeneratorDesktopSteps from '../invoice-generator/invoice-generator-desktop-steps'
+import InvoiceGeneratorMobileHorizontalSteps from '../invoice-generator/invoice-generator-mobile-horizontal-steps'
 import { Card } from '../ui/card'
 
 export default function InvoiceGeneratorFallback() {

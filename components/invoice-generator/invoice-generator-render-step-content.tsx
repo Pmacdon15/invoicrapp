@@ -1,11 +1,11 @@
 import type { Dispatch, SetStateAction } from 'react'
 import type { InvoiceData } from '@/types/invoice'
 import type { CustomField } from '@/types/settings'
-import { ClientInformation } from './ClientInformation'
-import { CustomFields } from './CustomFields'
-import { InvoiceItems } from './InvoiceItems'
-import { InvoicePreview } from './InvoicePreview'
-import { ThemeSelection } from './ThemeSelection'
+import { ClientInformation } from '../invoice/ClientInformation'
+import { CustomFields } from '../invoice/CustomFields'
+import { InvoiceItems } from '../invoice/InvoiceItems'
+import { InvoicePreview } from '../invoice/InvoicePreview'
+import { ThemeSelection } from '../invoice/ThemeSelection'
 
 export default function RenderStepContent({
 	setInvoiceData,
@@ -75,7 +75,7 @@ export default function RenderStepContent({
 			return (
 				<InvoicePreview
 					invoiceData={invoiceData}
-					isSaved={isSaved}					
+					isSaved={isSaved}
 					setIsSaved={setIsSaved}
 				/>
 			)

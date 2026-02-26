@@ -34,7 +34,7 @@ import type { SettingsFormData } from '@/types/settings'
 interface InvoicePreviewProps {
 	invoiceData: InvoiceData
 	isSaved?: boolean
-	setIsSaved: Dispatch<SetStateAction<boolean>>
+	setIsSaved?: Dispatch<SetStateAction<boolean>>
 }
 
 export const InvoicePreview = ({
@@ -124,7 +124,7 @@ export const InvoicePreview = ({
 					}
 				}
 
-				setIsSaved("saved")				
+				setIsSaved(true)				
 
 				showSuccess(
 					'Invoice Saved Successfully!',

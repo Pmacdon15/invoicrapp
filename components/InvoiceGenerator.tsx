@@ -10,13 +10,13 @@ import { calculateDueDate } from '@/lib/format-utils'
 import type { SavedInvoice } from '@/lib/invoice-service'
 import type { SettingsValidationResult } from '@/lib/settings-validation'
 import type { InvoiceData, InvoiceTheme } from '@/types/invoice'
-import type { CustomField, SettingsFormData } from '@/types/settings'
-import ExitButton from './invoice/invoice-generator-button-exit'
-import InvoiceGeneratorDesktopSteps from './invoice/invoice-generator-desktop-steps'
-import LimitReached from './invoice/invoice-generator-limit-reached'
-import InvoiceGeneratorMobileHorizontalSteps from './invoice/invoice-generator-mobile-horizontal-steps'
-import RenderStepContent from './invoice/invoice-generator-render-step-content'
-import SaveButton from './invoice/invoice-generator-save-button'
+import type { SettingsFormData } from '@/types/settings'
+import ExitButton from './invoice-generator/invoice-generator-button-exit'
+import InvoiceGeneratorDesktopSteps from './invoice-generator/invoice-generator-desktop-steps'
+import LimitReached from './invoice-generator/invoice-generator-limit-reached'
+import InvoiceGeneratorMobileHorizontalSteps from './invoice-generator/invoice-generator-mobile-horizontal-steps'
+import RenderStepContent from './invoice-generator/invoice-generator-render-step-content'
+import SaveButton from './invoice-generator/invoice-generator-save-button'
 
 interface InvoiceGeneratorProps {
 	editingInvoicePromise?: Promise<SavedInvoice>
@@ -92,7 +92,7 @@ export const InvoiceGenerator = ({
 	const [invoiceData, setInvoiceData] = useState<InvoiceData>(
 		getInitialInvoiceData,
 	)
-	const [currentStep, setCurrentStep] = useState(editingInvoice ? 5 : 1) 
+	const [currentStep, setCurrentStep] = useState(editingInvoice ? 5 : 1)
 	const [isSaved, setIsSaved] = useState(false)
 	const [isNewClient, setIsNewClient] = useState(false)
 	const [showBlockingDialog, setShowBlockingDialog] = useState(false)
@@ -181,7 +181,9 @@ export const InvoiceGenerator = ({
 										<ExitButton isSaved={isSaved} />
 										<SaveButton
 											currentStep={currentStep}
-											customFields={settingsUser?.custom_fields}
+											customFields={
+												settingsUser?.custom_fields
+											}
 											invoiceData={invoiceData}
 											isNewClient={isNewClient}
 											isSaved={isSaved}
@@ -220,9 +222,7 @@ export const InvoiceGenerator = ({
 
 			{/* Settings Dialog */}
 			<SettingsRequiredDialog
-				onContinueAnyway={
-					setShowSettingsDialog(false)
-				}
+				onContinueAnyway={() => setShowSettingsDialog(false)}
 				onOpenChange={setShowSettingsDialog}
 				open={showSettingsDialog && settingsValidation !== null}
 				validationResult={
