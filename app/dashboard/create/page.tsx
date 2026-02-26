@@ -29,7 +29,7 @@ export default function CreateInvoicePage(
 		return SettingsService.getSettingsWithDefaults(data.data.user?.id)
 	})
 
-	const defaultThemePromise = settingsUserPromise.then(async (data) => {
+	const defaultThemePromise = settingsUserPromise.then(async (data) => {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
 		if (!data?.default_theme || data.default_theme === undefined) {
 			return getDefaultTheme()
 		}

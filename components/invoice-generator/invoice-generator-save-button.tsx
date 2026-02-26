@@ -1,5 +1,6 @@
+'use client'
 import { ArrowRight, CheckCircle, Save } from 'lucide-react'
-import router from 'next/router'
+import { useRouter } from 'next/navigation'
 import { type Dispatch, type SetStateAction, useState } from 'react'
 import { showError, showSuccess } from '@/hooks/use-toast'
 import { supabase } from '@/integrations/supabase/client'
@@ -22,7 +23,7 @@ export default function SaveButton({
 	setIsSaved,
 	isSaved,
 	isNewClient,
-	customFields,
+	customFields = [],
 }: {
 	refreshUsage: () => Promise<void>
 	currentStep: number
@@ -31,9 +32,10 @@ export default function SaveButton({
 	setIsSaved: Dispatch<SetStateAction<boolean>>
 	isSaved: boolean
 	isNewClient: boolean
-	customFields: CustomField[]
+	customFields?: CustomField[]
 }) {
 	const [isSaving, setIsSaving] = useState(false)
+	const router = useRouter()
 	const handleSaveInvoice = async () => {
 		setIsSaving(true)
 		try {
@@ -129,11 +131,11 @@ export default function SaveButton({
 				return invoiceData.items?.length > 0
 			case 4: {
 				// Check if all required custom fields are filled
-				const requiredFields = customFields.filter(
+				const requiredFields = customFields?.filter(
 					(field) => field.required,
 				)
 				const customFieldValues = invoiceData.customFields || []
-				return requiredFields.every((field) => {
+				return requiredFields?.every((field) => {
 					const fieldValue = customFieldValues.find(
 						(cfv) => cfv.fieldId === field.id,
 					)

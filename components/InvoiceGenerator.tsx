@@ -148,7 +148,7 @@ export const InvoiceGenerator = ({
 						<Card className="h-[85%] flex-1 border-primary/30 p-4 shadow-lg sm:p-6 lg:h-[90%] lg:p-8">
 							<RenderStepContent
 								currentStep={currentStep}
-								customFields={settingsUser?.custom_fields}
+								customFields={settingsUser?.custom_fields || []}
 								invoiceData={invoiceData}
 								isSaved={isSaved}
 								setInvoiceData={setInvoiceData}
@@ -182,7 +182,7 @@ export const InvoiceGenerator = ({
 										<SaveButton
 											currentStep={currentStep}
 											customFields={
-												settingsUser?.custom_fields
+												settingsUser?.custom_fields || []
 											}
 											invoiceData={invoiceData}
 											isNewClient={isNewClient}
