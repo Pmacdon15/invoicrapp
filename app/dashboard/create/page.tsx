@@ -12,6 +12,7 @@ export default function CreateInvoicePage(
 ) {
 	const invoicePromise = props.searchParams.then(({ editId, viewId }) => {
 		const targetId = [editId, viewId].flat().filter(Boolean)[0]
+		console.log(targetId)
 		return getInvoiceById(targetId)
 	})
 

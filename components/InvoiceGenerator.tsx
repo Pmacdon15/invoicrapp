@@ -109,18 +109,18 @@ export const InvoiceGenerator = ({
 		}
 	}, [])
 
-	if (!invoiceData) {
-		return (
-			<div className="flex h-full items-center justify-center">
-				<div className="text-center">
-					<div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-					<p className="text-muted-foreground">
-						Loading invoice generator...
-					</p>
-				</div>
-			</div>
-		)
-	}
+	// if (!invoiceData) {
+	// 	return (
+	// 		<div className="flex h-full items-center justify-center">
+	// 			<div className="text-center">
+	// 				<div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+	// 				<p className="text-muted-foreground">
+	// 					Loading invoice generator...
+	// 				</p>
+	// 			</div>
+	// 		</div>
+	// 	)
+	// }
 
 	return (
 		<div className="relative h-full">
