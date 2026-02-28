@@ -13,16 +13,16 @@ export default function DashboardLayoutClient({
 }: {
 	children: React.ReactNode
 }) {
-	const { user, loading } = useAuth()
+	// const { user, loading } = useAuth()
 	const router = useRouter()
 	const pathname = usePathname()
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
-	useEffect(() => {
-		if (!loading && !user) {
-			router.replace('/auth')
-		}
-	}, [user, loading, router])
+	// useEffect(() => {
+	// 	if (!loading && !user) {
+	// 		router.replace('/auth')
+	// 	}
+	// }, [user, loading, router])
 
 	// Extract the active tab from pathname
 	const getActiveTab = () => {

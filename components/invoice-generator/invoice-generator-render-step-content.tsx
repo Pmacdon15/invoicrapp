@@ -1,4 +1,5 @@
-import type { Dispatch, SetStateAction } from 'react'
+import { type Dispatch, type SetStateAction, Suspense } from 'react'
+import type { Client } from '@/lib/client-service'
 import type { InvoiceData } from '@/types/invoice'
 import type { CustomField } from '@/types/settings'
 import { ClientInformation } from '../invoice/ClientInformation'
@@ -15,6 +16,7 @@ export default function RenderStepContent({
 	setIsSaved,
 	currentStep,
 	customFields,
+	clientsPromise,
 }: {
 	setInvoiceData: Dispatch<SetStateAction<InvoiceData>>
 	setIsNewClient: Dispatch<SetStateAction<boolean>>
@@ -23,6 +25,7 @@ export default function RenderStepContent({
 	setIsSaved: Dispatch<SetStateAction<boolean>>
 	currentStep: number
 	customFields: CustomField[]
+	clientsPromise: Promise<Client[]>
 }) {
 	const updateInvoiceData = (field: keyof InvoiceData, value: any) => {
 		setInvoiceData((prev) => (prev ? { ...prev, [field]: value } : null))
@@ -38,13 +41,16 @@ export default function RenderStepContent({
 			)
 		case 2:
 			return (
-				<ClientInformation
-					clientInfo={invoiceData.client}
-					onClientModeChange={setIsNewClient}
-					onClientUpdate={(client) =>
-						updateInvoiceData('client', client)
-					}
-				/>
+				<Suspense>
+					<ClientInformation
+						clientInfo={invoiceData.client}
+						clientsPromise={clientsPromise}
+						onClientModeChange={setIsNewClient}
+						onClientUpdate={(client) =>
+							updateInvoiceData('client', client)
+						}
+					/>
+				</Suspense>
 			)
 		case 3:
 			return (

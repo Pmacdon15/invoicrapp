@@ -20,7 +20,7 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
 import { showError, showSuccess } from '@/hooks/use-toast'
-import { supabase } from '@/integrations/supabase/client'
+import { supabase } from '@/integrations/supabase/old/client'
 import { formatCurrency, formatDate, formatNumber } from '@/lib/format-utils'
 import {
 	convertInvoiceDataToSaveFormat,
@@ -40,7 +40,7 @@ interface InvoicePreviewProps {
 export const InvoicePreview = ({
 	invoiceData,
 	isSaved = false,
-	setIsSaved,	
+	setIsSaved,
 }: InvoicePreviewProps) => {
 	const pdfRef = useRef<HTMLDivElement>(null)
 	const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -124,7 +124,7 @@ export const InvoicePreview = ({
 					}
 				}
 
-				setIsSaved(true)				
+				setIsSaved(true)
 
 				showSuccess(
 					'Invoice Saved Successfully!',

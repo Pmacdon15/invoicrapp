@@ -3,7 +3,7 @@ import { ArrowRight, CheckCircle, Save } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { type Dispatch, type SetStateAction, useState } from 'react'
 import { showError, showSuccess } from '@/hooks/use-toast'
-import { supabase } from '@/integrations/supabase/client'
+import { supabase } from '@/integrations/supabase/old/client'
 import { type CreateClientData, saveClient } from '@/lib/client-service'
 import {
 	convertInvoiceDataToSaveFormat,

@@ -20,7 +20,9 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { showError, showSuccess } from '@/hooks/use-toast'
-import { supabase } from '@/integrations/supabase/client'
+import { createClient } from '@/integrations/supabase/client'
+import { login } from '@/actions/login'
+
 
 const Auth = () => {
 	const [user, setUser] = useState<User | null>(null)
@@ -33,25 +35,30 @@ const Auth = () => {
 	// Using enhanced toast helpers
 
 	useEffect(() => {
-		// Check for existing session on component mount
-		supabase.auth.getSession().then(({ data: { session } }) => {
-			setSession(session)
-			setUser(session?.user ?? null)
+		const initializeAuth = async () => {
+			const supabaseServer = createClient()
+			// Check for existing session on component mount
+			 supabaseServer .auth.getSession().then(({ data: { session } }) => {
+				setSession(session)
+				setUser(session?.user ?? null)
 
-			// Let AuthContext handle redirects - no redirect logic here
-		})
+				// Let AuthContext handle redirects - no redirect logic here
+			})
 
-		// Set up auth state listener without redirect logic
-		const {
-			data: { subscription },
-		} = supabase.auth.onAuthStateChange((event, session) => {
-			setSession(session)
-			setUser(session?.user ?? null)
-			// Let AuthContext handle redirects
-		})
+			// Set up auth state listener without redirect logic
+			const {
+				data: { subscription },
+			} =  supabaseServer .auth.onAuthStateChange((event, session) => {
+				setSession(session)
+				setUser(session?.user ?? null)
+				// Let AuthContext handle redirects
+			})
 
-		return () => subscription.unsubscribe()
-	}, [router])
+			return () => subscription.unsubscribe()
+		}
+
+		initializeAuth()
+	}, [])
 
 	const handleSignUp = async (e: React.FormEvent) => {
 		e.preventDefault()
@@ -84,15 +91,11 @@ const Auth = () => {
 		}
 	}
 
-	const handleSignIn = async (e: React.FormEvent) => {
-		e.preventDefault()
-		setLoading(true)
-
-		try {
-			const { data, error } = await supabase.auth.signInWithPassword({
-				email,
-				password,
-			})
+const handleSignIn = async (e: React.FormEvent) => {
+	e.preventDefault()
+	setLoading(true)
+	try {
+		const { data, error } = await login(email, password)
 
 			if (error) {
 				showError('Sign in failed', error.message)

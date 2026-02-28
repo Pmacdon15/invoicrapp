@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client'
+import { supabase } from '@/integrations/supabase/old/client'
 import type {
 	CustomFieldValue,
 	InvoiceData,
@@ -7,7 +7,7 @@ import type {
 import { SubscriptionService } from './subscription-service'
 
 // Define the database row type for invoices
-type InvoiceRow = {
+export type InvoiceRow = {
 	id: string
 	user_id: string
 	invoice_number: string
@@ -188,39 +188,6 @@ export const getUserInvoices = async (): Promise<SavedInvoice[]> => {
 	} catch (error) {
 		console.error('Error fetching invoices:', error)
 		return []
-	}
-}
-
-// Get a specific invoice by ID
-export const getInvoiceById = async (
-	id: string,
-): Promise<SavedInvoice | null> => {
-	await new Promise((resolve) => setTimeout(resolve, 4000))
-	try {
-		const {
-			data: { user },
-		} = await supabase.auth.getUser()
-
-		if (!user) {
-			return null
-		}
-
-		const { data, error } = await (supabase as any)
-			.from('invoices')
-			.select('*')
-			.eq('id', id)
-			.eq('user_id', user.id)
-			.single()
-
-		if (error) {
-			console.error('Error fetching invoice:', error)
-			return null
-		}
-
-		return data as SavedInvoice
-	} catch (error) {
-		console.error('Error fetching invoice:', error)
-		return null
 	}
 }
 

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { SettingsRequiredDialog } from '@/components/ui/SettingsRequiredDialog'
 import { useUsage } from '@/contexts/UsageContext'
+import type { Client } from '@/lib/client-service'
 import { calculateDueDate } from '@/lib/format-utils'
 import type { SavedInvoice } from '@/lib/invoice-service'
 import type { SettingsValidationResult } from '@/lib/settings-validation'
@@ -23,6 +24,7 @@ interface InvoiceGeneratorProps {
 	settingsValidationPromise: Promise<SettingsValidationResult>
 	settingsUserPromise: Promise<SettingsFormData>
 	defaultThemePromise: Promise<InvoiceTheme>
+	clientsPromise: Promise<Client[]>
 }
 
 export const InvoiceGenerator = ({
@@ -30,6 +32,7 @@ export const InvoiceGenerator = ({
 	settingsValidationPromise,
 	settingsUserPromise,
 	defaultThemePromise,
+	clientsPromise,
 }: InvoiceGeneratorProps) => {
 	const editingInvoice = use(editingInvoicePromise)
 	const settingsValidation = use(settingsValidationPromise)
@@ -109,7 +112,6 @@ export const InvoiceGenerator = ({
 		}
 	}, [])
 
-	
 	return (
 		<div className="relative h-full">
 			<div className="mx-auto h-full">
@@ -135,6 +137,7 @@ export const InvoiceGenerator = ({
 						{/* Step Content */}
 						<Card className="flex flex-col h-[85%] flex-1 border-primary/30 p-4 shadow-lg sm:p-6 lg:h-[90%] lg:p-8">
 							<RenderStepContent
+								clientsPromise={clientsPromise}
 								currentStep={currentStep}
 								customFields={settingsUser?.custom_fields || []}
 								invoiceData={invoiceData}
