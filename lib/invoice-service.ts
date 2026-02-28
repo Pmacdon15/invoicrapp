@@ -118,49 +118,49 @@ export const convertInvoiceDataToSaveFormat = (
 	}
 }
 
-// Save a new invoice with usage tracking
-export const saveInvoice = async (
-	invoiceData: CreateInvoiceData,
-): Promise<{ success: boolean; invoice?: SavedInvoice; error?: string }> => {
-	try {
-		const {
-			data: { user },
-		} = await supabase.auth.getUser()
+// // Save a new invoice with usage tracking
+// export const saveInvoice = async (
+// 	invoiceData: CreateInvoiceData,
+// ): Promise<{ success: boolean; invoice?: SavedInvoice; error?: string }> => {
+// 	try {
+// 		const {
+// 			data: { user },
+// 		} = await supabase.auth.getUser()
 
-		if (!user) {
-			return { success: false, error: 'User not authenticated' }
-		}
+// 		if (!user) {
+// 			return { success: false, error: 'User not authenticated' }
+// 		}
 
-		// Increment usage before creating invoice
-		const usageIncremented =
-			await SubscriptionService.incrementInvoiceUsage(user.id)
-		if (!usageIncremented) {
-			return { success: false, error: 'Failed to update usage tracking.' }
-		}
+// 		// Increment usage before creating invoice
+// 		const usageIncremented =
+// 			await SubscriptionService.incrementInvoiceUsage(user.id)
+// 		if (!usageIncremented) {
+// 			return { success: false, error: 'Failed to update usage tracking.' }
+// 		}
 
-		const { data, error } = await (supabase as any)
-			.from('invoices')
-			.insert({
-				user_id: user.id,
-				...invoiceData,
-			})
-			.select()
-			.single()
+// 		const { data, error } = await (supabase as any)
+// 			.from('invoices')
+// 			.insert({
+// 				user_id: user.id,
+// 				...invoiceData,
+// 			})
+// 			.select()
+// 			.single()
 
-		if (error) {
-			console.error('Error saving invoice:', error)
-			return {
-				success: false,
-				error: 'Failed to save invoice to database.',
-			}
-		}
+// 		if (error) {
+// 			console.error('Error saving invoice:', error)
+// 			return {
+// 				success: false,
+// 				error: 'Failed to save invoice to database.',
+// 			}
+// 		}
 
-		return { success: true, invoice: data as SavedInvoice }
-	} catch (error) {
-		console.error('Error saving invoice:', error)
-		return { success: false, error: 'An unexpected error occurred.' }
-	}
-}
+// 		return { success: true, invoice: data as SavedInvoice }
+// 	} catch (error) {
+// 		console.error('Error saving invoice:', error)
+// 		return { success: false, error: 'An unexpected error occurred.' }
+// 	}
+// }
 
 // Get all invoices for the current user
 export const getUserInvoices = async (): Promise<SavedInvoice[]> => {

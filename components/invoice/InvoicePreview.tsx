@@ -8,6 +8,7 @@ import {
 	useRef,
 	useState,
 } from 'react'
+import { saveInvoice } from '@/actions/invoices'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import {
@@ -22,10 +23,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { showError, showSuccess } from '@/hooks/use-toast'
 import { supabase } from '@/integrations/supabase/old/client'
 import { formatCurrency, formatDate, formatNumber } from '@/lib/format-utils'
-import {
-	convertInvoiceDataToSaveFormat,
-	saveInvoice,
-} from '@/lib/invoice-service'
+import { convertInvoiceDataToSaveFormat } from '@/lib/invoice-service'
 import { SettingsService } from '@/lib/settings-service'
 import type { InvoiceData } from '@/types/invoice'
 import type { SettingsFormData } from '@/types/settings'
@@ -105,25 +103,7 @@ export const InvoicePreview = ({
 			const invoiceToSave = convertInvoiceDataToSaveFormat(invoiceData)
 			const savedInvoice = await saveInvoice(invoiceToSave)
 
-			if (savedInvoice) {
-				// Increment invoice counter in user settings after successful save
-				const {
-					data: { user },
-				} = await supabase.auth.getUser()
-				if (user) {
-					try {
-						const userSettings =
-							await SettingsService.getSettingsWithDefaults(
-								user.id,
-							)
-						await SettingsService.saveUserSettings(user.id, {
-							invoice_counter: userSettings.invoice_counter + 1,
-						})
-					} catch (error) {
-						console.error('Error updating invoice counter:', error)
-					}
-				}
-
+			if (savedInvoice.success) {
 				setIsSaved(true)
 
 				showSuccess(

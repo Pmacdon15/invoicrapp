@@ -2,15 +2,11 @@
 import { ArrowRight, CheckCircle, Save } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { type Dispatch, type SetStateAction, useState } from 'react'
+import { saveInvoice } from '@/actions/invoices'
 import { showError, showSuccess } from '@/hooks/use-toast'
-import { supabase } from '@/integrations/supabase/old/client'
 import { type CreateClientData, saveClient } from '@/lib/client-service'
-import {
-	convertInvoiceDataToSaveFormat,
-	saveInvoice,
-} from '@/lib/invoice-service'
+import { convertInvoiceDataToSaveFormat } from '@/lib/invoice-service'
 import { steps } from '@/lib/invoice-utils'
-import { SettingsService } from '@/lib/settings-service'
 import type { InvoiceData } from '@/types/invoice'
 import type { CustomField } from '@/types/settings'
 import { Button } from '../ui/button'
@@ -35,45 +31,29 @@ export default function SaveButton({
 	customFields?: CustomField[]
 }) {
 	const [isSaving, setIsSaving] = useState(false)
-	const router = useRouter()
+	
 	const handleSaveInvoice = async () => {
+		
 		setIsSaving(true)
 		try {
 			const invoiceToSave = convertInvoiceDataToSaveFormat(invoiceData)
-			const result = await saveInvoice(invoiceToSave)
+			const savedInvoice = await saveInvoice(invoiceToSave)
 
-			if (result.success && result.invoice) {
-				const {
-					data: { user },
-				} = await supabase.auth.getUser()
-				if (user) {
-					try {
-						const userSettings =
-							await SettingsService.getSettingsWithDefaults(
-								user.id,
-							)
-						await SettingsService.saveUserSettings(user.id, {
-							invoice_counter: userSettings.invoice_counter + 1,
-						})
-					} catch (error) {
-						console.error('Error updating invoice counter:', error)
-					}
-				}
-
+			if (savedInvoice.success) {
 				setIsSaved(true)
+
 				showSuccess(
 					'Invoice Saved Successfully!',
 					`Invoice ${invoiceData.invoiceNumber} has been saved to your history.`,
 				)
 
-				await refreshUsage()
-				router.push(`/dashboard/invoices`)
+				return true
 			} else {
 				showError(
 					'Error Saving Invoice',
-					result.error ||
-						'There was an error saving your invoice. Please try again.',
+					'There was an error saving your invoice. Please try again.',
 				)
+				return false
 			}
 		} catch (error) {
 			console.error('Error saving invoice:', error)
@@ -81,6 +61,7 @@ export default function SaveButton({
 				'Error Saving Invoice',
 				'There was an error saving your invoice. Please try again.',
 			)
+			return false
 		} finally {
 			setIsSaving(false)
 		}
