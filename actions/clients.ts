@@ -1,9 +1,9 @@
 'use server'
 
+import { revalidatePath } from 'next/cache'
 import { supabase } from '@/integrations/supabase/old/client'
 import { createClient } from '@/integrations/supabase/server/client'
 import type { Client, CreateClientData } from '@/lib/client-service'
-import { revalidatePath } from 'next/cache'
 
 // Update an existing client
 export const updateClient = async (
@@ -36,6 +36,41 @@ export const updateClient = async (
 		return data as Client
 	} catch (error) {
 		console.error('Error updating client:', error)
+		return null
+	}
+}
+
+// Save a new client
+export const saveClient = async (
+	clientData: CreateClientData,
+): Promise<Client | null> => {
+	const supabaseServer = await createClient()
+	try {
+		const {
+			data: { user },
+		} = await supabaseServer.auth.getUser()
+
+		if (!user) {
+			throw new Error('User not authenticated')
+		}
+
+		const { data, error } = await supabaseServer
+			.from('clients')
+			.insert({
+				user_id: user.id,
+				...clientData,
+			})
+			.select()
+			.single()
+
+		if (error) {
+			console.error('Error saving client:', error)
+			return null
+		}
+		revalidatePath('/dashboard/clients')
+		return data as Client
+	} catch (error) {
+		console.error('Error saving client:', error)
 		return null
 	}
 }
