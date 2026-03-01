@@ -3,6 +3,7 @@
 import { createClient } from '@/integrations/supabase/server/client'
 import type { CreateInvoiceData, SavedInvoice } from '@/lib/invoice-service'
 import { SubscriptionService } from '@/lib/subscription-service'
+import { revalidatePath } from 'next/cache'
 
 // Save a new invoice with usage tracking
 export const saveInvoice = async (
@@ -50,5 +51,39 @@ export const saveInvoice = async (
 	} catch (error) {
 		console.error('Error in saveInvoice flow:', error)
 		return { success: false, error: 'An unexpected error occurred.' }
+	}
+}
+
+
+// Update invoice status
+export const updateInvoiceStatus = async (
+	id: string,
+	status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled',
+): Promise<boolean> => {
+	try {
+		const supabaseServer = await createClient()
+		const {
+			data: { user },
+		} = await supabaseServer.auth.getUser()
+
+		if (!user) {
+			return false
+		}
+
+		const { error } = await (supabaseServer)
+			.from('invoices')
+			.update({ status })
+			.eq('id', id)
+			.eq('user_id', user.id)
+
+		if (error) {
+			console.error('Error updating invoice status:', error)
+			return false
+		}
+		revalidatePath("/dashboard/invoices")
+		return true
+	} catch (error) {
+		console.error('Error updating invoice status:', error)
+		return false
 	}
 }

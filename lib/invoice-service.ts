@@ -254,37 +254,37 @@ export const deleteInvoice = async (id: string): Promise<boolean> => {
 	}
 }
 
-// Update invoice status
-export const updateInvoiceStatus = async (
-	id: string,
-	status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled',
-): Promise<boolean> => {
-	try {
-		const {
-			data: { user },
-		} = await supabase.auth.getUser()
+// // Update invoice status
+// export const updateInvoiceStatus = async (
+// 	id: string,
+// 	status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled',
+// ): Promise<boolean> => {
+// 	try {
+// 		const {
+// 			data: { user },
+// 		} = await supabase.auth.getUser()
 
-		if (!user) {
-			return false
-		}
+// 		if (!user) {
+// 			return false
+// 		}
 
-		const { error } = await (supabase as any)
-			.from('invoices')
-			.update({ status })
-			.eq('id', id)
-			.eq('user_id', user.id)
+// 		const { error } = await (supabase as any)
+// 			.from('invoices')
+// 			.update({ status })
+// 			.eq('id', id)
+// 			.eq('user_id', user.id)
 
-		if (error) {
-			console.error('Error updating invoice status:', error)
-			return false
-		}
+// 		if (error) {
+// 			console.error('Error updating invoice status:', error)
+// 			return false
+// 		}
 
-		return true
-	} catch (error) {
-		console.error('Error updating invoice status:', error)
-		return false
-	}
-}
+// 		return true
+// 	} catch (error) {
+// 		console.error('Error updating invoice status:', error)
+// 		return false
+// 	}
+// }
 
 // Get invoices by client name
 export const getInvoicesByClient = async (

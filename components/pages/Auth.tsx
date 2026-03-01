@@ -25,8 +25,8 @@ import { login } from '@/actions/login'
 
 
 const Auth = () => {
-	const [user, setUser] = useState<User | null>(null)
-	const [session, setSession] = useState<Session | null>(null)
+	// const [user, setUser] = useState<User | null>(null)
+	// const [session, setSession] = useState<Session | null>(null)
 	const [loading, setLoading] = useState(false)
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
@@ -34,31 +34,6 @@ const Auth = () => {
 	const router = useRouter()
 	// Using enhanced toast helpers
 
-	useEffect(() => {
-		const initializeAuth = async () => {
-			const supabaseServer = createClient()
-			// Check for existing session on component mount
-			 supabaseServer .auth.getSession().then(({ data: { session } }) => {
-				setSession(session)
-				setUser(session?.user ?? null)
-
-				// Let AuthContext handle redirects - no redirect logic here
-			})
-
-			// Set up auth state listener without redirect logic
-			const {
-				data: { subscription },
-			} =  supabaseServer .auth.onAuthStateChange((event, session) => {
-				setSession(session)
-				setUser(session?.user ?? null)
-				// Let AuthContext handle redirects
-			})
-
-			return () => subscription.unsubscribe()
-		}
-
-		initializeAuth()
-	}, [])
 
 	const handleSignUp = async (e: React.FormEvent) => {
 		e.preventDefault()
