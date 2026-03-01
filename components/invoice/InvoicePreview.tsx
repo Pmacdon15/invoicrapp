@@ -21,53 +21,30 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
 import { showError, showSuccess } from '@/hooks/use-toast'
-import { supabase } from '@/integrations/supabase/old/client'
 import { formatCurrency, formatDate, formatNumber } from '@/lib/format-utils'
 import { convertInvoiceDataToSaveFormat } from '@/lib/invoice-service'
-import { SettingsService } from '@/lib/settings-service'
 import type { InvoiceData } from '@/types/invoice'
-import type { SettingsFormData } from '@/types/settings'
+import type { UserSettings } from '@/types/settings'
 
 // Theme styles are now included in the invoiceData.theme object
 interface InvoicePreviewProps {
 	invoiceData: InvoiceData
 	isSaved?: boolean
 	setIsSaved?: Dispatch<SetStateAction<boolean>>
+	userSettings: UserSettings | null
 }
 
 export const InvoicePreview = ({
 	invoiceData,
 	isSaved = false,
 	setIsSaved,
+	userSettings,
 }: InvoicePreviewProps) => {
 	const pdfRef = useRef<HTMLDivElement>(null)
 	const [isDialogOpen, setIsDialogOpen] = useState(false)
-	const [userSettings, setUserSettings] = useState<SettingsFormData | null>(
-		null,
-	)
 	const [isSaving, setIsSaving] = useState(false)
 	const [isHtmlDialogOpen, setIsHtmlDialogOpen] = useState(false)
 	const [htmlContent, setHtmlContent] = useState('')
-	//TODO: start this on the client and pass it down so we can just have the value and not have to worry about state or this useeffect on mount
-	// Load user settings for formatting
-	useEffect(() => {
-		const loadUserSettings = async () => {
-			try {
-				const {
-					data: { user },
-				} = await supabase.auth.getUser()
-				if (user) {
-					const settings =
-						await SettingsService.getSettingsWithDefaults(user.id)
-					setUserSettings(settings)
-				}
-			} catch (error) {
-				console.error('Error loading user settings:', error)
-			}
-		}
-
-		loadUserSettings()
-	}, [])
 
 	// Inject theme's custom CSS into the page
 	useEffect(() => {

@@ -27,7 +27,7 @@ export const getInvoiceById = async (
 			.single()
 
 		if (error) {
-			console.error('Error fetching invoice:', error)
+			// console.error('Error fetching invoice:', error)
 			return null
 		}
 
@@ -59,7 +59,7 @@ export const getUserInvoices = async (): Promise<SavedInvoice[]> => {
 			.order('created_at', { ascending: false })
 
 		if (error) {
-			console.error('Error fetching invoices:', error)
+			// console.error('Error fetching invoices:', error)
 			return []
 		}
 

@@ -9,9 +9,8 @@ import { useUsage } from '@/contexts/UsageContext'
 import type { Client } from '@/lib/client-service'
 import { calculateDueDate } from '@/lib/format-utils'
 import type { SavedInvoice } from '@/lib/invoice-service'
-import type { SettingsValidationResult } from '@/lib/settings-validation'
 import type { InvoiceData, InvoiceTheme } from '@/types/invoice'
-import type { SettingsFormData } from '@/types/settings'
+import type { UserSettings } from '@/types/settings'
 import ExitButton from './invoice-generator/invoice-generator-button-exit'
 import InvoiceGeneratorDesktopSteps from './invoice-generator/invoice-generator-desktop-steps'
 import LimitReached from './invoice-generator/invoice-generator-limit-reached'
@@ -21,21 +20,18 @@ import SaveButton from './invoice-generator/invoice-generator-save-button'
 
 interface InvoiceGeneratorProps {
 	editingInvoicePromise?: Promise<SavedInvoice>
-	settingsValidationPromise: Promise<SettingsValidationResult>
-	settingsUserPromise: Promise<SettingsFormData>
+	settingsUserPromise: Promise<UserSettings | null>
 	defaultThemePromise: Promise<InvoiceTheme>
 	clientsPromise: Promise<Client[]>
 }
 
 export const InvoiceGenerator = ({
 	editingInvoicePromise,
-	settingsValidationPromise,
 	settingsUserPromise,
 	defaultThemePromise,
 	clientsPromise,
 }: InvoiceGeneratorProps) => {
 	const editingInvoice = use(editingInvoicePromise)
-	const settingsValidation = use(settingsValidationPromise)
 	const settingsUser = use(settingsUserPromise)
 	const defaultTheme = use(defaultThemePromise)
 
@@ -145,6 +141,7 @@ export const InvoiceGenerator = ({
 								setInvoiceData={setInvoiceData}
 								setIsNewClient={setIsNewClient}
 								setIsSaved={setIsSaved}
+								settingsUser={settingsUser}
 							/>
 						</Card>
 
@@ -216,14 +213,8 @@ export const InvoiceGenerator = ({
 			<SettingsRequiredDialog
 				onContinueAnyway={() => setShowSettingsDialog(false)}
 				onOpenChange={setShowSettingsDialog}
-				open={showSettingsDialog && settingsValidation !== null}
-				validationResult={
-					settingsValidation || {
-						isValid: true,
-						missingFields: [],
-						criticalMissing: [],
-					}
-				}
+				open={showSettingsDialog && settingsUser !== null}
+				validationResult={settingsUser}
 			/>
 		</div>
 	)
