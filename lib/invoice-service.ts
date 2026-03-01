@@ -349,44 +349,44 @@ export const getInvoiceCountByClient = async (
 	}
 }
 
-// Get invoice counts for all clients
-export const getInvoiceCountsForClients = async (
-	clientNames: string[],
-): Promise<Record<string, number>> => {
-	try {
-		const {
-			data: { user },
-		} = await supabase.auth.getUser()
+// // Get invoice counts for all clients
+// export const getInvoiceCountsForClients = async (
+// 	clientNames: string[],
+// ): Promise<Record<string, number>> => {
+// 	try {
+// 		const {
+// 			data: { user },
+// 		} = await supabase.auth.getUser()
 
-		if (!user || clientNames.length === 0) {
-			return {}
-		}
+// 		if (!user || clientNames.length === 0) {
+// 			return {}
+// 		}
 
-		const { data, error } = await (supabase as any)
-			.from('invoices')
-			.select('client_name')
-			.eq('user_id', user.id)
-			.in('client_name', clientNames)
+// 		const { data, error } = await (supabase as any)
+// 			.from('invoices')
+// 			.select('client_name')
+// 			.eq('user_id', user.id)
+// 			.in('client_name', clientNames)
 
-		if (error) {
-			console.error('Error fetching invoice counts for clients:', error)
-			return {}
-		}
+// 		if (error) {
+// 			console.error('Error fetching invoice counts for clients:', error)
+// 			return {}
+// 		}
 
-		// Count invoices per client
-		const counts: Record<string, number> = {}
-		clientNames.forEach((name) => (counts[name] = 0))
+// 		// Count invoices per client
+// 		const counts: Record<string, number> = {}
+// 		clientNames.forEach((name) => (counts[name] = 0))
 
-		data.forEach((invoice: { client_name: string }) => {
-			counts[invoice.client_name] = (counts[invoice.client_name] || 0) + 1
-		})
+// 		data.forEach((invoice: { client_name: string }) => {
+// 			counts[invoice.client_name] = (counts[invoice.client_name] || 0) + 1
+// 		})
 
-		return counts
-	} catch (error) {
-		console.error('Error fetching invoice counts for clients:', error)
-		return {}
-	}
-}
+// 		return counts
+// 	} catch (error) {
+// 		console.error('Error fetching invoice counts for clients:', error)
+// 		return {}
+// 	}
+// }
 
 // Analytics interfaces
 export interface InvoiceAnalytics {

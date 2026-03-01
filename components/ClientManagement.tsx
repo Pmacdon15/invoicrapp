@@ -20,11 +20,10 @@ import {
 	Users,
 	X,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { use, useState } from 'react'
 import { InvoicePreview } from '@/components/invoice/InvoicePreview'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import {
 	Dialog,
 	DialogContent,
@@ -62,16 +61,10 @@ import { showError, showSuccess } from '@/hooks/use-toast'
 import {
 	type Client,
 	deleteClient,
-	getUserClients,
 	saveClient,
-	searchClients,
 	updateClient,
 } from '@/lib/client-service'
-import {
-	getInvoiceCountsForClients,
-	getInvoicesByClient,
-	type SavedInvoice,
-} from '@/lib/invoice-service'
+import { getInvoicesByClient, type SavedInvoice } from '@/lib/invoice-service'
 import { getThemeMetadataSync } from '@/lib/invoice-themes'
 import type { InvoiceData } from '@/types/invoice'
 
@@ -79,6 +72,8 @@ interface ClientManagementProps {
 	onSelectClient?: (client: Client) => void
 	selectedClientId?: string
 	showSelectMode?: boolean
+	clientsPromise: Promise<Client[] | null>
+	clientsInvoiceCountPromise: Promise<Record<string, number>>
 }
 
 interface ClientWithInvoices extends Client {
@@ -87,12 +82,24 @@ interface ClientWithInvoices extends Client {
 }
 
 export const ClientManagement = ({
+	clientsInvoiceCountPromise,
+	clientsPromise,
 	onSelectClient,
 	selectedClientId,
 	showSelectMode = false,
 }: ClientManagementProps) => {
-	const [clients, setClients] = useState<ClientWithInvoices[]>([])
-	const [loading, setLoading] = useState(true)
+	// const [clients, setClients] = useState<ClientWithInvoices[]>([])
+
+	const clientsWithOutCount = use(clientsPromise)
+	const clientsInvoiceCount = use(clientsInvoiceCountPromise)
+
+	const clients =
+		clientsWithOutCount?.map((client) => ({
+			...client,
+			invoiceCount: clientsInvoiceCount?.[client.id] || 0,
+		})) || []
+
+	// const [loading, setLoading] = useState(true)
 	const [searchTerm, setSearchTerm] = useState('')
 	const [isDialogOpen, setIsDialogOpen] = useState(false)
 	const [editingClient, setEditingClient] = useState<Client | null>(null)
@@ -135,57 +142,57 @@ export const ClientManagement = ({
 		website: '',
 	})
 
-	const loadClients = async () => {
-		try {
-			setLoading(true)
-			const userClients = await getUserClients()
+	// const loadClients = async () => {
+	// 	try {
+	// 		setLoading(true)
+	// 		const userClients = await getUserClients()
 
-			// Get invoice counts for all clients
-			const clientNames = userClients.map((client) => client.name)
-			const invoiceCounts = await getInvoiceCountsForClients(clientNames)
+	// 		// Get invoice counts for all clients
+	// 		const clientNames = userClients.map((client) => client.name)
+	// 		const invoiceCounts = await getInvoiceCountsForClients(clientNames)
 
-			// Add invoice counts to clients
-			const clientsWithCounts = userClients.map((client) => ({
-				...client,
-				invoiceCount: invoiceCounts[client.name] || 0,
-			}))
+	// 		// Add invoice counts to clients
+	// 		const clientsWithCounts = userClients.map((client) => ({
+	// 			...client,
+	// 			invoiceCount: invoiceCounts[client.name] || 0,
+	// 		}))
 
-			setClients(clientsWithCounts)
-		} catch (error) {
-			console.error('Error loading clients:', error)
-			showError(
-				'Error Loading Clients',
-				'Failed to load your clients. Please try again.',
-			)
-		} finally {
-			setLoading(false)
-		}
-	}
+	// 		setClients(clientsWithCounts)
+	// 	} catch (error) {
+	// 		console.error('Error loading clients:', error)
+	// 		showError(
+	// 			'Error Loading Clients',
+	// 			'Failed to load your clients. Please try again.',
+	// 		)
+	// 	} finally {
+	// 		setLoading(false)
+	// 	}
+	// }
 
-	const handleSearch = async (term: string) => {
-		setSearchTerm(term)
-		if (term.trim()) {
-			try {
-				const searchResults = await searchClients(term)
+	// const handleSearch = async (term: string) => {
+	// 	setSearchTerm(term)
+	// 	if (term.trim()) {
+	// 		try {
+	// 			const searchResults = await searchClients(term)
 
-				// Get invoice counts for search results
-				const clientNames = searchResults.map((client) => client.name)
-				const invoiceCounts =
-					await getInvoiceCountsForClients(clientNames)
+	// 			// Get invoice counts for search results
+	// 			const clientNames = searchResults.map((client) => client.name)
+	// 			const invoiceCounts =
+	// 				await getInvoiceCountsForClients(clientNames)
 
-				const resultsWithCounts = searchResults.map((client) => ({
-					...client,
-					invoiceCount: invoiceCounts[client.name] || 0,
-				}))
+	// 			const resultsWithCounts = searchResults.map((client) => ({
+	// 				...client,
+	// 				invoiceCount: invoiceCounts[client.name] || 0,
+	// 			}))
 
-				setClients(resultsWithCounts)
-			} catch (error) {
-				console.error('Error searching clients:', error)
-			}
-		} else {
-			loadClients()
-		}
-	}
+	// 			setClients(resultsWithCounts)
+	// 		} catch (error) {
+	// 			console.error('Error searching clients:', error)
+	// 		}
+	// 	} else {
+	// 		loadClients()
+	// 	}
+	// }
 
 	const resetForm = () => {
 		setFormData({
@@ -236,7 +243,7 @@ export const ClientManagement = ({
 				)
 				setIsDialogOpen(false)
 				resetForm()
-				loadClients()
+				// loadClients()
 			} else {
 				showError(
 					'Error',
@@ -267,7 +274,7 @@ export const ClientManagement = ({
 					'Client Deactivated',
 					'Client has been deactivated successfully.',
 				)
-				loadClients()
+				// loadClients()
 			} else {
 				showError(
 					'Error',
@@ -403,32 +410,6 @@ export const ClientManagement = ({
 
 			return sortOrder === 'asc' ? comparison : -comparison
 		})
-
-	useEffect(() => {
-		loadClients()
-	}, [])
-
-	if (loading) {
-		return (
-			<div className="space-y-4">
-				<div className="flex items-center justify-between">
-					<h2 className="text-lg md:text-2xl font-bold">
-						Client Management
-					</h2>
-				</div>
-				<div className="grid gap-4">
-					{[1, 2, 3].map((i) => (
-						<Card className="animate-pulse" key={i}>
-							<CardContent className="p-6">
-								<div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
-								<div className="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>
-							</CardContent>
-						</Card>
-					))}
-				</div>
-			</div>
-		)
-	}
 
 	return (
 		<div className="space-y-6">
@@ -590,7 +571,7 @@ export const ClientManagement = ({
 					<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
 					<Input
 						className="pl-10"
-						onChange={(e) => handleSearch(e.target.value)}
+						// onChange={(e) => handleSearch(e.target.value)}
 						placeholder="Search clients by name, company, or email..."
 						value={searchTerm}
 					/>
@@ -622,7 +603,7 @@ export const ClientManagement = ({
 							onClick={() => {
 								setFilterBy('all')
 								setSearchTerm('')
-								loadClients()
+								// loadClients()
 							}}
 							size="sm"
 							variant="ghost"
