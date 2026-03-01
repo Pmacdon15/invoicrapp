@@ -137,39 +137,39 @@ export const getClientById = async (id: string): Promise<Client | null> => {
 	}
 }
 
-// Update an existing client
-export const updateClient = async (
-	id: string,
-	updates: Partial<CreateClientData>,
-): Promise<Client | null> => {
-	try {
-		const {
-			data: { user },
-		} = await supabase.auth.getUser()
+// // Update an existing client
+// export const updateClient = async (
+// 	id: string,
+// 	updates: Partial<CreateClientData>,
+// ): Promise<Client | null> => {
+// 	try {
+// 		const {
+// 			data: { user },
+// 		} = await supabase.auth.getUser()
 
-		if (!user) {
-			return null
-		}
+// 		if (!user) {
+// 			return null
+// 		}
 
-		const { data, error } = await (supabase as any)
-			.from('clients')
-			.update(updates)
-			.eq('id', id)
-			.eq('user_id', user.id)
-			.select()
-			.single()
+// 		const { data, error } = await (supabase as any)
+// 			.from('clients')
+// 			.update(updates)
+// 			.eq('id', id)
+// 			.eq('user_id', user.id)
+// 			.select()
+// 			.single()
 
-		if (error) {
-			console.error('Error updating client:', error)
-			return null
-		}
+// 		if (error) {
+// 			console.error('Error updating client:', error)
+// 			return null
+// 		}
 
-		return data as Client
-	} catch (error) {
-		console.error('Error updating client:', error)
-		return null
-	}
-}
+// 		return data as Client
+// 	} catch (error) {
+// 		console.error('Error updating client:', error)
+// 		return null
+// 	}
+// }
 
 // Delete a client (soft delete by setting is_active to false)
 // export const deleteClient = async (
