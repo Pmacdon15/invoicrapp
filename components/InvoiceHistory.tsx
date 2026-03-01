@@ -52,8 +52,8 @@ import {
 } from '@/components/ui/table'
 import { showError, showSuccess } from '@/hooks/use-toast'
 import type { SavedInvoice } from '@/lib/invoice-service'
-import { getThemeMetadataSync } from '@/lib/invoice-themes'
-import type { InvoiceData } from '@/types/invoice'
+import { getDefaultTheme, getThemeById, getThemeMetadataSync } from '@/lib/invoice-themes'
+import type { InvoiceData, InvoiceTheme } from '@/types/invoice'
 import type { UserSettings } from '@/types/settings'
 
 // interface InvoiceHistoryProps {
@@ -89,6 +89,9 @@ export default function InvoiceHistory({
 	const userSettings = use(userSettingsPromise)
 	const [deletingId, setDeletingId] = useState<string | null>(null)
 	const [previewInvoice, setPreviewInvoice] = useState<SavedInvoice | null>(
+		null,
+	)
+	const [previewInvoiceData, setPreviewInvoiceData] = useState<InvoiceData | null>(
 		null,
 	)
 	const [showPreviewDialog, setShowPreviewDialog] = useState(false)
@@ -158,48 +161,9 @@ export default function InvoiceHistory({
 	}
 
 	// Convert SavedInvoice to InvoiceData format for preview
-	const convertToInvoiceData = (savedInvoice: SavedInvoice): InvoiceData => {
-		const themeMetadata = getThemeMetadataSync(savedInvoice.theme_id)
-
-		// Create a complete theme object for preview purposes
-		const previewTheme = {
-			id: savedInvoice.theme_id,
-			name: savedInvoice.theme_name,
-			color: themeMetadata?.id.split('-')[1] || 'blue',
-			description: themeMetadata?.description || 'Professional theme',
-			version: themeMetadata?.version || '1.0.0',
-			author: themeMetadata?.author || 'Invoicr',
-			preview: themeMetadata?.preview || {
-				primary: '#3b82f6',
-				secondary: '#dbeafe',
-				accent: '#1e40af',
-			},
-			styles: {
-				primary: `text-invoice-${themeMetadata?.id.split('-')[1] || 'blue'}`,
-				primaryLight: `bg-invoice-${
-					themeMetadata?.id.split('-')[1] || 'blue'
-				}-light`,
-				text: `text-invoice-${themeMetadata?.id.split('-')[1] || 'blue'}`,
-				background: `bg-invoice-${
-					themeMetadata?.id.split('-')[1] || 'blue'
-				}-light`,
-				border: `border-invoice-${themeMetadata?.id.split('-')[1] || 'blue'}`,
-			},
-			layout: {
-				headerStyle: 'classic',
-				footerStyle: 'minimal',
-				spacing: 'comfortable',
-				typography: {
-					headerFont: 'font-semibold',
-					bodyFont: 'font-normal',
-					accentFont: 'font-medium',
-				},
-			},
-			customCSS: '',
-		}
-
+	const convertToInvoiceData = (savedInvoice: SavedInvoice, theme: InvoiceTheme): InvoiceData => {
 		return {
-			theme: previewTheme,
+			theme: theme,
 			client: {
 				name: savedInvoice.client_name,
 				address: savedInvoice.client_address,
@@ -213,13 +177,63 @@ export default function InvoiceHistory({
 			notes: savedInvoice.notes || undefined,
 			currency: 'USD',
 			paymentTerms: 'Net 30',
-			taxRate: 0,
+			taxRate: (savedInvoice.subtotal > 0) 
+				? (savedInvoice.tax_amount / savedInvoice.subtotal) * 100 
+				: 0,
+			customFields: savedInvoice.custom_fields || [],
 		}
 	}
 
-	const handlePreviewInvoice = (invoice: SavedInvoice) => {
+	const handlePreviewInvoice = async (invoice: SavedInvoice) => {
 		setPreviewInvoice(invoice)
-		setShowPreviewDialog(true)
+		try {
+			const theme = await getThemeById(invoice.theme_id) || await getDefaultTheme()
+			const data = convertToInvoiceData(invoice, theme)
+			setPreviewInvoiceData(data)
+			setShowPreviewDialog(true)
+		} catch (error) {
+			console.error('Error loading theme for preview:', error)
+			// Fallback if theme fails to load
+			const themeMetadata = getThemeMetadataSync(invoice.theme_id)
+			const fallbackTheme: InvoiceTheme = {
+				id: invoice.theme_id,
+				name: invoice.theme_name,
+				color: themeMetadata?.id.split('-')[1] || 'blue',
+				description: themeMetadata?.description || 'Professional theme',
+				version: themeMetadata?.version || '1.0.0',
+				author: themeMetadata?.author || 'Invoicr',
+				preview: themeMetadata?.preview || {
+					primary: '#3b82f6',
+					secondary: '#dbeafe',
+					accent: '#1e40af',
+				},
+				styles: {
+					primary: `text-invoice-${themeMetadata?.id.split('-')[1] || 'blue'}`,
+					primaryLight: `bg-invoice-${
+						themeMetadata?.id.split('-')[1] || 'blue'
+					}-light`,
+					text: `text-invoice-${themeMetadata?.id.split('-')[1] || 'blue'}`,
+					background: `bg-invoice-${
+						themeMetadata?.id.split('-')[1] || 'blue'
+					}-light`,
+					border: `border-invoice-${themeMetadata?.id.split('-')[1] || 'blue'}`,
+				},
+				layout: {
+					headerStyle: 'classic',
+					footerStyle: 'minimal',
+					spacing: 'comfortable',
+					typography: {
+						headerFont: 'font-semibold',
+						bodyFont: 'font-normal',
+						accentFont: 'font-medium',
+					},
+				},
+				customCSS: '',
+			}
+			const data = convertToInvoiceData(invoice, fallbackTheme)
+			setPreviewInvoiceData(data)
+			setShowPreviewDialog(true)
+		}
 	}
 
 	const handleSort = (column: typeof sortBy) => {
@@ -609,12 +623,10 @@ export default function InvoiceHistory({
 						</DialogTitle>
 					</DialogHeader>
 
-					{previewInvoice && (
+					{previewInvoiceData && (
 						<div className="mt-4">
 							<InvoicePreview
-								invoiceData={convertToInvoiceData(
-									previewInvoice,
-								)}
+								invoiceData={previewInvoiceData}
 								userSettings={userSettings}
 							/>
 						</div>

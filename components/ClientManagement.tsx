@@ -2,9 +2,6 @@
 import {
 	ArrowUpDown,
 	Building,
-	Calendar,
-	Clock,
-	DollarSign,
 	Edit,
 	Eye,
 	Filter,
@@ -67,6 +64,8 @@ import {
 import { getInvoicesByClient, type SavedInvoice } from '@/lib/invoice-service'
 import { getThemeMetadataSync } from '@/lib/invoice-themes'
 import type { InvoiceData } from '@/types/invoice'
+import type { UserSettings } from '@/types/settings'
+import SelectedClientInvoices from './client-managment/selected-client-invoices'
 
 interface ClientManagementProps {
 	onSelectClient?: (client: Client) => void
@@ -74,6 +73,7 @@ interface ClientManagementProps {
 	showSelectMode?: boolean
 	clientsPromise: Promise<Client[] | null>
 	clientsInvoiceCountPromise: Promise<Record<string, number>>
+	userSettingsPromise: Promise<UserSettings>
 }
 
 interface ClientWithInvoices extends Client {
@@ -87,11 +87,13 @@ export const ClientManagement = ({
 	onSelectClient,
 	selectedClientId,
 	showSelectMode = false,
+	userSettingsPromise,
 }: ClientManagementProps) => {
 	// const [clients, setClients] = useState<ClientWithInvoices[]>([])
 
 	const clientsWithOutCount = use(clientsPromise)
 	const clientsInvoiceCount = use(clientsInvoiceCountPromise)
+	const userSettings = use(userSettingsPromise)
 
 	const clients =
 		clientsWithOutCount?.map((client) => ({
@@ -141,33 +143,6 @@ export const ClientManagement = ({
 		tax_number: '',
 		website: '',
 	})
-
-	// const loadClients = async () => {
-	// 	try {
-	// 		setLoading(true)
-	// 		const userClients = await getUserClients()
-
-	// 		// Get invoice counts for all clients
-	// 		const clientNames = userClients.map((client) => client.name)
-	// 		const invoiceCounts = await getInvoiceCountsForClients(clientNames)
-
-	// 		// Add invoice counts to clients
-	// 		const clientsWithCounts = userClients.map((client) => ({
-	// 			...client,
-	// 			invoiceCount: invoiceCounts[client.name] || 0,
-	// 		}))
-
-	// 		setClients(clientsWithCounts)
-	// 	} catch (error) {
-	// 		console.error('Error loading clients:', error)
-	// 		showError(
-	// 			'Error Loading Clients',
-	// 			'Failed to load your clients. Please try again.',
-	// 		)
-	// 	} finally {
-	// 		setLoading(false)
-	// 	}
-	// }
 
 	// const handleSearch = async (term: string) => {
 	// 	setSearchTerm(term)
@@ -844,143 +819,14 @@ export const ClientManagement = ({
 						</DialogDescription>
 					</DialogHeader>
 
-					{loadingInvoices ? (
-						<div className="space-y-4">
-							{[1, 2, 3].map((i) => (
-								<div
-									className="animate-pulse bg-gray-100 h-16 rounded"
-									key={i}
-								></div>
-							))}
+					<div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+						<div className="divide-y divide-gray-200">
+							<SelectedClientInvoices
+								handlePreviewInvoice={handlePreviewInvoice}
+								invoices={selectedClientInvoices}
+							/>
 						</div>
-					) : selectedClientInvoices.length === 0 ? (
-						<div className="text-center py-8">
-							<Receipt className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-							<h3 className="text-lg font-semibold text-gray-900 mb-2">
-								No Invoices Found
-							</h3>
-							<p className="text-gray-600">
-								This client doesn't have any invoices yet.
-							</p>
-						</div>
-					) : (
-						<div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-							<div className="divide-y divide-gray-200">
-								{selectedClientInvoices.map((invoice) => (
-									<div
-										className="group relative flex items-center justify-between p-4 hover:bg-gray-50 transition-colors cursor-pointer"
-										key={invoice.id}
-										onClick={() =>
-											handlePreviewInvoice(invoice)
-										}
-									>
-										<div className="flex items-center space-x-4 flex-1">
-											<div className="flex-shrink-0">
-												<div
-													className={`w-10 h-10 rounded-full flex items-center justify-center ${
-														invoice.status ===
-														'paid'
-															? 'bg-gradient-to-r from-green-500 to-green-600'
-															: invoice.status ===
-																	'sent'
-																? 'bg-gradient-to-r from-blue-500 to-blue-600'
-																: invoice.status ===
-																		'overdue'
-																	? 'bg-gradient-to-r from-red-500 to-red-600'
-																	: invoice.status ===
-																			'cancelled'
-																		? 'bg-gradient-to-r from-orange-500 to-orange-600'
-																		: 'bg-gradient-to-r from-gray-500 to-gray-600'
-													}`}
-												>
-													<Receipt className="w-5 h-5 text-white" />
-												</div>
-											</div>
-
-											<div className="flex-1 min-w-0">
-												<div className="flex items-center gap-3 mb-1">
-													<h4 className="text-base font-semibold text-gray-900">
-														{invoice.invoice_number}
-													</h4>
-													<Badge
-														className="text-xs"
-														variant={
-															invoice.status ===
-															'paid'
-																? 'default'
-																: invoice.status ===
-																		'sent'
-																	? 'secondary'
-																	: invoice.status ===
-																			'overdue'
-																		? 'destructive'
-																		: 'outline'
-														}
-													>
-														{invoice.status}
-													</Badge>
-												</div>
-
-												<div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-													<div className="flex items-center gap-1">
-														<Calendar className="w-4 h-4" />
-														<span>
-															{new Date(
-																invoice.invoice_date,
-															).toLocaleDateString()}
-														</span>
-													</div>
-													<div className="flex items-center gap-1">
-														<DollarSign className="w-4 h-4" />
-														<span className="font-semibold text-gray-900">
-															$
-															{invoice.total_amount.toFixed(
-																2,
-															)}
-														</span>
-													</div>
-													<div className="flex items-center gap-1 text-xs">
-														<Clock className="w-4 h-4" />
-														<span>
-															Due{' '}
-															{new Date(
-																invoice.due_date,
-															).toLocaleDateString()}
-														</span>
-													</div>
-												</div>
-
-												{invoice.notes && (
-													<div className="mt-2 text-sm text-gray-600 truncate">
-														<span className="font-medium">
-															Notes:
-														</span>{' '}
-														{invoice.notes}
-													</div>
-												)}
-											</div>
-										</div>
-
-										<div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-											<Button
-												className="h-8 w-8 p-0"
-												onClick={(e) => {
-													e.stopPropagation()
-													handlePreviewInvoice(
-														invoice,
-													)
-												}}
-												size="sm"
-												variant="ghost"
-											>
-												<Eye className="w-4 h-4" />
-											</Button>
-										</div>
-									</div>
-								))}
-							</div>
-						</div>
-					)}
+					</div>
 				</DialogContent>
 			</Dialog>
 
@@ -1005,6 +851,7 @@ export const ClientManagement = ({
 								)}
 								isSaved={isSaved}
 								setIsSaved={setIsSaved}
+								userSettings={userSettings}
 							/>
 						</div>
 					)}

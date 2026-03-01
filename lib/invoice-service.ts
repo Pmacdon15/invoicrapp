@@ -5,6 +5,7 @@ import type {
 	InvoiceItem,
 } from '@/types/invoice'
 import { SubscriptionService } from './subscription-service'
+import { createClient } from '@/integrations/supabase/client'
 
 // Define the database row type for invoices
 export type InvoiceRow = {
@@ -118,78 +119,6 @@ export const convertInvoiceDataToSaveFormat = (
 	}
 }
 
-// // Save a new invoice with usage tracking
-// export const saveInvoice = async (
-// 	invoiceData: CreateInvoiceData,
-// ): Promise<{ success: boolean; invoice?: SavedInvoice; error?: string }> => {
-// 	try {
-// 		const {
-// 			data: { user },
-// 		} = await supabase.auth.getUser()
-
-// 		if (!user) {
-// 			return { success: false, error: 'User not authenticated' }
-// 		}
-
-// 		// Increment usage before creating invoice
-// 		const usageIncremented =
-// 			await SubscriptionService.incrementInvoiceUsage(user.id)
-// 		if (!usageIncremented) {
-// 			return { success: false, error: 'Failed to update usage tracking.' }
-// 		}
-
-// 		const { data, error } = await (supabase as any)
-// 			.from('invoices')
-// 			.insert({
-// 				user_id: user.id,
-// 				...invoiceData,
-// 			})
-// 			.select()
-// 			.single()
-
-// 		if (error) {
-// 			console.error('Error saving invoice:', error)
-// 			return {
-// 				success: false,
-// 				error: 'Failed to save invoice to database.',
-// 			}
-// 		}
-
-// 		return { success: true, invoice: data as SavedInvoice }
-// 	} catch (error) {
-// 		console.error('Error saving invoice:', error)
-// 		return { success: false, error: 'An unexpected error occurred.' }
-// 	}
-// }
-
-// // Get all invoices for the current user
-// export const getUserInvoices = async (): Promise<SavedInvoice[]> => {
-// 	try {
-// 		const {
-// 			data: { user },
-// 		} = await supabase.auth.getUser()
-
-// 		if (!user) {
-// 			return []
-// 		}
-
-// 		const { data, error } = await (supabase as any)
-// 			.from('invoices')
-// 			.select('*')
-// 			.eq('user_id', user.id)
-// 			.order('created_at', { ascending: false })
-
-// 		if (error) {
-// 			console.error('Error fetching invoices:', error)
-// 			return []
-// 		}
-
-// 		return data as SavedInvoice[]
-// 	} catch (error) {
-// 		console.error('Error fetching invoices:', error)
-// 		return []
-// 	}
-// }
 
 // Update an existing invoice
 export const updateInvoice = async (
@@ -225,81 +154,21 @@ export const updateInvoice = async (
 	}
 }
 
-// // Delete an invoice
-// export const deleteInvoice = async (id: string): Promise<boolean> => {
-// 	try {
-// 		const {
-// 			data: { user },
-// 		} = await supabase.auth.getUser()
-
-// 		if (!user) {
-// 			return false
-// 		}
-
-// 		const { error } = await (supabase as any)
-// 			.from('invoices')
-// 			.delete()
-// 			.eq('id', id)
-// 			.eq('user_id', user.id)
-
-// 		if (error) {
-// 			console.error('Error deleting invoice:', error)
-// 			return false
-// 		}
-
-// 		return true
-// 	} catch (error) {
-// 		console.error('Error deleting invoice:', error)
-// 		return false
-// 	}
-// }
-
-// // Update invoice status
-// export const updateInvoiceStatus = async (
-// 	id: string,
-// 	status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled',
-// ): Promise<boolean> => {
-// 	try {
-// 		const {
-// 			data: { user },
-// 		} = await supabase.auth.getUser()
-
-// 		if (!user) {
-// 			return false
-// 		}
-
-// 		const { error } = await (supabase as any)
-// 			.from('invoices')
-// 			.update({ status })
-// 			.eq('id', id)
-// 			.eq('user_id', user.id)
-
-// 		if (error) {
-// 			console.error('Error updating invoice status:', error)
-// 			return false
-// 		}
-
-// 		return true
-// 	} catch (error) {
-// 		console.error('Error updating invoice status:', error)
-// 		return false
-// 	}
-// }
-
 // Get invoices by client name
 export const getInvoicesByClient = async (
 	clientName: string,
 ): Promise<SavedInvoice[]> => {
+	const supabaseClient = createClient()
 	try {
 		const {
 			data: { user },
-		} = await supabase.auth.getUser()
+		} = await supabaseClient.auth.getUser()
 
 		if (!user) {
 			return []
 		}
 
-		const { data, error } = await (supabase as any)
+		const { data, error } = await (supabaseClient)
 			.from('invoices')
 			.select('*')
 			.eq('user_id', user.id)

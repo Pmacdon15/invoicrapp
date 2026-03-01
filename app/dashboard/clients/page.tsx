@@ -6,6 +6,7 @@ import {
 	getInvoiceCountsForClients,
 	getUserClients,
 } from '@/lib/client-service-server'
+import { getUserSettings } from '@/lib/settings-service-server'
 
 export const metadata: Metadata = {
 	title: 'Clients',
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
 
 export default function ClientsPage() {
 	const clientsPromise = getUserClients()
-
+	const userSettingsPromise = getUserSettings()
 	const clientsInvoiceCountPromise = clientsPromise.then((clients) => {
 		const clientNames = clients?.map((client) => client.name) || []
 		return getInvoiceCountsForClients(clientNames)
@@ -30,6 +31,7 @@ export default function ClientsPage() {
 			<ClientManagement
 				clientsInvoiceCountPromise={clientsInvoiceCountPromise}
 				clientsPromise={clientsPromise}
+				userSettingsPromise={userSettingsPromise}
 			/>
 		</Suspense>
 	)
