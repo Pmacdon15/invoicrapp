@@ -20,19 +20,19 @@ import SaveButton from './invoice-generator/invoice-generator-save-button'
 
 interface InvoiceGeneratorProps {
 	editingInvoicePromise?: Promise<SavedInvoice>
-	settingsUserPromise: Promise<UserSettings | null>
+	userSettingsPromise: Promise<UserSettings | null>
 	defaultThemePromise: Promise<InvoiceTheme>
 	clientsPromise: Promise<Client[]>
 }
 
 export const InvoiceGenerator = ({
 	editingInvoicePromise,
-	settingsUserPromise,
+	userSettingsPromise,
 	defaultThemePromise,
 	clientsPromise,
 }: InvoiceGeneratorProps) => {
 	const editingInvoice = use(editingInvoicePromise)
-	const settingsUser = use(settingsUserPromise)
+	const userSettings = use(userSettingsPromise)
 	const defaultTheme = use(defaultThemePromise)
 
 	const getInitialInvoiceData = (): InvoiceData => {
@@ -41,12 +41,12 @@ export const InvoiceGenerator = ({
 		// 1. Safely handle the generated number
 		let generatedNumber = `INV-${Date.now()}` // Default fallback
 
-		if (settingsUser && settingsUser.invoice_number_format !== undefined) {
-			generatedNumber = settingsUser.invoice_number_format
-				.replace('{prefix}', settingsUser.invoice_prefix || '')
+		if (userSettings && userSettings.invoice_number_format !== undefined) {
+			generatedNumber = userSettings.invoice_number_format
+				.replace('{prefix}', userSettings.invoice_prefix || '')
 				.replace(
 					'{number}',
-					(settingsUser.invoice_counter || 0)
+					(userSettings.invoice_counter || 0)
 						.toString()
 						.padStart(4, '0'),
 				)
@@ -69,11 +69,11 @@ export const InvoiceGenerator = ({
 				editingInvoice?.due_date ||
 				calculateDueDate(
 					today,
-					settingsUser?.default_payment_terms ?? 'Net 30',
+					userSettings?.default_payment_terms ?? 'Net 30',
 				),
-			notes: editingInvoice?.notes || settingsUser?.default_notes || '',
-			currency: settingsUser?.default_currency || 'USD',
-			paymentTerms: settingsUser?.default_payment_terms || 'Net 30',
+			notes: editingInvoice?.notes || userSettings?.default_notes || '',
+			currency: userSettings?.default_currency || 'USD',
+			paymentTerms: userSettings?.default_payment_terms || 'Net 30',
 			// 2. Fixed the crash on taxRate by adding optional chaining to editingInvoice
 			taxRate:
 				editingInvoice?.tax_amount !== undefined
@@ -82,7 +82,7 @@ export const InvoiceGenerator = ({
 								editingInvoice.subtotal) *
 							100
 						: 0
-					: (settingsUser?.default_tax_rate ?? 0),
+					: (userSettings?.default_tax_rate ?? 0),
 			customFields: editingInvoice?.custom_fields || [],
 			dynamicFields: [],
 		}
@@ -135,13 +135,13 @@ export const InvoiceGenerator = ({
 							<RenderStepContent
 								clientsPromise={clientsPromise}
 								currentStep={currentStep}
-								customFields={settingsUser?.custom_fields || []}
+								customFields={userSettings?.custom_fields || []}
 								invoiceData={invoiceData}
 								isSaved={isSaved}
 								setInvoiceData={setInvoiceData}
 								setIsNewClient={setIsNewClient}
 								setIsSaved={setIsSaved}
-								settingsUser={settingsUser}
+								userSettings={userSettings}
 							/>
 						</Card>
 
@@ -170,7 +170,7 @@ export const InvoiceGenerator = ({
 										<SaveButton
 											currentStep={currentStep}
 											customFields={
-												settingsUser?.custom_fields ||
+												userSettings?.custom_fields ||
 												[]
 											}
 											invoiceData={invoiceData}
@@ -213,8 +213,8 @@ export const InvoiceGenerator = ({
 			<SettingsRequiredDialog
 				onContinueAnyway={() => setShowSettingsDialog(false)}
 				onOpenChange={setShowSettingsDialog}
-				open={showSettingsDialog && settingsUser !== null}
-				validationResult={settingsUser}
+				open={showSettingsDialog && userSettings !== null}
+				validationResult={userSettings}
 			/>
 		</div>
 	)

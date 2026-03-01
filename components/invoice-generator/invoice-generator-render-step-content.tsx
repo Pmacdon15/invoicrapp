@@ -17,7 +17,7 @@ export default function RenderStepContent({
 	currentStep,
 	customFields,
 	clientsPromise,
-	settingsUser,
+	userSettings,
 }: {
 	setInvoiceData: Dispatch<SetStateAction<InvoiceData>>
 	setIsNewClient: Dispatch<SetStateAction<boolean>>
@@ -27,7 +27,7 @@ export default function RenderStepContent({
 	currentStep: number
 	customFields: CustomField[]
 	clientsPromise: Promise<Client[]>
-	settingsUser: UserSettings | null
+	userSettings: UserSettings | null
 }) {
 	const updateInvoiceData = (field: keyof InvoiceData, value: any) => {
 		setInvoiceData((prev) => (prev ? { ...prev, [field]: value } : null))
@@ -85,7 +85,7 @@ export default function RenderStepContent({
 					invoiceData={invoiceData}
 					isSaved={isSaved}
 					setIsSaved={setIsSaved}
-					userSettings={settingsUser}
+					userSettings={userSettings}
 				/>
 			)
 		default:

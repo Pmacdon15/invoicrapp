@@ -10,16 +10,14 @@ export default function CreateInvoicePage(
 	props: PageProps<'/dashboard/create'>,
 ) {
 	const invoicePromise = props.searchParams.then(({ editId, viewId }) => {
-		const targetId = [editId, viewId].flat().filter(Boolean)[0]
-		console.log(targetId)
+		const targetId = [editId, viewId].flat().filter(Boolean)[0]		
 		return getInvoiceById(targetId)
 	})
 
 	const clientsPromise = getUserClients()
+	const userSettingsPromise = getUserSettings()
 
-	const settingsUserPromise = getUserSettings()
-
-	const defaultThemePromise = settingsUserPromise.then(async (data) => {
+	const defaultThemePromise = userSettingsPromise.then(async (data) => {
 		if (!data?.default_theme || data.default_theme === undefined) {
 			return getDefaultTheme()
 		}
@@ -32,7 +30,7 @@ export default function CreateInvoicePage(
 				clientsPromise={clientsPromise}
 				defaultThemePromise={defaultThemePromise}
 				editingInvoicePromise={invoicePromise}
-				settingsUserPromise={settingsUserPromise}				
+				userSettingsPromise={userSettingsPromise}				
 			/>
 		</Suspense>
 	)

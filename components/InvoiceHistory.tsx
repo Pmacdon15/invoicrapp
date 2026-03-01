@@ -54,6 +54,7 @@ import { showError, showSuccess } from '@/hooks/use-toast'
 import type { SavedInvoice } from '@/lib/invoice-service'
 import { getThemeMetadataSync } from '@/lib/invoice-themes'
 import type { InvoiceData } from '@/types/invoice'
+import type { UserSettings } from '@/types/settings'
 
 // interface InvoiceHistoryProps {
 // 	onEditInvoice?: (invoice: SavedInvoice) => void
@@ -78,11 +79,14 @@ const statusLabels = {
 
 export default function InvoiceHistory({
 	invoicesPromise,
+	userSettingsPromise,
 }: {
 	invoicesPromise: Promise<SavedInvoice[]>
+	userSettingsPromise: Promise<UserSettings | null>
 }) {
 	// const [invoices, setInvoices] = useState<SavedInvoice[]>([])
 	const invoices = use(invoicesPromise)
+	const userSettings = use(userSettingsPromise)
 	const [deletingId, setDeletingId] = useState<string | null>(null)
 	const [previewInvoice, setPreviewInvoice] = useState<SavedInvoice | null>(
 		null,
@@ -611,6 +615,7 @@ export default function InvoiceHistory({
 								invoiceData={convertToInvoiceData(
 									previewInvoice,
 								)}
+								userSettings={userSettings}
 							/>
 						</div>
 					)}
