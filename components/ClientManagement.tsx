@@ -96,7 +96,7 @@ export const ClientManagement = ({
 	const clients =
 		clientsWithOutCount?.map((client) => ({
 			...client,
-			invoiceCount: clientsInvoiceCount?.[client.id] || 0,
+			invoiceCount: clientsInvoiceCount?.[client.name] || 0,
 		})) || []
 
 	// const [loading, setLoading] = useState(true)
