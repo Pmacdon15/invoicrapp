@@ -17,6 +17,9 @@ interface ClientManagementProps {
 	clientsPromise: Promise<Client[] | null>
 	clientsInvoiceCountPromise: Promise<Record<string, number>>
 	userSettingsPromise: Promise<UserSettings>
+	filterPromise: Promise<'with-invoices' | 'no-invoices' | 'all'>
+	sortPromise: Promise<'name' | 'email' | 'invoiceCount' | 'created_at'>
+	orderPromise: Promise<'asc' | 'desc'>
 }
 
 interface ClientWithInvoices extends Client {
@@ -29,12 +32,16 @@ export const ClientManagement = ({
 	clientsPromise,
 	showSelectMode = false,
 	userSettingsPromise,
+	filterPromise,
+	sortPromise,
+	orderPromise,
 }: ClientManagementProps) => {
-	// const [clients, setClients] = useState<ClientWithInvoices[]>([])
-
 	const clientsWithOutCount = use(clientsPromise)
 	const clientsInvoiceCount = use(clientsInvoiceCountPromise)
 	const userSettings = use(userSettingsPromise)
+	const filterBy = use(filterPromise)
+	const sortBy = use(sortPromise)
+	const sortOrder = use(orderPromise)
 
 	const clients =
 		clientsWithOutCount?.map((client) => ({
@@ -58,15 +65,7 @@ export const ClientManagement = ({
 	)
 	const [showPreviewDialog, setShowPreviewDialog] = useState(false)
 	const [isSaved, setIsSaved] = useState(false)
-	const [sortBy, setSortBy] = useState<
-		'name' | 'email' | 'invoiceCount' | 'created_at'
-	>('name')
-	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
-	const [filterBy, setFilterBy] = useState<
-		'all' | 'with-invoices' | 'no-invoices'
-	>('all')
-	// Using enhanced toast helpers
-
+	
 	interface ClientFormData {
 		name: string
 		address: string
@@ -168,23 +167,12 @@ export const ClientManagement = ({
 				'Error Loading Invoices',
 				'Failed to load invoices for this client.',
 			)
-		} finally {
-			// setLoadingInvoices(false)
 		}
 	}
 
 	const handlePreviewInvoice = (invoice: SavedInvoice) => {
 		setPreviewInvoice(invoice)
 		setShowPreviewDialog(true)
-	}
-
-	const handleSort = (column: typeof sortBy) => {
-		if (sortBy === column) {
-			setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
-		} else {
-			setSortBy(column)
-			setSortOrder('asc')
-		}
 	}
 
 	const filteredAndSortedClients = clients
@@ -251,7 +239,6 @@ export const ClientManagement = ({
 			<ClientsTable
 				filteredAndSortedClients={filteredAndSortedClients}
 				handleEdit={handleEdit}
-				handleSort={handleSort}
 				handleViewInvoices={handleViewInvoices}
 			/>
 

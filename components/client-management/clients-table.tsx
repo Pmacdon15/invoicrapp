@@ -1,6 +1,5 @@
 'use client'
 import {
-	ArrowUpDown,
 	Building,
 	Edit,
 	Eye,
@@ -31,6 +30,7 @@ import {
 	TableHeader,
 	TableRow,
 } from '../ui/table'
+import { SortButton } from './sort-button'
 
 interface Client {
 	invoiceCount: number
@@ -49,9 +49,8 @@ interface Client {
 interface ClientsTableProps {
 	filteredAndSortedClients: Client[]
 	selectedClientId?: string
-	showSelectMode?: boolean	
+	showSelectMode?: boolean
 	onSelectClient?: (client: Client) => void
-	handleSort: (column: 'name' | 'email' | 'invoiceCount') => void
 	handleEdit: (client: Client) => void
 	handleViewInvoices: (client: Client) => void
 }
@@ -59,16 +58,15 @@ interface ClientsTableProps {
 export default function ClientsTable({
 	filteredAndSortedClients,
 	selectedClientId,
-	showSelectMode,	
+	showSelectMode,
 	onSelectClient,
-	handleSort,
 	handleEdit,
 	handleViewInvoices,
 }: ClientsTableProps) {
 	const [isDeleting, setIsDeleting] = useState(false)
 	const handleDelete = async (id: string) => {
 		setIsDeleting(true)
-        try {
+		try {
 			const success = await deleteClient(id)
 			if (success) {
 				showSuccess(
@@ -85,9 +83,9 @@ export default function ClientsTable({
 		} catch (error) {
 			console.error('Error deleting client:', error)
 			showError('Error', 'Failed to deactivate client. Please try again.')
-		}finally{
-            setIsDeleting(false)
-        }
+		} finally {
+			setIsDeleting(false)
+		}
 	}
 
 	if (filteredAndSortedClients.length > 0)
@@ -95,45 +93,34 @@ export default function ClientsTable({
 			<div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
 				<Table>
 					<TableHeader>
-						<TableRow className="bg-gray-50">
-							<TableHead className="w-8">
-								{/* Avatar */}
-							</TableHead>
+						<TableRow className="bg-gray-50/50">
+							<TableHead className="w-10"></TableHead>
+
 							<TableHead>
-								<Button
-									className="h-auto p-0 font-semibold hover:bg-transparent hover:text-primary"
-									onClick={() => handleSort('name')}
-									variant="ghost"
-								>
-									Name
-									<ArrowUpDown className="ml-1 h-4 w-4" />
-								</Button>
+								<SortButton column="name" label="Name" />
 							</TableHead>
+
 							<TableHead>
-								<Button
-									className="h-auto p-0 font-semibold hover:bg-transparent hover:text-primary"
-									onClick={() => handleSort('email')}
-									variant="ghost"
-								>
-									Email
-									<ArrowUpDown className="ml-1 h-4 w-4" />
-								</Button>
+								<SortButton column="email" label="Email" />
 							</TableHead>
-							<TableHead>Phone</TableHead>
+
+							<TableHead className="text-gray-500 font-semibold">
+								Phone
+							</TableHead>
 							<TableHead>Location</TableHead>
 							<TableHead>
-								<Button
-									className="h-auto p-0 font-semibold hover:bg-transparent hover:text-primary"
-									onClick={() => handleSort('invoiceCount')}
-									variant="ghost"
-								>
-									Invoices
-									<ArrowUpDown className="ml-1 h-4 w-4" />
-								</Button>
+								<SortButton
+									column="invoiceCount"
+									label="Invoices"
+								/>
 							</TableHead>
-							<TableHead className="w-20">Actions</TableHead>
+
+							<TableHead className="w-16 text-right pr-6">
+								Actions
+							</TableHead>
 						</TableRow>
 					</TableHeader>
+
 					<TableBody>
 						{filteredAndSortedClients.map((client) => (
 							<TableRow

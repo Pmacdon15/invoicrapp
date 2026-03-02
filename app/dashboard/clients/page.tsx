@@ -1,4 +1,3 @@
-import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { ClientManagement } from '@/components/ClientManagement'
 import ClientManagementFallback from '@/components/fallbacks/client-mnagement-fallback'
@@ -8,22 +7,34 @@ import {
 } from '@/lib/client-service-server'
 import { getUserSettings } from '@/lib/settings-service-server'
 
-export const metadata: Metadata = {
-	title: 'Clients',
-	description:
-		'Manage your client database with Invoicr. Store client information and streamline your invoicing process.',
-	robots: {
-		index: false,
-		follow: false,
-	},
-}
-
-export default function ClientsPage() {
+export default function ClientsPage(props: PageProps<'/dashboard/clients'>) {
 	const clientsPromise = getUserClients()
-	const userSettingsPromise = getUserSettings()
+
 	const clientsInvoiceCountPromise = clientsPromise.then((clients) => {
 		const clientNames = clients?.map((client) => client.name) || []
 		return getInvoiceCountsForClients(clientNames)
+	})
+
+	const userSettingsPromise = getUserSettings()
+
+	const filterPromise = props.searchParams.then((params) => {
+		const f = params.filter
+		return f === 'with-invoices' || f === 'no-invoices' ? f : 'all'
+	})
+
+	const sortPromise = props.searchParams.then((params) => {
+		const s = params.sort
+		return s === 'name' ||
+			s === 'email' ||
+			s === 'invoiceCount' ||
+			s === 'created_at'
+			? s
+			: 'name'
+	})
+
+	const orderPromise = props.searchParams.then((params) => {
+		const o = params.order
+		return o === 'asc' || o === 'desc' ? o : 'asc'
 	})
 
 	return (
@@ -31,6 +42,9 @@ export default function ClientsPage() {
 			<ClientManagement
 				clientsInvoiceCountPromise={clientsInvoiceCountPromise}
 				clientsPromise={clientsPromise}
+				filterPromise={filterPromise}
+				orderPromise={orderPromise}
+				sortPromise={sortPromise}
 				userSettingsPromise={userSettingsPromise}
 			/>
 		</Suspense>

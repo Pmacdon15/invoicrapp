@@ -18,7 +18,7 @@ export async function getUserSettings(): Promise<UserSettings | null> {
 			.eq('user_id', user.id)
 			.single()
 
-		console.log('User Settings: ', data)
+		// console.log('User Settings: ', data)
 		if (error) {
 			if (error.code === 'PGRST116') {
 				// No settings found, return null
