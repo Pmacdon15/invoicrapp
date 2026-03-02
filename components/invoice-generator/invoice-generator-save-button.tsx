@@ -1,10 +1,10 @@
 'use client'
 import { ArrowRight, CheckCircle, Save } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { type Dispatch, type SetStateAction, useState } from 'react'
+import { saveClient } from '@/actions/clients'
 import { saveInvoice } from '@/actions/invoices'
 import { showError, showSuccess } from '@/hooks/use-toast'
-import { type CreateClientData, saveClient } from '@/lib/client-service'
+import type { CreateClientData } from '@/lib/client-service'
 import { convertInvoiceDataToSaveFormat } from '@/lib/invoice-service'
 import { steps } from '@/lib/invoice-utils'
 import type { InvoiceData } from '@/types/invoice'
@@ -12,7 +12,7 @@ import type { CustomField } from '@/types/settings'
 import { Button } from '../ui/button'
 
 export default function SaveButton({
-	refreshUsage,
+	// refreshUsage,
 	currentStep,
 	setCurrentStep,
 	invoiceData,
@@ -21,7 +21,7 @@ export default function SaveButton({
 	isNewClient,
 	customFields = [],
 }: {
-	refreshUsage: () => Promise<void>
+	// refreshUsage: () => Promise<void>
 	currentStep: number
 	setCurrentStep: Dispatch<SetStateAction<number>>
 	invoiceData: InvoiceData
@@ -31,9 +31,8 @@ export default function SaveButton({
 	customFields?: CustomField[]
 }) {
 	const [isSaving, setIsSaving] = useState(false)
-	
+
 	const handleSaveInvoice = async () => {
-		
 		setIsSaving(true)
 		try {
 			const invoiceToSave = convertInvoiceDataToSaveFormat(invoiceData)

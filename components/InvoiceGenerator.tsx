@@ -178,6 +178,7 @@ export const InvoiceGenerator = ({
 											isSaved={isSaved}
 											refreshUsage={refreshUsage}
 											setCurrentStep={setCurrentStep}
+											setInvoiceData={setInvoiceData}
 											setIsSaved={setIsSaved}
 										/>
 									</div>

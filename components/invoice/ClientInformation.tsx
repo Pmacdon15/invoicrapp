@@ -69,6 +69,7 @@ export const ClientInformation = ({
 		const selectedClient = existingClients.find((c) => c.id === clientId)
 		if (selectedClient) {
 			onClientUpdate({
+				id: selectedClient.id,
 				name: selectedClient.name,
 				address: selectedClient.address || '',
 				email: selectedClient.email || '',

@@ -47,34 +47,36 @@ export const getUserClientsWithInvoiceCounts = async (
 
 		let query = supabaseServer
 			.from('clients')
-			.select(`
-                *,
-                invoiceCount:invoices(count)
-            `)
+			.select('*')
 			.eq('user_id', user.id)
 
 		// Add search logic if a term is provided
 		if (searchTerm && searchTerm.trim() !== '') {
 			const ilikeTerm = `%${searchTerm}%`
-			// .or() filters for matches in any of the specified columns
 			query = query.or(
 				`name.ilike.${ilikeTerm},email.ilike.${ilikeTerm},tax_number.ilike.${ilikeTerm},phone.ilike.${ilikeTerm}`,
 			)
 		}
 
-		const { data, error } = await query.order('name', { ascending: true })
+		const { data: clients, error } = await query.order('name', { ascending: true })
 
 		if (error) {
-			console.error('Error fetching clients with counts:', error)
+			console.error('Error fetching clients:', error)
 			return []
 		}
 
-		return (data as any[]).map((client) => ({
+		if (!clients || clients.length === 0) return []
+
+		// Get counts separately using the existing function that uses client_name
+		const clientNames = clients.map(c => c.name)
+		const counts = await getInvoiceCountsForClients(clientNames)
+
+		return (clients as Client[]).map((client) => ({
 			...client,
-			invoiceCount: client.invoiceCount?.[0]?.count || 0,
-		}))
+			invoiceCount: counts[client.name] || 0,
+		})) as ClientWithInvoiceCount[]
 	} catch (error) {
-		console.error('Unexpected error:', error)
+		console.error('Unexpected error in getUserClientsWithInvoiceCounts:', error)
 		return []
 	}
 }

@@ -11,6 +11,7 @@ import { createClient } from '@/integrations/supabase/client'
 export type InvoiceRow = {
 	id: string
 	user_id: string
+	client_id: string | null
 	invoice_number: string
 	client_name: string
 	client_address: string
@@ -35,6 +36,7 @@ export type InvoiceRow = {
 export interface SavedInvoice {
 	id: string
 	user_id: string
+	client_id?: string
 	invoice_number: string
 	client_name: string
 	client_address: string
@@ -57,6 +59,7 @@ export interface SavedInvoice {
 }
 
 export interface CreateInvoiceData {
+	client_id?: string
 	invoice_number: string
 	client_name: string
 	client_address: string
@@ -101,6 +104,7 @@ export const convertInvoiceDataToSaveFormat = (
 	)
 
 	return {
+		client_id: invoiceData.client.id,
 		invoice_number: invoiceData.invoiceNumber,
 		client_name: invoiceData.client.name,
 		client_address: invoiceData.client.address,
