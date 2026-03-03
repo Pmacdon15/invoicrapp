@@ -390,8 +390,8 @@ export const Settings = ({
 										<SelectContent>
 											{getThemes().map((theme) => (
 												<SelectItem
-													defaultValue={theme.id}
 													key={theme.id}
+													value={theme.id}
 												>
 													{theme.name}
 												</SelectItem>
@@ -931,8 +931,8 @@ export const Settings = ({
 							</CardDescription>
 						</CardHeader>
 						<CardContent className="space-y-6">
-							{!settings.custom_fields ||
-							settings.custom_fields.length === 0 ? (
+							{!settingsToUpdate.custom_fields ||
+							settingsToUpdate.custom_fields.length === 0 ? (
 								<div className="text-center py-8 text-muted-foreground">
 									<Plus className="h-12 w-12 mx-auto mb-4 opacity-50" />
 									<p className="text-sm">
@@ -942,181 +942,174 @@ export const Settings = ({
 								</div>
 							) : (
 								<div className="space-y-4">
-									{settings.custom_fields &&
-										settings.custom_fields.map(
-											(field, index) => (
-												<Card
-													className="p-4"
-													key={field.id}
-												>
-													<div className="space-y-4">
-														<div className="flex items-center justify-between">
-															<div className="flex items-center gap-2">
-																{getFieldIcon(
-																	field.type,
-																)}
-																<span className="font-medium">
-																	Field{' '}
-																	{index + 1}
-																</span>
+									{settingsToUpdate.custom_fields.map(
+										(field, index) => (
+											<Card
+												className="p-4"
+												key={field.id}
+											>
+												<div className="space-y-4">
+													<div className="flex items-center justify-between">
+														<div className="flex items-center gap-2">
+															{getFieldIcon(
+																field.type,
+															)}
+															<span className="font-medium">
+																Field{' '}
+																{index + 1}
+															</span>
+															<Badge
+																className="text-xs"
+																variant="outline"
+															>
+																{field.type}
+															</Badge>
+															{field.required && (
 																<Badge
 																	className="text-xs"
-																	variant="outline"
+																	variant="destructive"
 																>
-																	{field.type}
+																	Required
 																</Badge>
-																{field.required && (
-																	<Badge
-																		className="text-xs"
-																		variant="destructive"
-																	>
-																		Required
-																	</Badge>
-																)}
-															</div>
-															<Button
-																className="text-destructive hover:text-destructive"
-																onClick={() =>
-																	removeCustomField(
+															)}
+														</div>
+														<Button
+															className="text-destructive hover:text-destructive"
+															onClick={() =>
+																removeCustomField(
+																	field.id,
+																)
+															}
+															size="sm"
+															variant="ghost"
+														>
+															<Trash2 className="h-4 w-4" />
+														</Button>
+													</div>
+
+													<div className="grid grid-cols-2 gap-4">
+														<div className="space-y-2">
+															<Label className="flex items-center gap-2">
+																<Type className="h-4 w-4" />
+																Field Label
+															</Label>
+															<Input
+																onChange={(e) =>
+																	updateCustomField(
 																		field.id,
+																		{
+																			label: e
+																				.target
+																				.value,
+																		},
 																	)
 																}
-																size="sm"
-																variant="ghost"
-															>
-																<Trash2 className="h-4 w-4" />
-															</Button>
+																placeholder="Enter field label"
+																value={
+																	field.label
+																}
+															/>
 														</div>
+														<div className="space-y-2">
+															<Label className="flex items-center gap-2">
+																<SettingsIcon className="h-4 w-4" />
+																Field Type
+															</Label>
+															<Select
+																onValueChange={(
+																	value:
+																		| 'text'
+																		| 'number'
+																		| 'date',
+																) =>
+																	updateCustomField(
+																		field.id,
+																		{
+																			type: value,
+																		},
+																	)
+																}
+																value={
+																	field.type
+																}
+															>
+																<SelectTrigger>
+																	<SelectValue />
+																</SelectTrigger>
+																<SelectContent>
+																	<SelectItem value="text">
+																		Text
+																	</SelectItem>
+																	<SelectItem value="number">
+																		Number
+																	</SelectItem>
+																	<SelectItem value="date">
+																		Date
+																	</SelectItem>
+																</SelectContent>
+															</Select>
+														</div>
+													</div>
 
-														<div className="grid grid-cols-2 gap-4">
-															<div className="space-y-2">
-																<Label className="flex items-center gap-2">
-																	<Type className="h-4 w-4" />
-																	Field Label
-																</Label>
-																<Input
-																	onChange={(
-																		e,
-																	) =>
-																		updateCustomField(
-																			field.id,
-																			{
-																				label: e
+													<div className="grid grid-cols-2 gap-4">
+														<div className="space-y-2">
+															<Label className="flex items-center gap-2">
+																<FileText className="h-4 w-4" />
+																Default Value
+																(Optional)
+															</Label>
+															<Input
+																onChange={(e) =>
+																	updateCustomField(
+																		field.id,
+																		{
+																			defaultValue:
+																				e
 																					.target
 																					.value,
-																			},
-																		)
-																	}
-																	placeholder="Enter field label"
-																	value={
-																		field.label
-																	}
-																/>
-															</div>
-															<div className="space-y-2">
-																<Label className="flex items-center gap-2">
-																	<SettingsIcon className="h-4 w-4" />
-																	Field Type
-																</Label>
-																<Select
-																	onValueChange={(
-																		value:
-																			| 'text'
-																			| 'number'
-																			| 'date',
-																	) =>
-																		updateCustomField(
-																			field.id,
-																			{
-																				type: value,
-																			},
-																		)
-																	}
-																	value={
-																		field.type
-																	}
-																>
-																	<SelectTrigger>
-																		<SelectValue />
-																	</SelectTrigger>
-																	<SelectContent>
-																		<SelectItem value="text">
-																			Text
-																		</SelectItem>
-																		<SelectItem value="number">
-																			Number
-																		</SelectItem>
-																		<SelectItem value="date">
-																			Date
-																		</SelectItem>
-																	</SelectContent>
-																</Select>
-															</div>
+																		},
+																	)
+																}
+																placeholder="Enter default value"
+																value={
+																	field.defaultValue
+																}
+															/>
 														</div>
-
-														<div className="grid grid-cols-2 gap-4">
-															<div className="space-y-2">
-																<Label className="flex items-center gap-2">
-																	<FileText className="h-4 w-4" />
-																	Default
-																	Value
-																	(Optional)
-																</Label>
-																<Input
-																	onChange={(
-																		e,
+														<div className="space-y-2">
+															<Label className="flex items-center gap-2">
+																<AlertTriangle className="h-4 w-4" />
+																Required Field
+															</Label>
+															<div className="flex items-center space-x-2 pt-2">
+																<Switch
+																	defaultChecked={
+																		field.required
+																	}
+																	onCheckedChange={(
+																		checked,
 																	) =>
 																		updateCustomField(
 																			field.id,
 																			{
-																				defaultValue:
-																					e
-																						.target
-																						.value,
+																				required:
+																					checked,
 																			},
 																		)
 																	}
-																	placeholder="Enter default value"
-																	value={
-																		field.defaultValue
-																	}
 																/>
-															</div>
-															<div className="space-y-2">
-																<Label className="flex items-center gap-2">
-																	<AlertTriangle className="h-4 w-4" />
-																	Required
-																	Field
-																</Label>
-																<div className="flex items-center space-x-2 pt-2">
-																	<Switch
-																		checked={
-																			field.required
-																		}
-																		onCheckedChange={(
-																			checked,
-																		) =>
-																			updateCustomField(
-																				field.id,
-																				{
-																					required:
-																						checked,
-																				},
-																			)
-																		}
-																	/>
-																	<span className="text-sm text-muted-foreground">
-																		{field.required
-																			? 'Required'
-																			: 'Optional'}
-																	</span>
-																</div>
+																<span className="text-sm text-muted-foreground">
+																	{field.required
+																		? 'Required'
+																		: 'Optional'}
+																</span>
 															</div>
 														</div>
 													</div>
-												</Card>
-											),
-										)}
+												</div>
+											</Card>
+										),
+									)}
 								</div>
 							)}
 

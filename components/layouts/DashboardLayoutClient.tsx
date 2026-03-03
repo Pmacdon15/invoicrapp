@@ -14,7 +14,7 @@ export default function DashboardLayoutClient({
 	children: React.ReactNode
 }) {
 	// const { user, loading } = useAuth()
-	const router = useRouter()
+	// const router = useRouter()
 	const pathname = usePathname()
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
