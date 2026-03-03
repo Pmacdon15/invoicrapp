@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import DashboardLayoutClient from "./DashboardLayoutClient";
+import DashboardLayoutClient from "../../components/layouts/DashboardLayoutClient";
 
 export const metadata: Metadata = {
   title: "Dashboard - Invoicr",
