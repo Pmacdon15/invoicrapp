@@ -11,7 +11,6 @@ import {
 	Save,
 	Shield,
 	Trash2,
-	UserIcon,
 } from 'lucide-react'
 import { use, useState } from 'react'
 import { saveUserSettings } from '@/actions/settings'
@@ -27,7 +26,6 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
 	Card,
@@ -40,10 +38,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { showError, showSuccess } from '@/hooks/use-toast'
 import { createClient } from '@/integrations/supabase/client'
 import type { UserSettings } from '@/types/settings'
+import ProfileHeader from './profile/profile-header'
+import ProfileTabsList from './profile/profile-tabs-list'
+import TabGeneral from './profile/tabs-content/tabs-general'
 
 export interface UserProfile {
 	id: string
@@ -115,7 +116,7 @@ export const Profile = ({
 		try {
 			const error = await saveProfileInfo(profileForm)
 			if (error) throw new Error(error.error)
-				else showSuccess("Success", "Profile updated")
+			else showSuccess('Success', 'Profile updated')
 		} catch (error) {
 			console.error('Error saving profile:', error)
 			showError('Error', 'Failed to update profile')
@@ -191,169 +192,20 @@ export const Profile = ({
 
 	return (
 		<div className="max-w-4xl mx-auto space-y-6 h-full mb-2 ">
-			{/* Header */}
-			<div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 mb-6 sm:mb-8">
-				<div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
-					<UserIcon className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
-				</div>
-				<div className="text-center sm:text-left">
-					<h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">
-						Profile Settings
-					</h1>
-					<p className="text-sm sm:text-base text-muted-foreground">
-						Manage your account information and preferences
-					</p>
-				</div>
-			</div>
+			<ProfileHeader />
 
 			<Tabs className="space-y-6 mb-2" defaultValue="general">
-				<div className="w-full overflow-x-auto">
-					<TabsList className="flex w-max min-w-full justify-between sm:grid sm:grid-cols-3 gap-1 p-1">
-						<TabsTrigger
-							className="flex-shrink-0 px-3 py-2 text-xs sm:text-sm font-medium"
-							value="general"
-						>
-							<UserIcon className="w-4 h-4 mr-1" />
-							General
-						</TabsTrigger>
-						<TabsTrigger
-							className="flex-shrink-0 px-3 py-2 text-xs sm:text-sm font-medium"
-							value="security"
-						>
-							<Shield className="w-4 h-4 mr-1" />
-							Security
-						</TabsTrigger>
-						<TabsTrigger
-							className="flex-shrink-0 px-3 py-2 text-xs sm:text-sm font-medium"
-							value="notifications"
-						>
-							<Bell className="w-4 h-4 mr-1" />
-							Notifications
-						</TabsTrigger>
-					</TabsList>
-				</div>
+				<ProfileTabsList />
 
 				{/* General Tab */}
-				<TabsContent className="space-y-6" value="general">
-					<Card>
-						<CardHeader>
-							<CardTitle className="flex items-center gap-2">
-								<UserIcon className="w-5 h-5" />
-								Personal Information
-							</CardTitle>
-							<CardDescription>
-								Update your personal details and contact
-								information
-							</CardDescription>
-						</CardHeader>
-						<CardContent className="space-y-4">
-							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-								<div className="space-y-2">
-									<Label htmlFor="email">Email Address</Label>
-									<Input
-										className="bg-muted"
-										disabled
-										id="email"
-										type="email"
-										value={user?.email || ''}
-									/>
-									<p className="text-xs text-muted-foreground">
-										Email cannot be changed from this page
-									</p>
-								</div>
-								<div className="space-y-2">
-									<Label htmlFor="full_name">Full Name</Label>
-									<Input
-										id="full_name"
-										onChange={(e) =>
-											setProfileForm({
-												...profileForm,
-												full_name: e.target.value,
-											})
-										}
-										placeholder="Enter your full name"
-										value={profileForm.full_name}
-									/>
-								</div>
-							</div>
-
-							<div className="space-y-2">
-								<Label htmlFor="phone">Phone Number</Label>
-								<Input
-									id="phone"
-									onChange={(e) =>
-										setProfileForm({
-											...profileForm,
-											phone: e.target.value,
-										})
-									}
-									placeholder="Enter your phone number"
-									value={profileForm.phone}
-								/>
-							</div>
-
-							<div className="flex justify-end">
-								<Button
-									className="w-full sm:w-auto"
-									disabled={saving}
-									onClick={handleProfileSave}
-								>
-									{saving ? (
-										<>
-											<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-											Saving...
-										</>
-									) : (
-										<>
-											<Save className="w-4 h-4 mr-2" />
-											Save Changes
-										</>
-									)}
-								</Button>
-							</div>
-						</CardContent>
-					</Card>
-
-					{/* Account Info */}
-					<Card>
-						<CardHeader>
-							<CardTitle>Account Information</CardTitle>
-							<CardDescription>
-								View your account details and status
-							</CardDescription>
-						</CardHeader>
-						<CardContent className="space-y-4">
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-								<div>
-									<Label className="text-sm font-medium">
-										Account Created
-									</Label>
-									<p className="text-sm text-muted-foreground">
-										{user?.created_at
-											? new Date(
-													user.created_at,
-												).toLocaleDateString()
-											: 'N/A'}
-									</p>
-								</div>
-								<div>
-									<Label className="text-sm font-medium">
-										Account Status
-									</Label>
-									<div className="flex items-center gap-2 mt-1">
-										<Badge
-											className="bg-green-100 text-green-800"
-											variant="secondary"
-										>
-											<CheckCircle className="w-3 h-3 mr-1" />
-											Active
-										</Badge>
-									</div>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-				</TabsContent>
+				<TabGeneral
+					handleProfileSave={handleProfileSave}
+					profileForm={profileForm}
+					saving={saving}
+					setProfileForm={setProfileForm}
+					userCreatedAt={user.created_at}
+					userEmail={user.email}
+				/>
 
 				{/* Security Tab */}
 				<TabsContent className="space-y-6" value="security">
