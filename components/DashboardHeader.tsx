@@ -24,20 +24,20 @@ import {
 import { InvoiceUsageBar } from '@/components/ui/InvoiceUsageBar'
 import { Logo } from '@/components/ui/Logo'
 import { UpgradePrompt } from '@/components/ui/UpgradePrompt'
-import { useAuth } from '@/contexts/AuthContext'
-import { useUsage } from '@/contexts/UsageContext'
+
+import { useAuth } from '@/hooks/auth'
 
 interface DashboardHeaderProps {
 	// onNewInvoice: () => void
-		onMenuToggle?: () => void
+	onMenuToggle?: () => void
 }
 
 export const DashboardHeader = ({
-	// onNewInvoice,	
+	// onNewInvoice,
 	onMenuToggle,
 }: DashboardHeaderProps) => {
 	const { user, signOut } = useAuth()
-	const { usage } = useUsage()
+	// const { usage } = useUsage()
 
 	const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
 	const [upgradePromptType, _setUpgradePromptType] = useState<
@@ -86,7 +86,7 @@ export const DashboardHeader = ({
 					{/* Right side - Actions and user menu */}
 					<div className="flex items-center space-x-2 sm:space-x-3">
 						{/* Usage Bar - Show to the left of New Invoice button */}
-						{usage && (
+						{/* {usage && (
 							<div className="hidden md:block">
 								<InvoiceUsageBar
 									className="scale-90 origin-right"
@@ -99,7 +99,7 @@ export const DashboardHeader = ({
 									planType={usage.planType}
 								/>
 							</div>
-						)}
+						)} */}
 
 						{/* New Invoice Button */}
 						<Link href={'/dashboard/create'}>
@@ -132,7 +132,7 @@ export const DashboardHeader = ({
           )} */}
 
 						{/* Settings - Hidden on mobile, accessible via user menu */}
-						<Link href={`/dashboard/settings}`}>
+						<Link href="/dashboard/settings">
 							<Button
 								className="hidden sm:flex hover:bg-accent/10 transition-colors"
 								size="icon"
@@ -176,7 +176,7 @@ export const DashboardHeader = ({
 											{user?.email || 'user@example.com'}
 										</p>
 										<div className="flex items-center gap-2 mt-2">
-											{usage && (
+											{/* {usage && (
 												<Badge
 													className={`text-xs ${
 														usage.planType === 'pro'
@@ -195,18 +195,18 @@ export const DashboardHeader = ({
 														'Free Plan'
 													)}
 												</Badge>
-											)}
+											)} */}
 										</div>
 									</div>
 								</DropdownMenuLabel>
 								<DropdownMenuSeparator />
-								<Link href={'/dashboard//profile'}>
+								<Link href="/dashboard/profile">
 									<DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
 										<User className="w-4 h-4" />
 										Profile
 									</DropdownMenuItem>
 								</Link>
-								<Link href={'/dashboard//settings'}>
+								<Link href="/dashboard/settings">
 									<DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
 										<Settings className="w-4 h-4" />
 										Settings
@@ -230,7 +230,7 @@ export const DashboardHeader = ({
 				</div>
 
 				{/* Upgrade Prompt - DISABLED (subscription system disabled) */}
-				{false && usage && (
+				{/* {false && usage && (
 					<UpgradePrompt
 						currentUsage={usage.current}
 						description={
@@ -253,7 +253,7 @@ export const DashboardHeader = ({
 						}
 						type={upgradePromptType}
 					/>
-				)}
+				)} */}
 			</div>
 		</header>
 	)

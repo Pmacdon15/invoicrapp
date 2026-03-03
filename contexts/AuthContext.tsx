@@ -3,7 +3,7 @@
 import type { Session, User } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import type React from 'react'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useEffect, useState } from 'react'
 import { supabase } from '@/integrations/supabase/old/client'
 
 interface AuthContextType {
@@ -19,14 +19,6 @@ const AuthContext = createContext<AuthContextType>({
 	loading: true,
 	signOut: async () => {},
 })
-
-export const useAuth = () => {
-	const context = useContext(AuthContext)
-	if (!context) {
-		throw new Error('useAuth must be used within an AuthProvider')
-	}
-	return context
-}
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const [user, setUser] = useState<User | null>(null)

@@ -1,74 +1,75 @@
-"use client";
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
-import { SubscriptionService, UsageInfo } from "@/lib/subscription-service";
-import { useAuth } from "./AuthContext";
+'use client'
+import type React from 'react'
+import {
+	createContext,
+	type ReactNode,
+	useContext,
+	useEffect,
+	useState,
+} from 'react'
+import { useAuth } from '@/hooks/auth'
+import type { UsageInfo } from '@/lib/subscription-service'
 
 interface UsageContextType {
-  usage: UsageInfo | null;
-  isLoading: boolean;
-  refreshUsage: () => Promise<void>;
+	usage: UsageInfo | null
+	isLoading: boolean
+	refreshUsage: () => Promise<void>
 }
 
-const UsageContext = createContext<UsageContextType | undefined>(undefined);
+const UsageContext = createContext<UsageContextType | undefined>(undefined)
 
 export const useUsage = () => {
-  const context = useContext(UsageContext);
-  if (context === undefined) {
-    throw new Error("useUsage must be used within a UsageProvider");
-  }
-  return context;
-};
+	const context = useContext(UsageContext)
+	if (context === undefined) {
+		throw new Error('useUsage must be used within a UsageProvider')
+	}
+	return context
+}
 
 interface UsageProviderProps {
-  children: ReactNode;
+	children: ReactNode
 }
 
 export const UsageProvider: React.FC<UsageProviderProps> = ({ children }) => {
-  const { user } = useAuth();
-  const [usage, setUsage] = useState<UsageInfo | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+	const { user } = useAuth()
+	const [usage, setUsage] = useState<UsageInfo | null>(null)
+	const [isLoading, setIsLoading] = useState(true)
 
-  const loadUsage = async () => {
-    if (!user?.id) {
-      setUsage(null);
-      setIsLoading(false);
-      return;
-    }
+	const loadUsage = async () => {
+		if (!user?.id) {
+			setUsage(null)
+			setIsLoading(false)
+			return
+		}
 
-    // SUBSCRIPTION SYSTEM DISABLED - Always provide unlimited access
-    setIsLoading(true);
-    setUsage({
-      current: 0,
-      limit: Infinity,
-      remaining: Infinity,
-      percentage: 0,
-      canCreate: true,
-      planType: "pro", // Treat everyone as pro user
-    });
-    setIsLoading(false);
-  };
+		// SUBSCRIPTION SYSTEM DISABLED - Always provide unlimited access
+		setIsLoading(true)
+		setUsage({
+			current: 0,
+			limit: Infinity,
+			remaining: Infinity,
+			percentage: 0,
+			canCreate: true,
+			planType: 'pro', // Treat everyone as pro user
+		})
+		setIsLoading(false)
+	}
 
-  const refreshUsage = async () => {
-    await loadUsage();
-  };
+	const refreshUsage = async () => {
+		await loadUsage()
+	}
 
-  useEffect(() => {
-    loadUsage();
-  }, [user?.id]);
+	useEffect(() => {
+		loadUsage()
+	}, [user?.id])
 
-  const value: UsageContextType = {
-    usage,
-    isLoading,
-    refreshUsage,
-  };
+	const value: UsageContextType = {
+		usage,
+		isLoading,
+		refreshUsage,
+	}
 
-  return (
-    <UsageContext.Provider value={value}>{children}</UsageContext.Provider>
-  );
-};
+	return (
+		<UsageContext.Provider value={value}>{children}</UsageContext.Provider>
+	)
+}

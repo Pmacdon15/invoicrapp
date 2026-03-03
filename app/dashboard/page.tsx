@@ -1,5 +1,6 @@
-import DashboardPageClient from './DashboardPageClient'
+import { redirect } from 'next/navigation'
 
-export default function DashboardPage() {
-	return <DashboardPageClient />
+export default async function DashboardPage() {
+	redirect('/dashboard/invoices')
+	return <div>Redirecting</div>
 }

@@ -1,95 +1,97 @@
-"use client";
+'use client'
 
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useCallback,
-} from "react";
-import { useAuth } from "./AuthContext";
-import { adminService } from "@/lib/admin-service";
+import type React from 'react'
+import {
+	createContext,
+	useCallback,
+	useContext,
+	useEffect,
+	useState,
+} from 'react'
+
+import { adminService } from '@/lib/admin-service'
+import { useAuth } from '@/hooks/auth'
 
 interface AdminContextType {
-  isAdmin: boolean;
-  isSuperAdmin: boolean;
-  loading: boolean;
-  checkAdminStatus: () => Promise<void>;
+	isAdmin: boolean
+	isSuperAdmin: boolean
+	loading: boolean
+	checkAdminStatus: () => Promise<void>
 }
 
 const AdminContext = createContext<AdminContextType>({
-  isAdmin: false,
-  isSuperAdmin: false,
-  loading: true,
-  checkAdminStatus: async () => {},
-});
+	isAdmin: false,
+	isSuperAdmin: false,
+	loading: true,
+	checkAdminStatus: async () => {},
+})
 
 export const useAdmin = () => {
-  const context = useContext(AdminContext);
-  if (!context) {
-    throw new Error("useAdmin must be used within an AdminProvider");
-  }
-  return context;
-};
+	const context = useContext(AdminContext)
+	if (!context) {
+		throw new Error('useAdmin must be used within an AdminProvider')
+	}
+	return context
+}
 
 export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const { user, loading: authLoading } = useAuth();
+	const [isAdmin, setIsAdmin] = useState(false)
+	const [isSuperAdmin, setIsSuperAdmin] = useState(false)
+	const [loading, setLoading] = useState(true)
+	const { user, loading: authLoading } = useAuth()
 
-  const checkAdminStatus = useCallback(async () => {
-    if (!user || authLoading) {
-      setIsAdmin(false);
-      setIsSuperAdmin(false);
-      setLoading(false);
-      return;
-    }
+	const checkAdminStatus = useCallback(async () => {
+		if (!user || authLoading) {
+			setIsAdmin(false)
+			setIsSuperAdmin(false)
+			setLoading(false)
+			return
+		}
 
-    try {
-      setLoading(true);
+		try {
+			setLoading(true)
 
-      // Add timeout to admin service calls to prevent hanging
-      const adminPromise = Promise.race([
-        adminService.isAdmin(),
-        new Promise<boolean>((resolve) =>
-          setTimeout(() => resolve(false), 5000)
-        ),
-      ]);
+			// Add timeout to admin service calls to prevent hanging
+			const adminPromise = Promise.race([
+				adminService.isAdmin(),
+				new Promise<boolean>((resolve) =>
+					setTimeout(() => resolve(false), 5000),
+				),
+			])
 
-      const superAdminPromise = Promise.race([
-        adminService.isSuperAdmin(),
-        new Promise<boolean>((resolve) =>
-          setTimeout(() => resolve(false), 5000)
-        ),
-      ]);
+			const superAdminPromise = Promise.race([
+				adminService.isSuperAdmin(),
+				new Promise<boolean>((resolve) =>
+					setTimeout(() => resolve(false), 5000),
+				),
+			])
 
-      const adminStatus = await adminPromise;
-      const superAdminStatus = await superAdminPromise;
+			const adminStatus = await adminPromise
+			const superAdminStatus = await superAdminPromise
 
-      setIsAdmin(adminStatus);
-      setIsSuperAdmin(superAdminStatus);
-    } catch (error) {
-      console.error("Error checking admin status:", error);
-      setIsAdmin(false);
-      setIsSuperAdmin(false);
-    } finally {
-      setLoading(false);
-    }
-  }, [user, authLoading]);
+			setIsAdmin(adminStatus)
+			setIsSuperAdmin(superAdminStatus)
+		} catch (error) {
+			console.error('Error checking admin status:', error)
+			setIsAdmin(false)
+			setIsSuperAdmin(false)
+		} finally {
+			setLoading(false)
+		}
+	}, [user, authLoading])
 
-  useEffect(() => {
-    checkAdminStatus();
-  }, [checkAdminStatus]);
+	useEffect(() => {
+		checkAdminStatus()
+	}, [checkAdminStatus])
 
-  const value = {
-    isAdmin,
-    isSuperAdmin,
-    loading,
-    checkAdminStatus,
-  };
+	const value = {
+		isAdmin,
+		isSuperAdmin,
+		loading,
+		checkAdminStatus,
+	}
 
-  return (
-    <AdminContext.Provider value={value}>{children}</AdminContext.Provider>
-  );
-};
+	return (
+		<AdminContext.Provider value={value}>{children}</AdminContext.Provider>
+	)
+}

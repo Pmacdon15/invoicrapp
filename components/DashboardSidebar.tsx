@@ -35,7 +35,7 @@ export const DashboardSidebar = ({
 	isOpen = true,
 	onClose,
 }: DashboardSidebarProps) => {
-	const { usage } = useUsage()
+	// const { usage } = useUsage()
 	const { isAdmin, loading: adminLoading } = useAdmin()
 	const mainItems: SidebarItem[] = [
 		{
@@ -131,11 +131,11 @@ export const DashboardSidebar = ({
 				{/* Main Navigation */}
 				<nav className="px-4 py-6 space-y-2 flex-1">
 					<div className="md:hidden mb-6">
-						<InvoiceUsageBar
+						{/* <InvoiceUsageBar
 							current={usage?.current || 0}
 							limit={usage?.limit || 0}
 							planType={usage?.planType || 'free'}
-						/>
+						/> */}
 					</div>
 
 					<div className="mb-6">
@@ -182,7 +182,7 @@ export const DashboardSidebar = ({
 				)}
 
 				{/* Bottom Section - Only show upgrade prompt for free plan users */}
-				{usage?.planType === 'free' && (
+				{/* {usage?.planType === 'free' && (
 					<div className="p-4 border-t border-border">
 						<div className="bg-gradient-to-r from-primary to-accent rounded-lg p-4 text-white">
 							<h3 className="font-semibold text-sm mb-1">
@@ -199,7 +199,7 @@ export const DashboardSidebar = ({
 							</Button>
 						</div>
 					</div>
-				)}
+				)} */}
 			</aside>
 		</>
 	)
