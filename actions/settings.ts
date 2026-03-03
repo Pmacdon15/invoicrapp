@@ -52,6 +52,7 @@ export async function saveUserSettings(
 
 		if (result.error) throw result.error
 		revalidatePath('/dashboard/settings')
+		revalidatePath('/dashboard/profile')
 		return result.data
 	} catch (error) {
 		console.error('Error saving user settings:', error)
