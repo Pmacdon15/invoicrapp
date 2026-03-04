@@ -47,18 +47,18 @@ export function validateSettingsForInvoice(settings: import('@/types/settings').
 
 /**
  * Check if user has configured basic settings
- */
-export async function checkUserSettingsConfigured(userId: string): Promise<SettingsValidationResult> {
-  try {
-    const { SettingsService } = await import('@/lib/settings-service');
-    const settings = await SettingsService.getSettingsWithDefaults(userId);
-    return validateSettingsForInvoice(settings);
-  } catch (error) {
-    console.error('Error checking user settings:', error);
-    return {
-      isValid: false,
-      missingFields: ['Unable to load settings'],
-      criticalMissing: ['Unable to load settings'],
-    };
-  }
-}
+//  */
+// export async function checkUserSettingsConfigured(userId: string): Promise<SettingsValidationResult> {
+//   try {
+//     const { SettingsService } = await import('@/lib/settings-service');
+//     const settings = await SettingsService.getSettingsWithDefaults(userId);
+//     return validateSettingsForInvoice(settings);
+//   } catch (error) {
+//     console.error('Error checking user settings:', error);
+//     return {
+//       isValid: false,
+//       missingFields: ['Unable to load settings'],
+//       criticalMissing: ['Unable to load settings'],
+//     };
+//   }
+// }

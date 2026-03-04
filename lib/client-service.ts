@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/old/client'
+// import { supabase } from '@/integrations/supabase/old/client'
 
 export interface Client {
 	id: string
@@ -47,35 +47,35 @@ export const convertLegacyClientInfo = (clientInfo: {
 }
 
 
-// Get a specific client by ID
-export const getClientById = async (id: string): Promise<Client | null> => {
-	try {
-		const {
-			data: { user },
-		} = await supabase.auth.getUser()
+// // Get a specific client by ID
+// export const getClientById = async (id: string): Promise<Client | null> => {
+// 	try {
+// 		const {
+// 			data: { user },
+// 		} = await supabase.auth.getUser()
 
-		if (!user) {
-			return null
-		}
+// 		if (!user) {
+// 			return null
+// 		}
 
-		const { data, error } = await (supabase as any)
-			.from('clients')
-			.select('*')
-			.eq('id', id)
-			.eq('user_id', user.id)
-			.single()
+// 		const { data, error } = await (supabase as any)
+// 			.from('clients')
+// 			.select('*')
+// 			.eq('id', id)
+// 			.eq('user_id', user.id)
+// 			.single()
 
-		if (error) {
-			console.error('Error fetching client:', error)
-			return null
-		}
+// 		if (error) {
+// 			console.error('Error fetching client:', error)
+// 			return null
+// 		}
 
-		return data as Client
-	} catch (error) {
-		console.error('Error fetching client:', error)
-		return null
-	}
-}
+// 		return data as Client
+// 	} catch (error) {
+// 		console.error('Error fetching client:', error)
+// 		return null
+// 	}
+// }
 
 // // Update an existing client
 // export const updateClient = async (
@@ -157,65 +157,65 @@ export const getClientById = async (id: string): Promise<Client | null> => {
 // 	}
 // }
 
-// Reactivate a client
-export const reactivateClient = async (id: string): Promise<boolean> => {
-	try {
-		const {
-			data: { user },
-		} = await supabase.auth.getUser()
+// // Reactivate a client
+// export const reactivateClient = async (id: string): Promise<boolean> => {
+// 	try {
+// 		const {
+// 			data: { user },
+// 		} = await supabase.auth.getUser()
 
-		if (!user) {
-			return false
-		}
+// 		if (!user) {
+// 			return false
+// 		}
 
-		const { error } = await (supabase as any)
-			.from('clients')
-			.update({ is_active: true })
-			.eq('id', id)
-			.eq('user_id', user.id)
+// 		const { error } = await (supabase as any)
+// 			.from('clients')
+// 			.update({ is_active: true })
+// 			.eq('id', id)
+// 			.eq('user_id', user.id)
 
-		if (error) {
-			console.error('Error reactivating client:', error)
-			return false
-		}
+// 		if (error) {
+// 			console.error('Error reactivating client:', error)
+// 			return false
+// 		}
 
-		return true
-	} catch (error) {
-		console.error('Error reactivating client:', error)
-		return false
-	}
-}
+// 		return true
+// 	} catch (error) {
+// 		console.error('Error reactivating client:', error)
+// 		return false
+// 	}
+// }
 
-// Search clients by name or company
-export const searchClients = async (searchTerm: string): Promise<Client[]> => {
-	try {
-		const {
-			data: { user },
-		} = await supabase.auth.getUser()
+// // Search clients by name or company
+// export const searchClients = async (searchTerm: string): Promise<Client[]> => {
+// 	try {
+// 		const {
+// 			data: { user },
+// 		} = await supabase.auth.getUser()
 
-		if (!user) {
-			return []
-		}
+// 		if (!user) {
+// 			return []
+// 		}
 
-		const { data, error } = await (supabase as any)
-			.from('clients')
-			.select('*')
-			.eq('user_id', user.id)
-			.eq('is_active', true)
-			.or(
-				`name.ilike.%${searchTerm}%,company_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`,
-			)
-			.order('name', { ascending: true })
-			.limit(10)
+// 		const { data, error } = await (supabase as any)
+// 			.from('clients')
+// 			.select('*')
+// 			.eq('user_id', user.id)
+// 			.eq('is_active', true)
+// 			.or(
+// 				`name.ilike.%${searchTerm}%,company_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`,
+// 			)
+// 			.order('name', { ascending: true })
+// 			.limit(10)
 
-		if (error) {
-			console.error('Error searching clients:', error)
-			return []
-		}
+// 		if (error) {
+// 			console.error('Error searching clients:', error)
+// 			return []
+// 		}
 
-		return data as Client[]
-	} catch (error) {
-		console.error('Error searching clients:', error)
-		return []
-	}
-}
+// 		return data as Client[]
+// 	} catch (error) {
+// 		console.error('Error searching clients:', error)
+// 		return []
+// 	}
+// }

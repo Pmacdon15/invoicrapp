@@ -20,7 +20,8 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { showError, showSuccess } from '@/hooks/use-toast'
-import { supabase } from '@/integrations/supabase/old/client'
+import { createClient } from '@/integrations/supabase/client'
+
 
 const Auth = () => {
 	// const [user, setUser] = useState<User | null>(null)
@@ -37,6 +38,7 @@ const Auth = () => {
 		setLoading(true)
 
 		try {
+			const supabase = createClient()
 			const { data, error } = await supabase.auth.signUp({
 				email,
 				password,
@@ -90,6 +92,7 @@ const Auth = () => {
 		setLoading(true)
 
 		try {
+			const supabase = createClient()
 			const { data, error } = await supabase.auth.signInWithOAuth({
 				provider: 'google',
 				options: {
@@ -160,6 +163,7 @@ const Auth = () => {
 										variant="outline"
 									>
 										<svg
+										
 											className="w-4 h-4 mr-2"
 											viewBox="0 0 24 24"
 										>

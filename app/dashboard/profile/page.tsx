@@ -6,7 +6,7 @@ import {
 	getUserProfile,
 	getUserSettings,
 } from '@/lib/settings-service-server'
-
+export const dynamic = 'force-dynamic'
 export default function ProfilePage() {
 	const userPromise = getUser()
 	const userSettingsPromise = getUserSettings()

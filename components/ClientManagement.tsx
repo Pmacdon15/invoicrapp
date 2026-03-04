@@ -50,13 +50,13 @@ export const ClientManagement = ({
 		SavedInvoice[]
 	>([])
 	const [showInvoicesDialog, setShowInvoicesDialog] = useState(false)
-	
+
 	const [previewInvoice, setPreviewInvoice] = useState<SavedInvoice | null>(
 		null,
 	)
 	const [showPreviewDialog, setShowPreviewDialog] = useState(false)
 	const [isSaved, setIsSaved] = useState(false)
-	
+
 	interface ClientFormData {
 		name: string
 		address: string

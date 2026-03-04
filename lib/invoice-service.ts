@@ -1,13 +1,21 @@
-import { supabase } from '@/integrations/supabase/old/client'
+// import { supabase } from '@/integrations/supabase/old/client'
+// import type {
+// 	CustomFieldValue,
+// 	InvoiceData,
+// 	InvoiceItem,
+// } from '@/types/invoice'
+// import { SubscriptionService } from './subscription-service'
+// import { createClient } from '@/integrations/supabase/client'
+
+import { createClient } from '@/integrations/supabase/client'
 import type {
 	CustomFieldValue,
 	InvoiceData,
 	InvoiceItem,
 } from '@/types/invoice'
-import { SubscriptionService } from './subscription-service'
-import { createClient } from '@/integrations/supabase/client'
+import { calculateInvoiceTotals } from './format-utils'
 
-// Define the database row type for invoices
+// // Define the database row type for invoices
 export type InvoiceRow = {
 	id: string
 	user_id: string
@@ -79,26 +87,26 @@ export interface CreateInvoiceData {
 	custom_fields?: CustomFieldValue[]
 }
 
-// Calculate totals from invoice items
-export const calculateInvoiceTotals = (
-	items: InvoiceItem[],
-	taxRate: number = 0,
-) => {
-	const subtotal = items.reduce(
-		(sum, item) => sum + item.quantity * item.price,
-		0,
-	)
-	const tax_amount = subtotal * (taxRate / 100)
-	const total_amount = subtotal + tax_amount
+// // Calculate totals from invoice items
+// export const calculateInvoiceTotals = (
+// 	items: InvoiceItem[],
+// 	taxRate: number = 0,
+// ) => {
+// 	const subtotal = items.reduce(
+// 		(sum, item) => sum + item.quantity * item.price,
+// 		0,
+// 	)
+// 	const tax_amount = subtotal * (taxRate / 100)
+// 	const total_amount = subtotal + tax_amount
 
-	return { subtotal, tax_amount, total_amount }
-}
+// 	return { subtotal, tax_amount, total_amount }
+// }
 
 // Convert InvoiceData to CreateInvoiceData format
 export const convertInvoiceDataToSaveFormat = (
 	invoiceData: InvoiceData,
 ): CreateInvoiceData => {
-	const { subtotal, tax_amount, total_amount } = calculateInvoiceTotals(
+	const { subtotal, taxAmount, total } = calculateInvoiceTotals(
 		invoiceData.items,
 		invoiceData.taxRate || 0,
 	)
@@ -116,150 +124,149 @@ export const convertInvoiceDataToSaveFormat = (
 		theme_name: invoiceData.theme.name,
 		items: invoiceData.items,
 		subtotal,
-		tax_amount,
-		total_amount,
+		tax_amount: taxAmount,
+		total_amount: total,
 		status: 'draft',
 		custom_fields: invoiceData.customFields,
 	}
 }
 
-
-// Update an existing invoice
-export const updateInvoice = async (
-	id: string,
-	updates: Partial<CreateInvoiceData>,
-): Promise<SavedInvoice | null> => {
-	try {
-		const {
-			data: { user },
-		} = await supabase.auth.getUser()
-
-		if (!user) {
-			return null
-		}
-
-		const { data, error } = await (supabase as any)
-			.from('invoices')
-			.update(updates)
-			.eq('id', id)
-			.eq('user_id', user.id)
-			.select()
-			.single()
-
-		if (error) {
-			console.error('Error updating invoice:', error)
-			return null
-		}
-
-		return data as SavedInvoice
-	} catch (error) {
-		console.error('Error updating invoice:', error)
-		return null
-	}
-}
-
-// Get invoices by client name
-export const getInvoicesByClient = async (
-	clientName: string,
-): Promise<SavedInvoice[]> => {
-	const supabaseClient = createClient()
-	try {
-		const {
-			data: { user },
-		} = await supabaseClient.auth.getUser()
-
-		if (!user) {
-			return []
-		}
-
-		const { data, error } = await (supabaseClient)
-			.from('invoices')
-			.select('*')
-			.eq('user_id', user.id)
-			.eq('client_name', clientName)
-			.order('created_at', { ascending: false })
-
-		if (error) {
-			console.error('Error fetching invoices by client:', error)
-			return []
-		}
-
-		return data as SavedInvoice[]
-	} catch (error) {
-		console.error('Error fetching invoices by client:', error)
-		return []
-	}
-}
-
-// Get invoice count by client name
-export const getInvoiceCountByClient = async (
-	clientName: string,
-): Promise<number> => {
-	try {
-		const {
-			data: { user },
-		} = await supabase.auth.getUser()
-
-		if (!user) {
-			return 0
-		}
-
-		const { count, error } = await (supabase as any)
-			.from('invoices')
-			.select('*', { count: 'exact', head: true })
-			.eq('user_id', user.id)
-			.eq('client_name', clientName)
-
-		if (error) {
-			console.error('Error fetching invoice count by client:', error)
-			return 0
-		}
-
-		return count || 0
-	} catch (error) {
-		console.error('Error fetching invoice count by client:', error)
-		return 0
-	}
-}
-
-// // Get invoice counts for all clients
-// export const getInvoiceCountsForClients = async (
-// 	clientNames: string[],
-// ): Promise<Record<string, number>> => {
+// // Update an existing invoice
+// export const updateInvoice = async (
+// 	id: string,
+// 	updates: Partial<CreateInvoiceData>,
+// ): Promise<SavedInvoice | null> => {
 // 	try {
 // 		const {
 // 			data: { user },
 // 		} = await supabase.auth.getUser()
 
-// 		if (!user || clientNames.length === 0) {
-// 			return {}
+// 		if (!user) {
+// 			return null
 // 		}
 
 // 		const { data, error } = await (supabase as any)
 // 			.from('invoices')
-// 			.select('client_name')
+// 			.update(updates)
+// 			.eq('id', id)
 // 			.eq('user_id', user.id)
-// 			.in('client_name', clientNames)
+// 			.select()
+// 			.single()
 
 // 		if (error) {
-// 			console.error('Error fetching invoice counts for clients:', error)
-// 			return {}
+// 			console.error('Error updating invoice:', error)
+// 			return null
 // 		}
 
-// 		// Count invoices per client
-// 		const counts: Record<string, number> = {}
-// 		clientNames.forEach((name) => (counts[name] = 0))
-
-// 		data.forEach((invoice: { client_name: string }) => {
-// 			counts[invoice.client_name] = (counts[invoice.client_name] || 0) + 1
-// 		})
-
-// 		return counts
+// 		return data as SavedInvoice
 // 	} catch (error) {
-// 		console.error('Error fetching invoice counts for clients:', error)
-// 		return {}
+// 		console.error('Error updating invoice:', error)
+// 		return null
 // 	}
 // }
+
+// // Get invoices by client name
+// export const getInvoicesByClient = async (
+// 	clientName: string,
+// ): Promise<SavedInvoice[]> => {
+// 	const supabaseClient = createClient()
+// 	try {
+// 		const {
+// 			data: { user },
+// 		} = await supabaseClient.auth.getUser()
+
+// 		if (!user) {
+// 			return []
+// 		}
+
+// 		const { data, error } = await (supabaseClient)
+// 			.from('invoices')
+// 			.select('*')
+// 			.eq('user_id', user.id)
+// 			.eq('client_name', clientName)
+// 			.order('created_at', { ascending: false })
+
+// 		if (error) {
+// 			console.error('Error fetching invoices by client:', error)
+// 			return []
+// 		}
+
+// 		return data as SavedInvoice[]
+// 	} catch (error) {
+// 		console.error('Error fetching invoices by client:', error)
+// 		return []
+// 	}
+// }
+
+// // Get invoice count by client name
+// export const getInvoiceCountByClient = async (
+// 	clientName: string,
+// ): Promise<number> => {
+// 	try {
+// 		const {
+// 			data: { user },
+// 		} = await supabase.auth.getUser()
+
+// 		if (!user) {
+// 			return 0
+// 		}
+
+// 		const { count, error } = await (supabase as any)
+// 			.from('invoices')
+// 			.select('*', { count: 'exact', head: true })
+// 			.eq('user_id', user.id)
+// 			.eq('client_name', clientName)
+
+// 		if (error) {
+// 			console.error('Error fetching invoice count by client:', error)
+// 			return 0
+// 		}
+
+// 		return count || 0
+// 	} catch (error) {
+// 		console.error('Error fetching invoice count by client:', error)
+// 		return 0
+// 	}
+// }
+
+// // // Get invoice counts for all clients
+// // export const getInvoiceCountsForClients = async (
+// // 	clientNames: string[],
+// // ): Promise<Record<string, number>> => {
+// // 	try {
+// // 		const {
+// // 			data: { user },
+// // 		} = await supabase.auth.getUser()
+
+// // 		if (!user || clientNames.length === 0) {
+// // 			return {}
+// // 		}
+
+// // 		const { data, error } = await (supabase as any)
+// // 			.from('invoices')
+// // 			.select('client_name')
+// // 			.eq('user_id', user.id)
+// // 			.in('client_name', clientNames)
+
+// // 		if (error) {
+// // 			console.error('Error fetching invoice counts for clients:', error)
+// // 			return {}
+// // 		}
+
+// // 		// Count invoices per client
+// // 		const counts: Record<string, number> = {}
+// // 		clientNames.forEach((name) => (counts[name] = 0))
+
+// // 		data.forEach((invoice: { client_name: string }) => {
+// // 			counts[invoice.client_name] = (counts[invoice.client_name] || 0) + 1
+// // 		})
+
+// // 		return counts
+// // 	} catch (error) {
+// // 		console.error('Error fetching invoice counts for clients:', error)
+// // 		return {}
+// // 	}
+// // }
 
 // Analytics interfaces
 export interface InvoiceAnalytics {
@@ -452,3 +459,23 @@ export interface InvoiceAnalytics {
 // 		return null
 // 	}
 // }
+
+export async function getInvoicesByClient(clientName: string) {
+	try {
+		const supabase = await createClient()
+
+		const { data, error } = await supabase
+			.from('invoices')
+			.select(`
+        *,
+        clients!inner(name)
+      `)
+			.eq('clients.name', clientName)
+
+		if (error) throw error
+		return data
+	} catch (error) {
+		console.error('Error fetching invoices:', error)
+		return null
+	}
+}

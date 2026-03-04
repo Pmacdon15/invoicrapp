@@ -1,6 +1,5 @@
 import { Plus } from 'lucide-react'
 import type { Dispatch, SetStateAction } from 'react'
-import { Label } from 'recharts'
 import { Button } from '../ui/button'
 import {
 	Dialog,
@@ -12,6 +11,7 @@ import {
 	DialogTrigger,
 } from '../ui/dialog'
 import { Input } from '../ui/input'
+import { Label } from '../ui/label'
 import { Textarea } from '../ui/textarea'
 export interface ClientFormData {
 	name: string

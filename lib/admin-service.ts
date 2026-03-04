@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/old/client'
+import { createClient } from '@/integrations/supabase/client'
 
 export interface AdminAnalytics {
 	date: string
@@ -61,6 +61,7 @@ class AdminService {
 	 */
 	async isAdmin(): Promise<boolean> {
 		try {
+			const supabase = createClient()
 			const {
 				data: { user },
 				error,
@@ -94,6 +95,7 @@ class AdminService {
 	 */
 	async isSuperAdmin(): Promise<boolean> {
 		try {
+			const supabase = createClient()
 			const {
 				data: { user },
 				error,
@@ -125,6 +127,7 @@ class AdminService {
 	 */
 	async getAdminAnalytics(): Promise<AdminAnalytics | null> {
 		try {
+			const supabase = createClient()
 			// First update the analytics
 			await supabase.rpc('update_admin_analytics')
 
@@ -177,7 +180,7 @@ class AdminService {
 		try {
 			const startDate = new Date()
 			startDate.setDate(startDate.getDate() - days)
-
+			const supabase = createClient()
 			// Get historical analytics
 			const { data: analytics, error: analyticsError } = await supabase
 				.from('admin_analytics')
@@ -317,7 +320,7 @@ class AdminService {
 	}> {
 		try {
 			const offset = (page - 1) * limit
-
+const supabase = createClient()
 			// Get profiles
 			const {
 				data: profiles,
@@ -423,6 +426,7 @@ class AdminService {
 		role: 'user' | 'admin' | 'super_admin',
 	): Promise<boolean> {
 		try {
+			const supabase = createClient()
 			const isSuperAdmin = await this.isSuperAdmin()
 			if (!isSuperAdmin) {
 				throw new Error('Only super admins can update user roles')
@@ -454,6 +458,7 @@ class AdminService {
 		status: 'active' | 'cancelled' | 'expired' = 'active',
 	): Promise<boolean> {
 		try {
+			const supabase = createClient()
 			const isAdmin = await this.isAdmin()
 			if (!isAdmin) {
 				throw new Error('Only admins can update subscriptions')
@@ -483,6 +488,7 @@ class AdminService {
 	 */
 	async deleteUser(userId: string): Promise<boolean> {
 		try {
+			const supabase = createClient()
 			const isSuperAdmin = await this.isSuperAdmin()
 			if (!isSuperAdmin) {
 				throw new Error('Only super admins can delete users')
@@ -515,6 +521,7 @@ class AdminService {
 		| null
 	> {
 		try {
+			const supabase = createClient()
 			// Get profile data
 			const { data: profile, error: profileError } = await supabase
 				.from('profiles')
