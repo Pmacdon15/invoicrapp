@@ -1,6 +1,6 @@
 import { createClient } from '@/integrations/supabase/client/client'
 
-export interface AdminAnalytics {
+export interface AdminAnalyticsType {
 	date: string
 	totalUsers: number
 	newUsersToday: number
@@ -125,7 +125,7 @@ class AdminService {
 	/**
 	 * Get current admin analytics
 	 */
-	async getAdminAnalytics(): Promise<AdminAnalytics | null> {
+	async getAdminAnalytics(): Promise<AdminAnalyticsType | null> {
 		try {
 			const supabase = createClient()
 			// First update the analytics
