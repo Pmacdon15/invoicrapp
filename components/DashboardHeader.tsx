@@ -7,11 +7,11 @@ import {
 	Plus,
 	Settings,
 	User,
+	Zap,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
 	DropdownMenu,
@@ -21,11 +21,12 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { InvoiceUsageBar } from '@/components/ui/InvoiceUsageBar'
 import { Logo } from '@/components/ui/Logo'
-import { UpgradePrompt } from '@/components/ui/UpgradePrompt'
-
+import { useUsage } from '@/contexts/UsageContext'
 import { useAuth } from '@/hooks/auth'
+import { Badge } from './ui/badge'
+import { InvoiceUsageBar } from './ui/InvoiceUsageBar'
+import { UpgradePrompt } from './ui/UpgradePrompt'
 
 interface DashboardHeaderProps {
 	// onNewInvoice: () => void
@@ -37,10 +38,10 @@ export const DashboardHeader = ({
 	onMenuToggle,
 }: DashboardHeaderProps) => {
 	const { user, signOut } = useAuth()
-	// const { usage } = useUsage()
+	const { usage } = useUsage()
 
 	const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
-	const [upgradePromptType, _setUpgradePromptType] = useState<
+	const [upgradePromptType, setUpgradePromptType] = useState<
 		'warning' | 'limit-reached'
 	>('warning')
 
@@ -86,7 +87,7 @@ export const DashboardHeader = ({
 					{/* Right side - Actions and user menu */}
 					<div className="flex items-center space-x-2 sm:space-x-3">
 						{/* Usage Bar - Show to the left of New Invoice button */}
-						{/* {usage && (
+						{usage && (
 							<div className="hidden md:block">
 								<InvoiceUsageBar
 									className="scale-90 origin-right"
@@ -96,10 +97,10 @@ export const DashboardHeader = ({
 											? 999
 											: usage.limit
 									}
-									planType={usage.planType}
+									planType={usage.planType as 'pro'|'free'}
 								/>
 							</div>
-						)} */}
+						)}
 
 						{/* New Invoice Button */}
 						<Link href={'/dashboard/create'}>
@@ -116,20 +117,20 @@ export const DashboardHeader = ({
 						</Link>
 
 						{/* Upgrade to Pro Button - Hidden on mobile, only show for free users */}
-						{/* {usage && usage.planType === 'free' && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="hidden md:flex border-border text-accent hover:bg-accent/10 hover:border-accent transition-all duration-200 items-center gap-1"
-              onClick={() => {
-                setUpgradePromptType('warning');
-                setShowUpgradePrompt(true);
-              }}
-            >
-              <Zap className="w-3 h-3" />
-              Upgrade
-            </Button>
-          )} */}
+						{usage && usage.planType === 'free' && (
+							<Button
+								className="hidden md:flex border-border text-accent hover:bg-accent/10 hover:border-accent transition-all duration-200 items-center gap-1"
+								onClick={() => {
+									setUpgradePromptType('warning')
+									setShowUpgradePrompt(true)
+								}}
+								size="sm"
+								variant="outline"
+							>
+								<Zap className="w-3 h-3" />
+								Upgrade
+							</Button>
+						)}
 
 						{/* Settings - Hidden on mobile, accessible via user menu */}
 						<Link href="/dashboard/settings">
@@ -176,7 +177,7 @@ export const DashboardHeader = ({
 											{user?.email || 'user@example.com'}
 										</p>
 										<div className="flex items-center gap-2 mt-2">
-											{/* {usage && (
+											{usage && (
 												<Badge
 													className={`text-xs ${
 														usage.planType === 'pro'
@@ -195,7 +196,7 @@ export const DashboardHeader = ({
 														'Free Plan'
 													)}
 												</Badge>
-											)} */}
+											)}
 										</div>
 									</div>
 								</DropdownMenuLabel>
@@ -230,7 +231,7 @@ export const DashboardHeader = ({
 				</div>
 
 				{/* Upgrade Prompt - DISABLED (subscription system disabled) */}
-				{/* {false && usage && (
+				{false&& usage && (
 					<UpgradePrompt
 						currentUsage={usage.current}
 						description={
@@ -253,7 +254,7 @@ export const DashboardHeader = ({
 						}
 						type={upgradePromptType}
 					/>
-				)} */}
+				)}
 			</div>
 		</header>
 	)

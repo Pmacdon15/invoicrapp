@@ -1,58 +1,57 @@
-"use client";
+'use client'
 
-import React from "react";
-import { Logo } from "@/components/ui/Logo";
-import { FileText } from "lucide-react";
-import GitHubStarsBadge from "@/components/ui/GitHubStarsBadge";
-import ProductHuntBadge from "@/components/ui/ProductHuntBadge";
+import Link from 'next/link'
+import GitHubStarsBadge from '@/components/ui/GitHubStarsBadge'
+import { Logo } from '@/components/ui/Logo'
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear();
+	const currentYear = new Date().getFullYear()
 
-  const supportLinks = [
-    { label: "Help Center", href: "#" },
-    { label: "Documentation", href: "#" },
-    { label: "API Reference", href: "#" },
-    { label: "Status", href: "#" },
-  ];
+	// const supportLinks = [
+	// 	{ label: 'Help Center', href: '#' },
+	// 	{ label: 'Documentation', href: '#' },
+	// 	{ label: 'API Reference', href: '#' },
+	// 	{ label: 'Status', href: '#' },
+	// ]
 
-  return (
-    <footer className="bg-gradient-to-br from-emerald-50 via-white to-teal-50 border-t border-emerald-100">
-      <div className="container mx-auto px-4 sm:px-6 py-12">
-        <div className="flex flex-col items-center gap-2">
-          {/* Company Info */}
-          <div className="flex items-center gap-3 mb-4">
-            <Logo size="lg" />
-          </div>
-          <p className="text-gray-600 mb-4 leading-relaxed max-w-md text-center">
-            Professional invoice generation made simple. Create, customize, and
-            send beautiful invoices in minutes.
-          </p>
-          <div className="flex items-center gap-4 flex-wrap justify-center">
-            <GitHubStarsBadge />
-            {/* <ProductHuntBadge className="scale-90 origin-center" /> */}
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-              All systems operational
-            </div>
-          </div>
-        </div>
+	return (
+		<footer className="bg-gradient-to-br from-emerald-50 via-white to-teal-50 border-t border-emerald-100">
+			<div className="container mx-auto px-4 sm:px-6 py-12">
+				<div className="flex flex-col items-center gap-2">
+					{/* Company Info */}
+					<div className="flex items-center gap-3 mb-4">
+						<Logo size="lg" />
+					</div>
+					<p className="text-gray-600 mb-4 leading-relaxed max-w-md text-center">
+						Professional invoice generation made simple. Create,
+						customize, and send beautiful invoices in minutes.
+					</p>
+					<div className="flex items-center gap-4 flex-wrap justify-center">
+						<GitHubStarsBadge />
+						{/* <ProductHuntBadge className="scale-90 origin-center" /> */}
+						<div className="flex items-center gap-2 text-sm text-gray-500">
+							<span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+							All systems operational
+						</div>
+					</div>
+				</div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-emerald-100 pt-8 mt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-gray-500">
-              © {currentYear} Invoicr. All rights reserved. Made by{" "}
-              <a
-                href="https://jellyouness.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-emerald-600 hover:text-emerald-800 transition-colors"
-              >
-                Jellouli Youness
-              </a>
-            </p>
-            {/* <div className="flex items-center gap-6">
+				{/* Bottom Bar */}
+				<div className="border-t border-emerald-100 pt-8 mt-8">
+					<div className="flex flex-col md:flex-row justify-between items-center gap-4">
+						<p className="text-sm text-gray-500">
+							© {currentYear} Invoicr. All rights reserved. Made
+							by{' '}
+							<Link
+								className="text-emerald-600 hover:text-emerald-800 transition-colors"
+								href="https://jellyouness.com"
+								rel="noopener noreferrer"
+								target="_blank"
+							>
+								Jellouli Youness
+							</Link>
+						</p>
+						{/* <div className="flex items-center gap-6">
               <a
                 href="/privacy"
                 className="text-sm text-gray-500 hover:text-emerald-600 transition-colors"
@@ -72,11 +71,11 @@ const Footer = () => {
                 Cookie Policy
               </a>
             </div> */}
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
-};
+					</div>
+				</div>
+			</div>
+		</footer>
+	)
+}
 
-export default Footer;
+export default Footer

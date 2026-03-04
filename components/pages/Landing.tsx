@@ -7,6 +7,9 @@ import Header from '@/components/landing/Header'
 import Hero from '@/components/landing/Hero'
 import StructuredData from '@/components/StructuredData'
 import { trackReferrerData } from '@/lib/referrer-utils'
+import FinalCTA from '../landing/FinalCTA'
+import Pricing from '../landing/Pricing'
+import Testimonials from '../landing/Testimonials'
 
 const Landing = () => {
 	const companyLogos = [
@@ -30,9 +33,9 @@ const Landing = () => {
 				<div className="bg-background">
 					<Features />
 				</div>
-				{/* <Pricing /> */}
-				{/* <Testimonials /> */}
-				{/* <FinalCTA /> */}
+				<Pricing />
+				<Testimonials />
+				<FinalCTA />
 				<Footer />
 			</div>
 		</>
