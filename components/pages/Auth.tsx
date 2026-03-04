@@ -20,8 +20,7 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { showError, showSuccess } from '@/hooks/use-toast'
-import { createClient } from '@/integrations/supabase/client'
-
+import { createClient } from '@/integrations/supabase/client/client'
 
 const Auth = () => {
 	// const [user, setUser] = useState<User | null>(null)
@@ -163,7 +162,6 @@ const Auth = () => {
 										variant="outline"
 									>
 										<svg
-										
 											className="w-4 h-4 mr-2"
 											viewBox="0 0 24 24"
 										>

@@ -7,7 +7,7 @@
 // import { SubscriptionService } from './subscription-service'
 // import { createClient } from '@/integrations/supabase/client'
 
-import { createClient } from '@/integrations/supabase/client'
+import { createClient } from '@/integrations/supabase/client/client'
 import type {
 	CustomFieldValue,
 	InvoiceData,
@@ -464,15 +464,28 @@ export async function getInvoicesByClient(clientName: string) {
 	try {
 		const supabase = await createClient()
 
+		const {
+			data: { user },
+			error: userError,
+		} = await supabase.auth.getUser()
+
+		if (userError) {
+			console.error('User auth error:', userError)
+			return null
+		}
+
+		// Updated to filter by 'client_name' column
 		const { data, error } = await supabase
 			.from('invoices')
-			.select(`
-        *,
-        clients!inner(name)
-      `)
-			.eq('clients.name', clientName)
+			.select('*')
+			.eq('client_name', clientName) // Matches the new parameter
 
-		if (error) throw error
+		if (error) {
+			console.error('Supabase query error:', error)
+			throw error
+		}
+
+		console.log('Fetched invoices for:', clientName, data)
 		return data
 	} catch (error) {
 		console.error('Error fetching invoices:', error)

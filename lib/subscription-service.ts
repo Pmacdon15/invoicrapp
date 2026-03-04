@@ -1,5 +1,4 @@
-import { createClient } from "@/integrations/supabase/client"
-
+import { createClient } from '@/integrations/supabase/client/client'
 
 // Type casting for subscriptions table until Supabase types are regenerated
 const subscriptionsTable = 'subscriptions' as any
@@ -37,7 +36,7 @@ export class SubscriptionService {
 		userId: string,
 	): Promise<Subscription | null> {
 		try {
-            const supabase = await createClient()
+			const supabase = await createClient()
 			const { data, error } = await (supabase as any)
 				.from(subscriptionsTable)
 				.select('*')
@@ -117,7 +116,7 @@ export class SubscriptionService {
 	 */
 	static async createFreeSubscription(userId: string): Promise<Subscription> {
 		try {
-            const supabase = await createClient()
+			const supabase = await createClient()
 			const { data, error } = await (supabase as any)
 				.from(subscriptionsTable)
 				.insert({
@@ -204,7 +203,7 @@ export class SubscriptionService {
 					updateData.current_period_end = stripeData.currentPeriodEnd
 				}
 			}
-            const supabase = await createClient()
+			const supabase = await createClient()
 
 			const { data, error } = await (supabase as any)
 				.from(subscriptionsTable)
@@ -231,7 +230,7 @@ export class SubscriptionService {
 		newLimit: number,
 	): Promise<boolean> {
 		try {
-            const supabase = await createClient()
+			const supabase = await createClient()
 			const { error } = await (supabase as any)
 				.from(subscriptionsTable)
 				.update({
@@ -254,7 +253,7 @@ export class SubscriptionService {
 	 */
 	static async cancelSubscription(userId: string): Promise<boolean> {
 		try {
-            const supabase = await createClient()
+			const supabase = await createClient()
 			const { error } = await (supabase as any)
 				.from(subscriptionsTable)
 				.update({
@@ -276,7 +275,7 @@ export class SubscriptionService {
 	 */
 	static async resetMonthlyUsage(): Promise<boolean> {
 		try {
-            const supabase = await createClient()
+			const supabase = await createClient()
 			const { error } = await (supabase as any).rpc('reset_monthly_usage')
 			if (error) throw error
 			return true

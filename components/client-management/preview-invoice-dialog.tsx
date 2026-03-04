@@ -1,9 +1,41 @@
-import { Eye } from 'lucide-react'
+import { Eye, Loader2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import type { SavedInvoice } from '@/lib/invoice-service'
-import { getThemeMetadataSync } from '@/lib/invoice-themes'
-import type { InvoiceData } from '@/types/invoice'
+import {
+    getDefaultTheme,
+    getThemeById,
+    getThemeMetadataSync,
+} from '@/lib/invoice-themes'
+import type { InvoiceData, InvoiceTheme } from '@/types/invoice'
 import { InvoicePreview } from '../invoice/InvoicePreview'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
+
+const convertToInvoiceData = (
+	savedInvoice: SavedInvoice,
+	theme: InvoiceTheme,
+): InvoiceData => {
+	return {
+		theme: theme,
+		client: {
+			name: savedInvoice.client_name || 'Unknown Client',
+			address: savedInvoice.client_address || '',
+			email: savedInvoice.client_email || undefined,
+			phone: savedInvoice.client_phone || undefined,
+		},
+		items: savedInvoice.items || [],
+		invoiceNumber: savedInvoice.invoice_number || 'INV-000',
+		date: savedInvoice.invoice_date || new Date().toISOString(),
+		dueDate: savedInvoice.due_date || new Date().toISOString(),
+		notes: savedInvoice.notes || undefined,
+		currency: 'USD',
+		paymentTerms: 'Net 30',
+		taxRate:
+			savedInvoice.subtotal > 0
+				? (savedInvoice.tax_amount / savedInvoice.subtotal) * 100
+				: 0,
+		customFields: savedInvoice.custom_fields || [],
+	}
+}
 
 export default function PreviewInvoiceDialog({
 	setShowPreviewDialog,
@@ -13,68 +45,79 @@ export default function PreviewInvoiceDialog({
 	setIsSaved,
 	userSettings,
 }) {
-	const convertToInvoiceData = (
-		savedInvoice: SavedInvoice | null,
-	): InvoiceData | null => {
-		const themeMetadata = getThemeMetadataSync(savedInvoice?.theme_id)
+	const [invoiceData, setInvoiceData] = useState<InvoiceData | null>(null)
+	const [isLoading, setIsLoading] = useState(false)
 
-		const themeColor = themeMetadata?.id?.split('-')[1] || 'blue'
+	useEffect(() => {
+		const loadThemeData = async () => {
+			if (!previewInvoice) {
+				setInvoiceData(null)
+				return
+			}
 
-		if (!savedInvoice) {
-			return null
+			setIsLoading(true)
+			try {
+				const themeId =
+					previewInvoice.theme_id ||
+					userSettings?.default_theme ||
+					'professional-blue'
+				const theme =
+					(await getThemeById(themeId)) || (await getDefaultTheme())
+				const data = convertToInvoiceData(previewInvoice, theme)
+				setInvoiceData(data)
+			} catch (error) {
+				console.error('Error loading theme for preview:', error)
+				// Fallback if theme fails to load
+				const themeId =
+					previewInvoice.theme_id ||
+					userSettings?.default_theme ||
+					'professional-blue'
+				const themeMetadata = getThemeMetadataSync(themeId)
+				const themeColor = themeMetadata?.id.split('-')[1] || 'blue'
+
+				const fallbackTheme: InvoiceTheme = {
+					id: themeId,
+					name: previewInvoice.theme_name || 'Default Theme',
+					color: themeColor,
+					description:
+						themeMetadata?.description || 'Professional theme',
+					version: themeMetadata?.version || '1.0.0',
+					author: themeMetadata?.author || 'Invoicr',
+					preview: themeMetadata?.preview || {
+						primary: '#3b82f6',
+						secondary: '#dbeafe',
+						accent: '#1e40af',
+					},
+					styles: {
+						primary: `text-invoice-${themeColor}`,
+						primaryLight: `bg-invoice-${themeColor}-light`,
+						text: `text-invoice-${themeColor}`,
+						background: `bg-invoice-${themeColor}-light`,
+						border: `border-invoice-${themeColor}`,
+					},
+					layout: {
+						headerStyle: 'classic',
+						footerStyle: 'minimal',
+						spacing: 'comfortable',
+						typography: {
+							headerFont: 'font-semibold',
+							bodyFont: 'font-normal',
+							accentFont: 'font-medium',
+						},
+					},
+					customCSS: '',
+				}
+				const data = convertToInvoiceData(previewInvoice, fallbackTheme)
+				setInvoiceData(data)
+			} finally {
+				setIsLoading(false)
+			}
 		}
 
-		const previewTheme = {
-			id: savedInvoice?.theme_id || 'default-blue',
-			name: savedInvoice?.theme_name || 'Default Theme',
-			color: themeColor,
-			description: themeMetadata?.description || 'Professional theme',
-			version: themeMetadata?.version || '1.0.0',
-			author: themeMetadata?.author || 'Invoicr',
-			preview: themeMetadata?.preview || {
-				primary: '#3b82f6',
-				secondary: '#dbeafe',
-				accent: '#1e40af',
-			},
-			styles: {
-				primary: `text-invoice-${themeColor}`,
-				primaryLight: `bg-invoice-${themeColor}-light`,
-				text: `text-invoice-${themeColor}`,
-				background: `bg-invoice-${themeColor}-light`,
-				border: `border-invoice-${themeColor}`,
-			},
-			layout: {
-				headerStyle: 'classic' as const,
-				footerStyle: 'minimal' as const,
-				spacing: 'comfortable' as const,
-				typography: {
-					headerFont: 'font-semibold',
-					bodyFont: 'font-normal',
-					accentFont: 'font-medium',
-				},
-			},
-			customCSS: '',
+		if (showPreviewDialog) {
+			loadThemeData()
 		}
-
-		// 3. Return the mapped data with fallbacks for required fields
-		return {
-			theme: previewTheme,
-			client: {
-				name: savedInvoice.client_name || 'Unknown Client',
-				address: savedInvoice.client_address || '',
-				email: savedInvoice.client_email || undefined,
-				phone: savedInvoice.client_phone || undefined,
-			},
-			items: savedInvoice.items || [],
-			invoiceNumber: savedInvoice.invoice_number || 'INV-000',
-			date: savedInvoice.invoice_date || new Date().toISOString(),
-			dueDate: savedInvoice.due_date || new Date().toISOString(),
-			notes: savedInvoice.notes || undefined,
-			currency: 'USD',
-			paymentTerms: 'Net 30',
-			taxRate: 0,
-		}
-	}
+	}, [previewInvoice, showPreviewDialog, userSettings])
 
 	return (
 		<Dialog onOpenChange={setShowPreviewDialog} open={showPreviewDialog}>
@@ -86,16 +129,20 @@ export default function PreviewInvoiceDialog({
 					</DialogTitle>
 				</DialogHeader>
 
-				{previewInvoice && (
+				{isLoading ? (
+					<div className="flex justify-center items-center py-12">
+						<Loader2 className="w-8 h-8 animate-spin text-primary" />
+					</div>
+				) : invoiceData && previewInvoice ? (
 					<div className="mt-4">
 						<InvoicePreview
-							invoiceData={convertToInvoiceData(previewInvoice)}
+							invoiceData={invoiceData}
 							isSaved={isSaved}
 							setIsSaved={setIsSaved}
 							userSettings={userSettings}
 						/>
 					</div>
-				)}
+				) : null}
 			</DialogContent>
 		</Dialog>
 	)

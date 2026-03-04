@@ -1,4 +1,4 @@
-import { createClient } from '@/integrations/supabase/client'
+import { createClient } from '@/integrations/supabase/client/client'
 
 export interface AdminAnalytics {
 	date: string
@@ -320,7 +320,7 @@ class AdminService {
 	}> {
 		try {
 			const offset = (page - 1) * limit
-const supabase = createClient()
+			const supabase = createClient()
 			// Get profiles
 			const {
 				data: profiles,

@@ -1,4 +1,4 @@
-import { createClient } from '@/integrations/supabase/client'
+import { createClient } from '@/integrations/supabase/client/client'
 
 export interface LogoUploadResult {
 	url: string

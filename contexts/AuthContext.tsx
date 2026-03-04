@@ -4,7 +4,7 @@ import type { Session, User } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import type React from 'react'
 import { createContext, useEffect, useState } from 'react'
-import { createClient } from '@/integrations/supabase/client'
+import { createClient } from '@/integrations/supabase/client/client'
 
 // import { supabase } from '@/integrations/supabase/old/client'
 
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		})
 
 		return () => subscription.unsubscribe()
-	}, [router,supabase ])
+	}, [router, supabase])
 
 	const signOut = async () => {
 		await supabase.auth.signOut()
