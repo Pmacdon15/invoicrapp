@@ -1,5 +1,5 @@
 import { createClient } from '@/integrations/supabase/server/client'
-import type { AdminAnalytics } from './admin-service'
+import type { AdminAnalyticsType } from './admin-service'
 
 export async function isAdmin(): Promise<boolean> {
 	try {
@@ -32,7 +32,7 @@ export async function isAdmin(): Promise<boolean> {
 	}
 }
 
-export async function getAdminAnalytics(): Promise<AdminAnalytics | null> {
+export async function getAdminAnalytics(): Promise<AdminAnalyticsType | null> {
 	try {
 		const supabase = await createClient()
 		// First update the analytics
