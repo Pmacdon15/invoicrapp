@@ -1,20 +1,16 @@
 'use client'
 import { format } from 'date-fns'
 import {
-	ArrowUpDown,
 	Calendar,
 	CircleCheck,
 	DollarSign,
 	Edit,
 	Eye,
 	FileText,
-	Filter,
 	MoreVertical,
-	Search,
 	Send,
 	Trash2,
 	User,
-	X,
 } from 'lucide-react'
 import Link from 'next/link'
 import { use, useState } from 'react'
@@ -34,14 +30,6 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Input } from '@/components/ui/input'
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select'
 import {
 	Table,
 	TableBody,
@@ -52,9 +40,15 @@ import {
 } from '@/components/ui/table'
 import { showError, showSuccess } from '@/hooks/use-toast'
 import type { SavedInvoice } from '@/lib/invoice-service'
-import { getDefaultTheme, getThemeById, getThemeMetadataSync } from '@/lib/invoice-themes'
+import {
+	getDefaultTheme,
+	getThemeById,
+	getThemeMetadataSync,
+} from '@/lib/invoice-themes'
 import type { InvoiceData, InvoiceTheme } from '@/types/invoice'
 import type { UserSettings } from '@/types/settings'
+import { SortButton } from './client-management/sort-button'
+import SearchFilter from './invoice-history/search-filter'
 
 // interface InvoiceHistoryProps {
 // 	onEditInvoice?: (invoice: SavedInvoice) => void
@@ -78,35 +72,44 @@ const statusLabels = {
 }
 
 export default function InvoiceHistory({
+	filterPromise,
 	invoicesPromise,
 	userSettingsPromise,
+	sortPromise,
+	orderPromise,
+	searchTermPromise,
 }: {
+	filterPromise: Promise<
+		'all' | 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
+	>
 	invoicesPromise: Promise<SavedInvoice[]>
 	userSettingsPromise: Promise<UserSettings | null>
-}) {
-	// const [invoices, setInvoices] = useState<SavedInvoice[]>([])
-	const invoices = use(invoicesPromise)
-	const userSettings = use(userSettingsPromise)
-	const [deletingId, setDeletingId] = useState<string | null>(null)
-	const [previewInvoice, setPreviewInvoice] = useState<SavedInvoice | null>(
-		null,
-	)
-	const [previewInvoiceData, setPreviewInvoiceData] = useState<InvoiceData | null>(
-		null,
-	)
-	const [showPreviewDialog, setShowPreviewDialog] = useState(false)
-	const [searchTerm, setSearchTerm] = useState('')
-	const [sortBy, setSortBy] = useState<
+	sortPromise: Promise<
 		| 'invoice_number'
 		| 'client_name'
 		| 'invoice_date'
 		| 'total_amount'
 		| 'status'
-	>('invoice_date')
-	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
-	const [filterBy, setFilterBy] = useState<
-		'all' | 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
-	>('all')
+		| 'invoice_date'
+	>
+	orderPromise: Promise<'asc' | 'desc'>
+	searchTermPromise: Promise<string>
+}) {
+	// const [invoices, setInvoices] = useState<SavedInvoice[]>([])
+	const invoices = use(invoicesPromise)
+	const userSettings = use(userSettingsPromise)
+	const filterBy = use(filterPromise)
+	const sortBy = use(sortPromise)
+	const sortOrder = use(orderPromise)
+	const searchTerm = use(searchTermPromise)
+
+	const [deletingId, setDeletingId] = useState<string | null>(null)
+	const [previewInvoice, setPreviewInvoice] = useState<SavedInvoice | null>(
+		null,
+	)
+	const [previewInvoiceData, setPreviewInvoiceData] =
+		useState<InvoiceData | null>(null)
+	const [showPreviewDialog, setShowPreviewDialog] = useState(false)
 
 	const handleDeleteInvoice = async (id: string) => {
 		setDeletingId(id)
@@ -161,7 +164,10 @@ export default function InvoiceHistory({
 	}
 
 	// Convert SavedInvoice to InvoiceData format for preview
-	const convertToInvoiceData = (savedInvoice: SavedInvoice, theme: InvoiceTheme): InvoiceData => {
+	const convertToInvoiceData = (
+		savedInvoice: SavedInvoice,
+		theme: InvoiceTheme,
+	): InvoiceData => {
 		return {
 			theme: theme,
 			client: {
@@ -177,9 +183,10 @@ export default function InvoiceHistory({
 			notes: savedInvoice.notes || undefined,
 			currency: 'USD',
 			paymentTerms: 'Net 30',
-			taxRate: (savedInvoice.subtotal > 0) 
-				? (savedInvoice.tax_amount / savedInvoice.subtotal) * 100 
-				: 0,
+			taxRate:
+				savedInvoice.subtotal > 0
+					? (savedInvoice.tax_amount / savedInvoice.subtotal) * 100
+					: 0,
 			customFields: savedInvoice.custom_fields || [],
 		}
 	}
@@ -187,7 +194,9 @@ export default function InvoiceHistory({
 	const handlePreviewInvoice = async (invoice: SavedInvoice) => {
 		setPreviewInvoice(invoice)
 		try {
-			const theme = await getThemeById(invoice.theme_id) || await getDefaultTheme()
+			const theme =
+				(await getThemeById(invoice.theme_id)) ||
+				(await getDefaultTheme())
 			const data = convertToInvoiceData(invoice, theme)
 			setPreviewInvoiceData(data)
 			setShowPreviewDialog(true)
@@ -236,34 +245,31 @@ export default function InvoiceHistory({
 		}
 	}
 
-	const handleSort = (column: typeof sortBy) => {
-		if (sortBy === column) {
-			setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
-		} else {
-			setSortBy(column)
-			setSortOrder('asc')
-		}
-	}
-
 	const filteredAndSortedInvoices = invoices
 		.filter((invoice) => {
-			if (filterBy !== 'all' && invoice.status !== filterBy) return false
-			if (searchTerm) {
-				const searchLower = searchTerm.toLowerCase()
-				return (
-					invoice.invoice_number
-						.toLowerCase()
-						.includes(searchLower) ||
-					invoice.client_name.toLowerCase().includes(searchLower) ||
-					invoice.notes.toLowerCase().includes(searchLower)
-				)
-			}
+			// Status filtering logic (similar to your with-invoices/no-invoices style)
+			if (filterBy === 'paid') return invoice.status === 'paid'
+			if (filterBy === 'overdue') return invoice.status === 'overdue'
+			if (filterBy === 'draft') return invoice.status === 'draft'
+			if (filterBy === 'sent') return invoice.status === 'sent'
+			if (filterBy === 'cancelled') return invoice.status === 'cancelled'
+
+			// If 'all' or no match, show everything (search is already applied elsewhere)
 			return true
 		})
 		.sort((a, b) => {
 			let comparison = 0
 
-			switch (sortBy) {
+			// Your guard logic to ensure we only sort by allowed keys
+			const s =
+				sortBy === 'invoice_number' ||
+				sortBy === 'client_name' ||
+				sortBy === 'status' ||
+				sortBy === 'invoice_date'
+					? sortBy
+					: 'invoice_number'
+
+			switch (s) {
 				case 'invoice_number':
 					comparison = a.invoice_number.localeCompare(
 						b.invoice_number,
@@ -272,16 +278,13 @@ export default function InvoiceHistory({
 				case 'client_name':
 					comparison = a.client_name.localeCompare(b.client_name)
 					break
+				case 'status':
+					comparison = a.status.localeCompare(b.status)
+					break
 				case 'invoice_date':
 					comparison =
 						new Date(a.invoice_date).getTime() -
 						new Date(b.invoice_date).getTime()
-					break
-				case 'total_amount':
-					comparison = a.total_amount - b.total_amount
-					break
-				case 'status':
-					comparison = a.status.localeCompare(b.status)
 					break
 			}
 
@@ -307,51 +310,7 @@ export default function InvoiceHistory({
 			</div>
 
 			{/* Search and Filters */}
-			<div className="flex flex-col sm:flex-row gap-4">
-				<div className="relative flex-1">
-					<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-					<Input
-						className="pl-10"
-						onChange={(e) => setSearchTerm(e.target.value)}
-						placeholder="Search invoices by number, client, or notes..."
-						value={searchTerm}
-					/>
-				</div>
-				<div className="flex gap-2 items-center">
-					<Filter className="w-4 h-4 text-gray-500" />
-					<Select
-						onValueChange={(value: typeof filterBy) =>
-							setFilterBy(value)
-						}
-						value={filterBy}
-					>
-						<SelectTrigger className="w-48">
-							<SelectValue placeholder="Filter by status" />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value="all">All Invoices</SelectItem>
-							<SelectItem value="draft">Draft</SelectItem>
-							<SelectItem value="sent">Sent</SelectItem>
-							<SelectItem value="paid">Paid</SelectItem>
-							<SelectItem value="overdue">Overdue</SelectItem>
-							<SelectItem value="cancelled">Cancelled</SelectItem>
-						</SelectContent>
-					</Select>
-					{(filterBy !== 'all' || searchTerm) && (
-						<Button
-							className="h-8 w-8 p-0"
-							onClick={() => {
-								setFilterBy('all')
-								setSearchTerm('')
-							}}
-							size="sm"
-							variant="ghost"
-						>
-							<X className="w-4 h-4" />
-						</Button>
-					)}
-				</div>
-			</div>
+			<SearchFilter filterBy={filterBy} searchTerm={searchTerm} />
 
 			{/* Invoices Table */}
 			{filteredAndSortedInvoices.length === 0 ? (
@@ -361,7 +320,7 @@ export default function InvoiceHistory({
 						No Invoices Found
 					</h3>
 					<p className="text-gray-600 mb-4">
-						{searchTerm || filterBy !== 'all'
+						{filterBy !== 'all'
 							? 'No invoices match your current filters.'
 							: 'Start creating invoices to see them appear in your history.'}
 					</p>
@@ -375,62 +334,34 @@ export default function InvoiceHistory({
 									{/* Status */}
 								</TableHead>
 								<TableHead>
-									<Button
-										className="h-auto p-0 font-semibold hover:bg-transparent hover:text-primary"
-										onClick={() =>
-											handleSort('invoice_number')
-										}
-										variant="ghost"
-									>
-										Invoice #
-										<ArrowUpDown className="ml-1 h-4 w-4" />
-									</Button>
+									<SortButton
+										column={'invoice_number'}
+										label={'Invoice #'}
+									/>	
 								</TableHead>
 								<TableHead>
-									<Button
-										className="h-auto p-0 font-semibold hover:bg-transparent hover:text-primary"
-										onClick={() =>
-											handleSort('client_name')
-										}
-										variant="ghost"
-									>
-										Client
-										<ArrowUpDown className="ml-1 h-4 w-4" />
-									</Button>
+									<SortButton
+										column={'client_name'}
+										label={'Client'}
+									/>	
 								</TableHead>
 								<TableHead>
-									<Button
-										className="h-auto p-0 font-semibold hover:bg-transparent hover:text-primary"
-										onClick={() =>
-											handleSort('invoice_date')
-										}
-										variant="ghost"
-									>
-										Date
-										<ArrowUpDown className="ml-1 h-4 w-4" />
-									</Button>
+									<SortButton
+										column={'invoice_date'}
+										label={'Date'}
+									/>	
 								</TableHead>
 								<TableHead>
-									<Button
-										className="h-auto p-0 font-semibold hover:bg-transparent hover:text-primary"
-										onClick={() =>
-											handleSort('total_amount')
-										}
-										variant="ghost"
-									>
-										Amount
-										<ArrowUpDown className="ml-1 h-4 w-4" />
-									</Button>
+									<SortButton
+										column={'total_amount'}
+										label={'Total'}
+									/>	
 								</TableHead>
 								<TableHead>
-									<Button
-										className="h-auto p-0 font-semibold hover:bg-transparent hover:text-primary"
-										onClick={() => handleSort('status')}
-										variant="ghost"
-									>
-										Status
-										<ArrowUpDown className="ml-1 h-4 w-4" />
-									</Button>
+									<SortButton
+										column={'status'}
+										label={'Status'}
+									/>								
 								</TableHead>
 								<TableHead className="w-20">Actions</TableHead>
 							</TableRow>

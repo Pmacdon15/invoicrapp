@@ -1,6 +1,84 @@
 import { createClient } from '@/integrations/supabase/server/client'
 import type { InvoiceAnalytics, SavedInvoice } from './invoice-service'
 
+// Helper: Convert fuzzy date input into a real date range
+const parseDateRange = (
+	input: string,
+): { start: string; end: string } | null => {
+	const trimmed = input.trim()
+	const now = new Date()
+
+	// Full year: 2026
+	if (/^\d{4}$/.test(trimmed)) {
+		const year = Number(trimmed)
+		return {
+			start: `${year}-01-01`,
+			end: `${year}-12-31`,
+		}
+	}
+
+	// Full ISO date: YYYY-MM-DD
+	if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(trimmed)) {
+		return { start: trimmed, end: trimmed }
+	}
+
+	// Partial ISO date: YYYY-MM
+	if (/^\d{4}-\d{1,2}$/.test(trimmed)) {
+		const [year, month] = trimmed.split('-')
+		const start = `${year}-${month}-01`
+		const end = new Date(Number(year), Number(month), 0) // last day of month
+		return { start, end: end.toISOString().split('T')[0] }
+	}
+
+	// Month name or month+day e.g., Feb or Feb 27
+	const monthMatch = trimmed.match(
+		/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|January|February|March|April|May|June|July|August|September|October|November|December)(\s\d{1,2})?$/i,
+	)
+	if (monthMatch) {
+		const monthNames = [
+			'January',
+			'February',
+			'March',
+			'April',
+			'May',
+			'June',
+			'July',
+			'August',
+			'September',
+			'October',
+			'November',
+			'December',
+		]
+		const monthStr = monthMatch[1]
+		const dayStr = monthMatch[2] ? monthMatch[2].trim() : null
+		const monthIndex = monthNames.findIndex((m) =>
+			m.toLowerCase().startsWith(monthStr.toLowerCase()),
+		)
+		if (monthIndex === -1) return null
+
+		const year = now.getFullYear()
+		if (dayStr) {
+			// Specific day
+			const day = Number(dayStr)
+			return {
+				start: `${year}-${(monthIndex + 1).toString().padStart(2, '0')}-${day
+					.toString()
+					.padStart(2, '0')}`,
+				end: `${year}-${(monthIndex + 1).toString().padStart(2, '0')}-${day
+					.toString()
+					.padStart(2, '0')}`,
+			}
+		} else {
+			// Whole month
+			const start = `${year}-${(monthIndex + 1).toString().padStart(2, '0')}-01`
+			const endDate = new Date(year, monthIndex + 1, 0)
+			const end = endDate.toISOString().split('T')[0]
+			return { start, end }
+		}
+	}
+
+	return null
+}
 // Get a specific invoice by ID - Server Side
 export const getInvoiceById = async (
 	id: string,
@@ -39,25 +117,60 @@ export const getInvoiceById = async (
 }
 
 // Get all invoices for the current user
-export const getUserInvoices = async (): Promise<SavedInvoice[]> => {
+export const getUserInvoices = async (
+	searchTerm?: string,
+): Promise<SavedInvoice[]> => {
 	try {
 		const supabaseServer = await createClient()
 		const {
 			data: { user },
 		} = await supabaseServer.auth.getUser()
 
-		if (!user) {
-			return []
-		}
+		if (!user) return []
 
-		const { data, error } = await supabaseServer
+		let query = supabaseServer
 			.from('invoices')
 			.select('*')
 			.eq('user_id', user.id)
-			.order('created_at', { ascending: false })
+
+		if (searchTerm && searchTerm.trim() !== '') {
+			const trimmed = searchTerm.trim()
+			const ilikeTerm = `%${trimmed}%`
+
+			const conditions = [
+				`invoice_number.ilike.${ilikeTerm}`,
+				`client_name.ilike.${ilikeTerm}`,
+				`notes.ilike.${ilikeTerm}`,
+			]
+
+			// Numeric search
+			const numericValue = Number(trimmed)
+			if (!isNaN(numericValue)) {
+				conditions.push(
+					`and(total_amount.gte.${numericValue},total_amount.lt.${numericValue}999999)`,
+				)
+			}
+
+			// Fuzzy date search
+			const range = parseDateRange(trimmed)
+			if (range) {
+				conditions.push(
+					`and(invoice_date.gte.${range.start},invoice_date.lte.${range.end}z)`,
+				)
+				conditions.push(
+					`and(due_date.gte.${range.start},due_date.lte.${range.end}z)`,
+				)
+			}
+
+			query = query.or(conditions.join(','))
+		}
+
+		const { data, error } = await query.order('created_at', {
+			ascending: false,
+		})
 
 		if (error) {
-			// console.error('Error fetching invoices:', error)
+			console.error('Error fetching invoices with search:', error)
 			return []
 		}
 
@@ -67,7 +180,6 @@ export const getUserInvoices = async (): Promise<SavedInvoice[]> => {
 		return []
 	}
 }
-
 export const getInvoiceAnalytics = async (
 	period: '30days' | '6months' | '1year' = '6months',
 ): Promise<InvoiceAnalytics | null> => {
