@@ -5,7 +5,6 @@ import { BlockingUpgradeDialog } from '@/components/ui/BlockingUpgradeDialog'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { SettingsRequiredDialog } from '@/components/ui/SettingsRequiredDialog'
-import { useUsage } from '@/contexts/UsageContext'
 import type { Client } from '@/lib/client-service'
 import { calculateDueDate } from '@/lib/format-utils'
 import type { SavedInvoice } from '@/lib/invoice-service'
@@ -97,7 +96,7 @@ export const InvoiceGenerator = ({
 	const [showBlockingDialog, setShowBlockingDialog] = useState(false)
 	const [showSettingsDialog, setShowSettingsDialog] = useState(false)
 
-	const { usage, refreshUsage } = useUsage()
+	// const { usage, refreshUsage } = useUsage()
 
 	const isLimitReached = false
 
@@ -175,10 +174,8 @@ export const InvoiceGenerator = ({
 											}
 											invoiceData={invoiceData}
 											isNewClient={isNewClient}
-											isSaved={isSaved}
-											refreshUsage={refreshUsage}
-											setCurrentStep={setCurrentStep}
-											setInvoiceData={setInvoiceData}
+											isSaved={isSaved}											
+											setCurrentStep={setCurrentStep}											
 											setIsSaved={setIsSaved}
 										/>
 									</div>
@@ -196,9 +193,9 @@ export const InvoiceGenerator = ({
 					setShowBlockingDialog(val)
 				}}
 			/>
-
+			{/* TODO: figure out where usage is fetched and pass it to from the server  */}
 			{/* Blocking Upgrade Dialog */}
-			<BlockingUpgradeDialog
+			{/* <BlockingUpgradeDialog
 				currentUsage={usage?.current || 0}
 				isOpen={showBlockingDialog}
 				limit={usage?.limit || 0}
@@ -208,7 +205,7 @@ export const InvoiceGenerator = ({
 					console.log('Upgrade to Pro clicked from blocking dialog')
 					setShowBlockingDialog(false)
 				}}
-			/>
+			/> */}
 
 			{/* Settings Dialog */}
 			<SettingsRequiredDialog

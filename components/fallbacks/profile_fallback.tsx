@@ -13,7 +13,6 @@ export default function ProfileFallback() {
 			<Tabs className="space-y-6 mb-2" defaultValue="general">
 				<ProfileTabsList />
 
-				{/* General Tab */}
 				<TabGeneral
 					handleProfileSave={() => {}}
 					profileForm={{}}
